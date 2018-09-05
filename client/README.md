@@ -1,1 +1,2 @@
-The client stuff
+# Client
+Frontend for Wayfinder project built with Angular
