@@ -33,3 +33,9 @@ users alike.
 - **waypoint**: a single stop along a route. The starting point and
   destination are considered waypoints as well.
 - **leg**: a portion of the route between two adjacent waypoints
+
+## Project layout
+
+The project is split into two primary components: the server and the client.
+The server project is stored in the `server` subdirectory of the project
+root, and the client project is stored in the `client` subdirectory.
