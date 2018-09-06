@@ -1,35 +1,56 @@
 package com.wayfinder.server.beans;
 
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * A route is the navigation information for an entire trip, from start to
+ * finish.
+ * 
+ * @author Logan Smith
+ */
 @Component
+@Scope("prototype")
 @Entity
-@Table(name = "Routes")
 public class Route {
-
+	/**
+	 * The ID of the route in the database.
+	 */
 	@Id
-	@Column(name = "USER_ID")
-	@SequenceGenerator(name = "U_SEQ_GEN", sequenceName = "U_SEQ")
-	@GeneratedValue(generator = "U_SEQ_GEN", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "seq_route_id", sequenceName = "seq_route_id")
+	@GeneratedValue(generator = "seq_route_id", strategy = GenerationType.SEQUENCE)
 	private int id;
-
-	public Route() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public Route(int id) {
-		super();
-		this.id = id;
-	}
+	/**
+	 * The date/time on which the route was created.
+	 */
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date creationDate;
+	/**
+	 * The legs which this route contains. The list is guaranteed to be ordered
+	 * by leg index, so that the legs appear in the natural travel order (from
+	 * start to end).
+	 */
+	@Column(nullable = false)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OrderBy("index")
+	private List<Leg> legs;
 
 	public int getId() {
 		return id;
@@ -38,5 +59,4 @@ public class Route {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
 }

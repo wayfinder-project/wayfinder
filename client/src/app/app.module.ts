@@ -8,12 +8,14 @@ import { MapComponent } from './components/map/map.component';
 
 import { FormsModule } from '@angular/forms';
 import { AgmCoreModule, GoogleMapsAPIWrapper } from '@agm/core';
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    MapComponent
+    MapComponent,
+    NavbarComponent
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: 'AIzaSyBrZkV0T-ZJncle1r0SqiwQ2MJB6Qxz3mU'}),
