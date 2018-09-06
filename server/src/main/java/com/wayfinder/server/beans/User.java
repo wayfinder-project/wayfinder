@@ -1,6 +1,6 @@
 package com.wayfinder.server.beans;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -9,48 +9,41 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
 import org.springframework.stereotype.Component;
 
 @Component
 @Entity
-@Table(name = "Users")
 public class User {
-
 	@Id
-	@Column(name = "USER_ID")
-	@SequenceGenerator(name = "U_SEQ_GEN", sequenceName = "U_SEQ")
-	@GeneratedValue(generator = "U_SEQ_GEN", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "seq_user_id", sequenceName = "seq_user_id")
+	@GeneratedValue(generator = "seq_user_id", strategy = GenerationType.SEQUENCE)
 	private int id;
-	@Column(nullable=false, unique=true)
+
+	@Column(nullable = false, unique = true)
 	private String username;
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private String password;
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private String firstName;
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private String lastName;
-	@Column(nullable=false, unique=true)
+
+	@Column(nullable = false, unique = true)
 	private String email;
 
-	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-	@JoinTable(name="USERS_ROUTES", joinColumns=@JoinColumn(name="USER_ID"),
-	inverseJoinColumns=@JoinColumn(name="ROUTE_ID"))
-	private List<Route> routes;
-	
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<Route> routes;
+
 	public User() {
-		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public User(int id, String username, String password, String firstName, String lastName, String email) {
-		super();
-		this.id = id;
+	public User(String username, String password, String firstName, String lastName, String email) {
 		this.username = username;
 		this.password = password;
 		this.firstName = firstName;
@@ -106,4 +99,11 @@ public class User {
 		this.email = email;
 	}
 
+	public Set<Route> getRoutes() {
+		return routes;
+	}
+
+	public void setRoutes(Set<Route> routes) {
+		this.routes = routes;
+	}
 }
