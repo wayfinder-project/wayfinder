@@ -21,6 +21,10 @@ track their progress and update details as they go.
 
 Wayfinder is currently under heavy preliminary development.
 
+## Project roles
+
+- **Project lead**: Ian
+
 ## Key concepts and definitions
 
 To keep the project uniform and understandable to users, Wayfinder uses a set
@@ -34,8 +38,6 @@ users alike.
   destination are considered waypoints as well.
 - **leg**: a portion of the route between two adjacent waypoints
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ## Git Process Directions
 - IN YOUR BRANCH (make changes to files)
 - Git add .
@@ -45,25 +47,18 @@ users alike.
 - Git pull
 - Git checkout (YOUR BRANCH)
 - Git merge dev -m “ “
-- If you get merge conflicts 
+- If you get merge conflicts
     - RESOLVE merge conflicts
-    - REPEAT all steps 
+    - REPEAT all steps
 - MERGE REQUEST SHOULD BE SENT IN GITHUB GUI
 
-=======
-## Project layout
-=======
 ## Information for developers
 
 ### Project layout
->>>>>>> dev
 
 The project is split into two primary components: the server and the client.
 The server project is stored in the `server` subdirectory of the project
 root, and the client project is stored in the `client` subdirectory.
-<<<<<<< HEAD
->>>>>>> 8892c27a168e20399288a431fd7ac897b5898c3c
-=======
 
 ### Environment variables
 
@@ -101,4 +96,3 @@ environment variables above). Additionally, running Angular CLI commands with
 the `--prod` argument will use the production environment defined in
 `src/environments/environment.prod.ts`, which may be different than the
 development environment defined in `src/environments/environment.ts`.
->>>>>>> dev
