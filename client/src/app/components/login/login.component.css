@@ -10,9 +10,21 @@
 }
 
 
+@font-face {
+    font-family: 'Futura';
+    src: url(../../../assets/fonts/futura/FuturaStd-Medium.otf);
+}
+
 .font-mont{
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
+}
+.font-futura{
+    font-family: 'Futura';
+}
+
+a, p {
+   color:black;
 }
 @media screen and (min-width: 1025px){
     .loginStyle{
@@ -32,10 +44,14 @@
         position:absolute; 
         bottom:0px; 
         right:20px; 
-        max-width:25%;
+        min-width:25%;
+        min-height:50%; 
+        max-width:50%;
         max-height:100%; 
-        width:25%; 
-        height:100%;margin-left:150px;
+        width:auto; 
+        height:auto;
+        margin-left:150px;
+        z-index: -1;
     }
 }
 
@@ -58,15 +74,24 @@
             
     }
 
+    .modal-dialog {
+        max-width: 70%;
+        width: auto;
+    }
+    
+
     .loginImage{
         position:absolute; 
         bottom:0px; 
         right:25%; 
-        max-width:50%;
-        max-height:50%; 
-        width:50%; 
-        height:50%;
+        min-width:20%;
+        min-height:40%; 
+        max-width:40%;
+        max-height:80%;
+        width:auto; 
+        height:auto;
         opacity:.2;
+        z-index: -1;
     }
 }
 
@@ -77,6 +102,11 @@
     }
     .loginStyle{
         margin-top:50px;
+    }
+
+    .modal-dialog {
+        max-width: 90%;
+        width: auto;
     }
 
     .webTitleStyle{
@@ -91,7 +121,7 @@
     .loginImage{
         position:absolute; 
         top:-10%;
-        right:25%; 
+        right:-10%; 
         max-width:50%;
         max-height:50%; 
         width:50%; 
