@@ -42,6 +42,16 @@ The project is split into two primary components: the server and the client.
 The server project is stored in the `server` subdirectory of the project
 root, and the client project is stored in the `client` subdirectory.
 
+### Environment variables
+
+There are several environment variables that are recognized by various parts
+of the project, and the project may not function correctly if they are not
+set. The following is a comprehensive list of all such environment variables:
+
+- `JDBC_URL`: the URL of the database
+- `JDBC_USER`: the database user
+- `JDBC_PASSWORD`: the database password
+
 ### Deployment
 
 The project is automatically deployed by Jenkins whenever changes are made on
@@ -63,8 +73,8 @@ prompted. Alternatively, run `ng build` or `ng build --prod` to simply build
 the project without deploying it.
 
 If you run the code locally, be aware that certain environment variables may
-need to be set for the project to function properly (TODO: document these
-when they are added). Additionally, running Angular CLI commands with the
-`--prod` argument will use the production environment defined in
+need to be set for the project to function properly (see the section on
+environment variables above). Additionally, running Angular CLI commands with
+the `--prod` argument will use the production environment defined in
 `src/environments/environment.prod.ts`, which may be different than the
 development environment defined in `src/environments/environment.ts`.
