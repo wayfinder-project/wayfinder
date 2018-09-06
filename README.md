@@ -21,6 +21,10 @@ track their progress and update details as they go.
 
 Wayfinder is currently under heavy preliminary development.
 
+## Project roles
+
+- **Project lead**: Ian
+
 ## Key concepts and definitions
 
 To keep the project uniform and understandable to users, Wayfinder uses a set
@@ -33,6 +37,20 @@ users alike.
 - **waypoint**: a single stop along a route. The starting point and
   destination are considered waypoints as well.
 - **leg**: a portion of the route between two adjacent waypoints
+
+## Git Process Directions
+- IN YOUR BRANCH (make changes to files)
+- Git add .
+- Git commit -m “ ”
+- Git push
+- Git checkout dev
+- Git pull
+- Git checkout (YOUR BRANCH)
+- Git merge dev -m “ “
+- If you get merge conflicts
+    - RESOLVE merge conflicts
+    - REPEAT all steps
+- MERGE REQUEST SHOULD BE SENT IN GITHUB GUI
 
 ## Information for developers
 
