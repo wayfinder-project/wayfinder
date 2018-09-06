@@ -1,35 +1,29 @@
 package com.wayfinder.server.beans;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * A route is the navigation information for an entire trip, from start to
+ * finish.
+ * 
+ * @author Logan Smith
+ */
 @Component
 @Entity
-@Table(name = "Routes")
 public class Route {
-
+	/**
+	 * The ID of the route in the database.
+	 */
 	@Id
-	@Column(name = "USER_ID")
-	@SequenceGenerator(name = "U_SEQ_GEN", sequenceName = "U_SEQ")
-	@GeneratedValue(generator = "U_SEQ_GEN", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "seq_route_id", sequenceName = "seq_route_id")
+	@GeneratedValue(generator = "seq_route_id", strategy = GenerationType.SEQUENCE)
 	private int id;
-
-	public Route() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public Route(int id) {
-		super();
-		this.id = id;
-	}
 
 	public int getId() {
 		return id;
@@ -38,5 +32,4 @@ public class Route {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
 }
