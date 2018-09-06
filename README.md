@@ -21,6 +21,10 @@ track their progress and update details as they go.
 
 Wayfinder is currently under heavy preliminary development.
 
+## Project roles
+
+- **Project lead**: Ian
+
 ## Key concepts and definitions
 
 To keep the project uniform and understandable to users, Wayfinder uses a set
@@ -34,6 +38,20 @@ users alike.
   destination are considered waypoints as well.
 - **leg**: a portion of the route between two adjacent waypoints
 
+## Git Process Directions
+- IN YOUR BRANCH (make changes to files)
+- Git add .
+- Git commit -m “ ”
+- Git push
+- Git checkout dev
+- Git pull
+- Git checkout (YOUR BRANCH)
+- Git merge dev -m “ “
+- If you get merge conflicts
+    - RESOLVE merge conflicts
+    - REPEAT all steps
+- MERGE REQUEST SHOULD BE SENT IN GITHUB GUI
+
 ## Information for developers
 
 ### Project layout
@@ -41,6 +59,16 @@ users alike.
 The project is split into two primary components: the server and the client.
 The server project is stored in the `server` subdirectory of the project
 root, and the client project is stored in the `client` subdirectory.
+
+### Environment variables
+
+There are several environment variables that are recognized by various parts
+of the project, and the project may not function correctly if they are not
+set. The following is a comprehensive list of all such environment variables:
+
+- `JDBC_URL`: the URL of the database
+- `JDBC_USER`: the database user
+- `JDBC_PASSWORD`: the database password
 
 ### Deployment
 
@@ -63,8 +91,8 @@ prompted. Alternatively, run `ng build` or `ng build --prod` to simply build
 the project without deploying it.
 
 If you run the code locally, be aware that certain environment variables may
-need to be set for the project to function properly (TODO: document these
-when they are added). Additionally, running Angular CLI commands with the
-`--prod` argument will use the production environment defined in
+need to be set for the project to function properly (see the section on
+environment variables above). Additionally, running Angular CLI commands with
+the `--prod` argument will use the production environment defined in
 `src/environments/environment.prod.ts`, which may be different than the
 development environment defined in `src/environments/environment.ts`.
