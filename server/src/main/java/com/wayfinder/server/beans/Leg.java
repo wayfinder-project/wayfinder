@@ -5,7 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 
@@ -55,12 +54,6 @@ public class Leg {
 	 */
 	@Column(nullable = false)
 	private int index;
-	/**
-	 * The route to which this leg belongs.
-	 */
-	@ManyToOne
-	@Column(nullable = false)
-	private Route route;
 
 	public int getId() {
 		return id;
