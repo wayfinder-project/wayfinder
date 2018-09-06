@@ -1,5 +1,5 @@
 .background{
-    background-image: url(../../../assets/images/park.jpg); background-repeat: no-repeat;
+    background-image: url("../../../assets/images/park.jpg"); background-repeat: no-repeat;
 
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -12,7 +12,7 @@
 
 @font-face {
     font-family: 'Futura';
-    src: url(../../../assets/fonts/futura/FuturaStd-Medium.otf);
+    src: url("../../../assets/fonts/futura/FuturaStd-Medium.otf");
 }
 
 .font-mont{
