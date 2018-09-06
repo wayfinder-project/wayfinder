@@ -10,21 +10,22 @@ import com.wayfinder.server.repository.UserRepository;
 @Service("userService")
 @Transactional
 public class UserService {
-
 	@Autowired
 	private UserRepository userRepo;
-	
-	public User saveUser(User a) {
+
+	public User save(User a) {
 		return userRepo.save(a);
 	}
-	public User updateUser(User a) {
+
+	public User update(User a) {
 		return userRepo.save(a);
 	}
-	public User findUserByUsername(String u) {
+
+	public User findByUsername(String u) {
 		return userRepo.findByUsername(u);
 	}
-	public User findById(int u) {
-		return userRepo.findById(u);
+
+	public User findById(int id) {
+		return userRepo.findOne(id);
 	}
-	
 }
