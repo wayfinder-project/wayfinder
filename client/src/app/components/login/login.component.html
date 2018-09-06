@@ -1,3 +1,66 @@
-<p>
-  login works!
-</p>
+
+
+<div class="container font-futura" >
+  <div class="row">
+    <div class="col-m-4 center-block">
+      <div class="panel panel-default form-group text-center loginStyle" >
+        <div class="panel-body">
+          <h1>Login</h1>
+          <input type="text" placeholder="Username" id="username" name="username" class="form-control justify-content-center">
+          <input type="password" placeholder="Password" id="password" name="password" class="form-control justify-content-center" style="margin-top:2px">
+          <div style="padding:10px">
+            <button class="btn btn-block" style="background-color: #7DAA92;" id="login">Login</button>
+            <a href="" id="registerLink" >forgot password</a> | <a href="#modalRegister" data-toggle="modal" >register</a>
+          </div>
+          <div style="color:red" hidden="true" id="loginError"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 text-center webTitleStyle"  >
+      <div >
+        <p> <span>Way</span><span style="color:black">finder</span></p>
+      </div>
+      <div style="font-size:15px;">
+        <p> <span>find your </span><span style="color:black">own way.&trade;</span></p>
+      </div>
+    </div>
+    <div class="col-lg-4"></div>
+    <picture>
+      <source media="(min-width: 480px)" srcset="../../../assets/images/guy.gif" >
+      <source media="(max-width: 480px)" srcset="../../../assets/images/guycrop.gif"> 
+        <img src="../../../assets/images/floor.png" alt="" class="loginImage">
+    </picture>
+  </div>
+</div>
+
+<div id="modalRegister" class="modal fade" role="dialog" >
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content" >
+
+      <div class="modal-body" >
+        <div class="panel panel-default  text-center" >
+          <div class="panel-body form-group">
+              <button type="button" class="close" data-dismiss="modal">x</button>
+            <h1>Register</h1>
+            <div class="row">
+              <div class="col-md-8 col-md-offset-2">
+                <input type="text" placeholder="Username" id="usernameReg" name="username" class="form-control justify-content-center" required>
+                <input type="text" placeholder="First Name" id="firstnameReg" name="firstname" class="form-control justify-content-center" style="margin-top:2px" required>
+                <input type="text" placeholder="Last Name" id="lastnameReg" name="lastname" class="form-control justify-content-center" style="margin-top:2px" required> 
+                <input type="email" placeholder="Email" id="emailReg" name="email" class="form-control justify-content-center" style="margin-top:2px" required>
+
+                <input type="password" placeholder="Password" id="passwordReg" name="password" class="form-control justify-content-center" style="margin-top:2px" required>
+                <input type="password" placeholder="Confirm Password" id="passwordConfReg" name="passwordConfirm" class="form-control justify-content-center" style="margin-top:2px" required>
+                <div style="padding:10px">
+                  <button type=submit class="btn btn-block" style="background-color: #7DAA92;" id="register">Register</button>
+                </div>
+                <div style="color:red" hidden="true" id="loginError"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

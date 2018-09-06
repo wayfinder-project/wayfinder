@@ -7,8 +7,8 @@
 .logo-config {
     /*max-width: 100%;
     height: auto;*/
-    height: 50px;
-    width: 50px;
+    height: 30px;
+    width: 30px;
 }
 .button-height {
     height: 100%;
@@ -17,15 +17,24 @@
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
 }
+.font-futura{
+    font-family: 'Futura';
+}
 .web-title {
-    font-size:40px; 
+    font-size:30px; 
     background-color:rgba(125, 170, 146, 0.0); 
     }
 .web-item {
-    font-size:30px; 
+    font-size:20px; 
 }
-    .between-navbar {
-        border-right:solid 2px #000;
-        padding-left: 15px;
-        padding-right: 15px;
-    }
+.between-navbar {
+    /*border-right:solid 2px #000;
+    padding-left: 15px;*/
+    padding-right: 10px;
+}
+/*.navbar-nav > li > a, .navbar-brand {
+    padding-top:5px !important; padding-bottom:0 !important;
+    height: 30px;
+}*/
+.navbar {min-height:40px !important;}
+.navbar {max-height:40px !important}

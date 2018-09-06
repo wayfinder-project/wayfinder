@@ -1,0 +1,131 @@
+.background{
+    background-image: url(../../../assets/images/park.jpg); background-repeat: no-repeat;
+
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height:100%;
+    width:100%; 
+}
+
+
+@font-face {
+    font-family: 'Futura';
+    src: url(../../../assets/fonts/futura/FuturaStd-Medium.otf);
+}
+
+.font-mont{
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+}
+.font-futura{
+    font-family: 'Futura';
+}
+
+a, p {
+   color:black;
+}
+@media screen and (min-width: 1025px){
+    .loginStyle{
+        margin-top:250px;
+    }
+
+    .webTitleStyle{
+    position:relative; top:100px; left: 175px;
+    font-size:75px; background-color:rgba(125, 170, 146, 0.0);  text-shadow:
+            -1px -1px 0 white,
+            1px -1px 0 white,
+            -1px 1px 0 white,
+            1px 1px 0 white
+    }
+
+    .loginImage{
+        position:absolute; 
+        bottom:0px; 
+        right:20px; 
+        min-width:25%;
+        min-height:50%; 
+        max-width:50%;
+        max-height:100%; 
+        width:auto; 
+        height:auto;
+        margin-left:150px;
+        z-index: -1;
+    }
+}
+
+@media screen and (max-width: 1024px){
+    .row {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    .loginStyle{
+        margin-top:50px;
+    }
+
+    .webTitleStyle{
+        text-align: center ;
+    font-size:75px; background-color:rgba(125, 170, 146, 0.0);  text-shadow:
+            -1px -1px 0 white,
+            1px -1px 0 white,
+            -1px 1px 0 white,
+            1px 1px 0 white;
+            
+    }
+
+    .modal-dialog {
+        max-width: 70%;
+        width: auto;
+    }
+    
+
+    .loginImage{
+        position:absolute; 
+        bottom:0px; 
+        right:25%; 
+        min-width:20%;
+        min-height:40%; 
+        max-width:40%;
+        max-height:80%;
+        width:auto; 
+        height:auto;
+        opacity:.2;
+        z-index: -1;
+    }
+}
+
+@media screen and (max-width: 480px){
+    .row {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    .loginStyle{
+        margin-top:50px;
+    }
+
+    .modal-dialog {
+        max-width: 90%;
+        width: auto;
+    }
+
+    .webTitleStyle{
+    position:relative; 
+    font-size:45px; background-color:rgba(125, 170, 146, 0.0);  text-shadow:
+            -1px -1px 0 white,
+            1px -1px 0 white,
+            -1px 1px 0 white,
+            1px 1px 0 white
+    }
+
+    .loginImage{
+        position:absolute; 
+        top:-10%;
+        right:-10%; 
+        max-width:50%;
+        max-height:50%; 
+        width:50%; 
+        height:50%;
+        opacity:.2;
+    }
+}
