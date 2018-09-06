@@ -34,6 +34,7 @@ users alike.
   destination are considered waypoints as well.
 - **leg**: a portion of the route between two adjacent waypoints
 
+<<<<<<< HEAD
 ## Git Process Directions
 - IN YOUR BRANCH (make changes to files)
 - Git add .
@@ -48,3 +49,10 @@ users alike.
     - REPEAT all steps 
 - MERGE REQUEST SHOULD BE SENT IN GITHUB GUI
 
+=======
+## Project layout
+
+The project is split into two primary components: the server and the client.
+The server project is stored in the `server` subdirectory of the project
+root, and the client project is stored in the `client` subdirectory.
+>>>>>>> 8892c27a168e20399288a431fd7ac897b5898c3c
