@@ -24,7 +24,11 @@ export class UserService {
     });
   }
 
-  create(user: User, password: string): Observable<User> {
+  create(
+    user: Overwrite<User, { id?: number }>,
+    password: string
+  ): Observable<User> {
+    console.log('Creating user');
     return this.http.post<User>(environment.apiUrl + '/users', {
       user,
       password,
