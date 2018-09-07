@@ -31,13 +31,11 @@ public class Leg {
 	 * The starting point of the leg.
 	 */
 	@OneToOne
-	@Column(nullable = false)
 	private Waypoint start;
 	/**
 	 * The ending point of the leg.
 	 */
 	@OneToOne
-	@Column(nullable = false)
 	private Waypoint end;
 	/**
 	 * The total travel time of the leg, in seconds.
@@ -52,7 +50,7 @@ public class Leg {
 	/**
 	 * The index of this leg in the route which contains it (as a 0-based index).
 	 */
-	@Column(nullable = false)
+	@Column(name = "legIndex", nullable = false)
 	private int index;
 
 	public int getId() {
