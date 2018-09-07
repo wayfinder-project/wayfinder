@@ -35,7 +35,12 @@ export class MapComponent implements OnInit {
 
 
   @ViewChild(AgmMap) map: AgmMap;
+
+  // Logan Smith's Variables (To be added to service)
   controlmap;
+  locationSearchTypes:string[] =['lodging', 'restaurant', 'gas_station', 'supermarket', 'rv_park', 'parking', 'park'];
+  currentLocationSearchType: string = this.locationSearchTypes[0];
+  currentMarkers: google.maps.Marker[] = [];
 
   constructor(private http: HttpClient) {
 
@@ -80,10 +85,15 @@ export class MapComponent implements OnInit {
     var request = {
       location: this.destination,
       radius: '500',
-      types: ['lodging']
+      types: [this.currentLocationSearchType]
     };
 
     console.log(this.controlmap);
+
+    for (let i = 0; i < this.currentMarkers.length; i++) {
+      this.currentMarkers[i].setMap(null);
+    }
+    this.currentMarkers = [];
 
     var service = new google.maps.places.PlacesService(this.controlmap);
     service.nearbySearch(request, this.callback.bind(this));
@@ -115,6 +125,9 @@ createMarkers(places) {
       title: place.name,
       position: place.geometry.location
     });
+
+    this.currentMarkers.push(marker);
+
     bounds.extend(place.geometry.location);
   }
   this.controlmap.fitBounds(bounds);
