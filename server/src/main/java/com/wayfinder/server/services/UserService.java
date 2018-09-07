@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.wayfinder.server.beans.User;
 import com.wayfinder.server.exceptions.UserAlreadyExistsException;
+import com.wayfinder.server.exceptions.UserNotFoundException;
 import com.wayfinder.server.repository.UserRepository;
 import com.wayfinder.server.util.Passwords;
 
@@ -58,16 +59,24 @@ public class UserService {
 	 * ignored by this method.
 	 * 
 	 * @param user the user to update
-	 * @return the updated user, or null if the given user did not correspond to one
-	 *         in the database
+	 * @return the updated user
+	 * @throws UserNotFoundException      if the given user object does not have a
+	 *                                    valid ID
+	 * @throws UserAlreadyExistsException if the user attempts to change their
+	 *                                    username to one that is already taken
 	 */
-	public User update(User user) {
+	public User update(User user) throws UserNotFoundException, UserAlreadyExistsException {
 		// We need to get the user object that's already in the database so we
 		// can use its password information and prevent it being overwritten by
 		// this method.
 		User existing = findById(user.getId());
 		if (existing == null) {
-			return null;
+			throw new UserNotFoundException(user.getId());
+		}
+		// Make sure the user doesn't try to sneakily take someone else's username.
+		User byUsername = findByUsername(user.getUsername());
+		if (byUsername != null && byUsername.getId() != existing.getId()) {
+			throw new UserAlreadyExistsException(user.getUsername());
 		}
 		// Just make sure we save the given user object's password data to avoid
 		// leaking it to the client (we'll replace it once we're done updating).

@@ -17,6 +17,7 @@ import com.wayfinder.server.beans.ResponseError;
 import com.wayfinder.server.beans.User;
 import com.wayfinder.server.beans.UserWithPassword;
 import com.wayfinder.server.exceptions.UserAlreadyExistsException;
+import com.wayfinder.server.exceptions.UserNotFoundException;
 import com.wayfinder.server.services.UserService;
 
 @RestController
@@ -47,9 +48,20 @@ public class UserController {
 	@RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<?> add(@RequestBody UserWithPassword userWithPassword) {
 		try {
-			return new ResponseEntity<>(
+			return new ResponseEntity<User>(
 					userService.add(userWithPassword.getUser(), userWithPassword.getPassword().toCharArray()),
 					HttpStatus.CREATED);
+		} catch (UserAlreadyExistsException e) {
+			return new ResponseError(e).toEntity(HttpStatus.CONFLICT);
+		}
+	}
+	
+	@RequestMapping(method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<?> update(@RequestBody User user) {
+		try {
+			return new ResponseEntity<User>(userService.update(user), HttpStatus.OK);
+		} catch (UserNotFoundException e) {
+			return new ResponseError(e).toEntity(HttpStatus.NOT_FOUND);
 		} catch (UserAlreadyExistsException e) {
 			return new ResponseError(e).toEntity(HttpStatus.CONFLICT);
 		}

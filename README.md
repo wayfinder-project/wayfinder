@@ -124,6 +124,18 @@ the status is successful either way).
 **Response body**: The newly created user, or an error message describing the
 reason for failure.
 
+##### PATCH
+
+**Response status**: 200 (OK), 404 (not found) or 409 (conflict)
+
+**Request body**: `User`
+
+**Response type**: `User | ErrorMessage`
+
+**Response body**: The updated user, or an error message describing the
+reason for failure (e.g. if no user exists with the same ID to be updated, or
+the user attempts to change their username to one that is already taken).
+
 ### Project layout
 
 The project is split into two primary components: the server and the client.
