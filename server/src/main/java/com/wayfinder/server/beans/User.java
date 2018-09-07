@@ -13,6 +13,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -32,23 +34,29 @@ public class User {
 	private int id;
 
 	@Column(nullable = false, unique = true)
+	@NotNull
 	private String username;
 
 	@Column(nullable = false)
+	@NotNull
 	@JsonIgnore
 	private byte[] passwordHash;
 
 	@Column(nullable = false)
+	@NotNull
 	@JsonIgnore
 	private byte[] passwordSalt;
 
 	@Column(nullable = false)
+	@NotNull
 	private String firstName;
 
 	@Column(nullable = false)
+	@NotNull
 	private String lastName;
 
 	@Column(nullable = false)
+	@NotNull
 	private String email;
 
 	/**
@@ -57,6 +65,7 @@ public class User {
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@OrderBy("creationDate")
+	@Valid
 	private List<Trip> trips;
 
 	public User() {

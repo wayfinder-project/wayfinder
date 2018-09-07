@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -41,6 +43,8 @@ public class Route {
 	@Column(nullable = false)
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@OrderBy("index")
+	@NotNull
+	@Valid
 	private List<Leg> legs;
 
 	public int getId() {

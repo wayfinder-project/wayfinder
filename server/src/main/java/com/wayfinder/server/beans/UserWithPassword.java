@@ -1,5 +1,7 @@
 package com.wayfinder.server.beans;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("prototype")
 public class UserWithPassword {
+	@NotNull
 	private User user;
+	@NotNull
 	private String password;
 
 	public User getUser() {
