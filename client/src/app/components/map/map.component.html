@@ -1,4 +1,4 @@
-<agm-map [latitude]="lat" [longitude]="lng">
+<agm-map [latitude]="lat" [longitude]="lng" id="map" (mapReady)="mapReady($event)">
   <agm-direction [origin]="origin" [destination]="destination"
   [renderOptions]="renderOptions" 
   (onChange)="change($event)">
@@ -29,5 +29,16 @@
         Longitude
         <input type=number  [(ngModel)]='destination.lng' class='form-control' placeholder='State'>
     </div>
+    <div class="input-group mb-3 col-4">
+        <div class="input-group-prepend">
+          <label class="input-group-text" for="inputGroupSelect01">Search By:</label>
+        </div>
+        <select [(ngModel)]="currentLocationSearchType" class="custom-select">
+          <option selected value="">Any</option>
+          <ng-container *ngFor="let v of locationSearchTypes; let i = index">
+            <option [value]="locationSearchTypes[i]">{{locationSearchTypes[i]}}</option>
+          </ng-container>
+        </select>
+      </div>
   </div>
 </div>
