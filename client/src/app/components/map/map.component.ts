@@ -11,11 +11,7 @@ interface Marker {
   draggable: boolean;
 }
 
-interface Direction {
-  origin: Marker;
-  destination: Marker;
 
-}
 
 
 
@@ -33,17 +29,15 @@ export class MapComponent implements OnInit {
   geocoder: any;
 
   public renderOptions = {
-    suppressMarkers: true,
+    suppressMarkers: false,
     draggable: true,
-    visible: false
+    visible: true
   };
 
   markers: Marker[] = [
   ];
 
-  directions: Direction[] = [
 
-  ];
 
 
  waypoints: any = [
