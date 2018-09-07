@@ -7,6 +7,19 @@ each waypoint and keep a checklist of trip essentials. Wayfinder allows users
 full access to all the trips they have created in the app, where they can
 track their progress and update details as they go.
 
+## Table of contents
+
+- [Objectives](#objectives)
+- [Current state](#current-state)
+- [Project roles](#project-roles)
+- [Key concepts and definitions](#key-concepts-and-definitions)
+- [Information for developers](#information-for-developers)
+  - [Git directions](#git-directions)
+  - [Server API](#server-api)
+  - [Project layout](#project-layout)
+  - [Environment variables](#environment-variables)
+  - [Deployment](#deployment)
+
 ## Objectives
 
 - Provide an intuitive and attractive user interface for planning a trip from
@@ -38,22 +51,38 @@ users alike.
   destination are considered waypoints as well.
 - **leg**: a portion of the route between two adjacent waypoints
 
-## Git Process Directions
-
-- IN YOUR BRANCH (make changes to files)
-- Git add .
-- Git commit -m “ ”
-- Git push
-- Git checkout dev
-- Git pull
-- Git checkout (YOUR BRANCH)
-- Git merge dev -m “ “
-- If you get merge conflicts
-  - RESOLVE merge conflicts
-  - REPEAT all steps
-- MERGE REQUEST SHOULD BE SENT IN GITHUB GUI
-
 ## Information for developers
+
+### Git directions
+
+Here is an overview of the steps you need to take in order to make a
+successful change to the repo. If you do not follow all these steps, there
+may be problems!
+
+```sh
+git checkout -b your-branch # Omit the '-b' if the branch already exists.
+# Make changes to branch...
+git add .  # Assuming you are in the root directory.
+git commit -m 'Descriptive commit message'
+git push -u origin your-branch # You can use just 'git push' if you've already pushed.
+```
+
+Before you make a pull request, it's a good idea to merge any new changes
+from the dev branch, especially if you've spent a decent amount of time on
+your changes (making it more likely that the dev branch has changed). This is
+the best way to detect merge conflicts early.
+
+```sh
+# To merge any new changes from the dev branch:
+git checkout dev
+git pull
+git checkout your-branch
+git merge dev
+```
+
+If you get any merge conflicts, resolve them and then make a new commit (`git add . && git commit -m 'Descriptive commit message`).
+Once you've pushed your branch, make a pull request on GitHub and make sure
+that your PR is based off the dev branch and not master!
 
 ### Server API
 
