@@ -12,7 +12,6 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { AgmDirectionModule } from 'agm-direction';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { HomeComponent } from './components/home/home.component';
-import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -25,14 +24,13 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     AgmCoreModule.forRoot({ apiKey: 'AIzaSyBrZkV0T-ZJncle1r0SqiwQ2MJB6Qxz3mU' }),
     BrowserModule,
-    HttpClientModule,
     FormsModule,
     AgmDirectionModule,
     NgbModule.forRoot(),
     AppRoutingModule
   ],
   providers: [
-    GoogleMapsAPIWrapper,
+    GoogleMapsAPIWrapper
   ],
   bootstrap: [AppComponent]
 })
