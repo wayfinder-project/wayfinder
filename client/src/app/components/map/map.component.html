@@ -1,9 +1,33 @@
+<agm-map [latitude]="lat" [longitude]="lng">
+  <agm-direction [origin]="origin" [destination]="destination"
+  [renderOptions]="renderOptions" 
+  (onChange)="change($event)">
+  </agm-direction>
+  <agm-marker [(latitude)]="origin.lat" [(longitude)]="origin.lng" [markerDraggable]="true" (dragEnd)='markerDragEnd($event,true)'></agm-marker>
+  <agm-marker [(latitude)]="destination.lat" [(longitude)]="destination.lng" [markerDraggable]="true" (dragEnd)='markerDragEnd($event,false)'></agm-marker>
+ 
+</agm-map>
 
-<div class="map">
-  <agm-map [(latitude)]="location.lat" [(longitude)]="location.lng" [(zoom)]="location.zoom" [disableDefaultUI]="true" [zoomControl]="true" [(fitBounds)]='location.viewport'>
-    <agm-marker [(latitude)]="location.marker.lat" [(longitude)]="location.marker.lng" [markerDraggable]="location.marker.draggable" (dragEnd)='markerDragEnd($event)'></agm-marker>
-
-
-  </agm-map>
-</div> 
-       
+<div class="container">
+  <div class="row">
+    <div class="col-4 text-center">
+      <h1>Origin</h1>
+      Latitude
+      <input type=number  [(ngModel)]='origin.lat' class='form-control' placeholder='State'>
+      Longitude
+      <input type=number  [(ngModel)]='origin.lng' class='form-control' placeholder='State'>
+    </div>
+    <div class="col-4 text-center">
+      <div style="margin-top:75px">
+        <button (click)="getDirection()">Find route!</button>
+      </div>
+    </div>
+    <div class="col-4 text-center">
+        <h1>Destination</h1>
+        Latitude
+        <input type=number  [(ngModel)]='destination.lat' class='form-control' placeholder='State'>
+        Longitude
+        <input type=number  [(ngModel)]='destination.lng' class='form-control' placeholder='State'>
+    </div>
+  </div>
+</div>
