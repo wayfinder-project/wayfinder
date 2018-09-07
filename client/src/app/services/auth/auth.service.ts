@@ -3,19 +3,17 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { TokenStorage } from '../../utils/token.storage';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
+  constructor(private http: HttpClient, private tokenStorage: TokenStorage) {}
 
-  private authUrl = 'http://localhost:8888/token/generate-token';
-
-  constructor(private http: HttpClient, private tokenStorage: TokenStorage) { }
-
-  authenticate(ussername: string, password: string) {
-    const credentials = { username: ussername, password: password };
-    return this.http.post<any>(this.authUrl, credentials);
+  authenticate(username: string, password: string) {
+    const credentials = { username, password };
+    return this.http.post<any>(environment.apiUrl + '/login', credentials);
   }
 
   logout() {

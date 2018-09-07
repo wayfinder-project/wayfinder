@@ -4,26 +4,6 @@ import { GoogleMapsAPIWrapper } from '@agm/core/services';
 
 declare var google: any;
 
-interface Marker {
-  lat: number;
-  lng: number;
-  label?: string;
-  draggable: boolean;
-}
-
-interface Location {
-  lat: number;
-  lng: number;
-  viewport?: Object;
-  zoom: number;
-  address_level_1?: string;
-  address_level_2?: string;
-  address_country?: string;
-  address_zip?: string;
-  address_state?: string;
-  marker?: Marker;
-}
-
 
 
 
@@ -34,33 +14,56 @@ interface Location {
 })
 export class MapComponent implements OnInit {
 
-  public location: Location = {
-    lat: 38.9586,
-    lng: -77.3570,
-    marker: {
-      lat: 38.9586,
-      lng: -77.3570,
-      draggable: true
-    },
-    zoom: 5
-  };
-
+public lat: Number = 24.799448;
+public lng: Number = 120.979021;
+public origin: any;
+public destination: any;
   geocoder: any;
+
+  public renderOptions = {
+    suppressMarkers: true,
+    draggable: true,
+    visible: true
+};
+
+
+public waypoints: any = [];
+
+
 
   @ViewChild(AgmMap) map: AgmMap;
 
-  constructor(public mapsApiLoader: MapsAPILoader,
-    private zone: NgZone,
-    private wrapper: GoogleMapsAPIWrapper) {
-    this.mapsApiLoader = mapsApiLoader;
-    this.zone = zone;
-    this.wrapper = wrapper;
-    this.mapsApiLoader.load().then(() => {
-      this.geocoder = new google.maps.Geocoder();
-    });
+  constructor() {
+
+  }
+
+  public change(event: any) {
+    this.waypoints = event.request.waypoints;
   }
 
   ngOnInit() {
-    this.location.marker.draggable = true;
+    this.origin = { lat: 38.9586, lng: -77.3570 };
+    this.destination = { lat: 38.9072, lng: -77.0369 };
+    this.getDirection();
   }
+  getDirection() {
+
+        this.origin = { lat: this.origin.lat, lng: this.origin.lng};
+        this.destination = { lat: this.destination.lat, lng: this.destination.lng};
+        this.map.triggerResize();
+  }
+
+  markerDragEnd(m: any, origin: boolean) {
+    if (origin) {
+      this.origin.lat = m.coords.lat;
+      this.origin.lng = m.coords.lng;
+    } else {
+      this.destination.lat = m.coords.lat;
+      this.destination.lng = m.coords.lng;
+    }
+    this.getDirection();
+   }
+
+
+
 }
