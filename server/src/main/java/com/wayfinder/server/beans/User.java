@@ -1,6 +1,6 @@
 package com.wayfinder.server.beans;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -36,7 +37,7 @@ public class User {
 	@Column(nullable = false)
 	@JsonIgnore
 	private byte[] passwordHash;
-	
+
 	@Column(nullable = false)
 	@JsonIgnore
 	private byte[] passwordSalt;
@@ -50,8 +51,13 @@ public class User {
 	@Column(nullable = false)
 	private String email;
 
+	/**
+	 * The user's trips. This list is always in descending order of creation
+	 * date/time.
+	 */
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private Set<Route> routes;
+	@OrderBy("creationDate")
+	private List<Trip> trips;
 
 	public User() {
 	}
@@ -112,11 +118,11 @@ public class User {
 		this.email = email;
 	}
 
-	public Set<Route> getRoutes() {
-		return routes;
+	public List<Trip> getTrips() {
+		return trips;
 	}
 
-	public void setRoutes(Set<Route> routes) {
-		this.routes = routes;
+	public void setTrips(List<Trip> trips) {
+		this.trips = trips;
 	}
 }

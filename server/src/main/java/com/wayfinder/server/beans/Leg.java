@@ -11,8 +11,6 @@ import javax.persistence.SequenceGenerator;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * A leg is the route between two adjacent waypoints.
  * 

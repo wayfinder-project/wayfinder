@@ -1,8 +1,9 @@
-export class WaypointModel {
-    location: LocationModel;
-}
-
-export class LocationModel {
-    lat: number;
-    lng: number;
+export interface Waypoint {
+  id: number;
+  latitude: number;
+  longitude: number;
+  /**
+   * A user-readable address string.
+   */
+  address: string;
 }
