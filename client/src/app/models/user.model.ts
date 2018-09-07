@@ -1,4 +1,4 @@
-import { Route } from './route.model';
+import { Trip } from './trip.model';
 
 export interface User {
   id: number;
@@ -6,5 +6,5 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  routes?: Route[];
+  trips?: Trip[];
 }

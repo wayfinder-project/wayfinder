@@ -83,7 +83,21 @@ is, properties not explicitly marked as optional may not be null.
   firstName: string;
   lastName: string;
   email: string;
-  routes?: Route[];
+  trips?: Trip[];
+}
+```
+
+##### `Trip`
+
+```ts
+{
+  id: number;
+  /**
+   * As a UTC timestamp in the format "yyyy-MM-dd'T'HH:mm:ss'Z'"; e.g.
+   * "2018-09-06T21:45:45Z".
+   */
+  creationDate: string;
+  route: Route;
 }
 ```
 
@@ -92,10 +106,9 @@ is, properties not explicitly marked as optional may not be null.
 ```ts
 {
   id: number;
-  // As a UTC timestamp in the format "yyyy-MM-dd'T'HH:mm:ss'Z'"; e.g.
-  // "2018-09-06T21:45:45Z".
-  creationDate: string;
-  // Always ordered from start to finish.
+  /**
+   * Always ordered from start to finish.
+   */
   legs: Leg[];
 }
 ```
@@ -107,11 +120,17 @@ is, properties not explicitly marked as optional may not be null.
   id: number;
   start: Waypoint;
   end: Waypoint;
-  // In seconds.
+  /**
+   * In seconds.
+   */
   travelTime: number;
-  // In meters.
+  /**
+   * In meters.
+   */
   distance: number;
-  // The zero-based index of this leg, to order it among other legs.
+  /**
+   * The zero-based index of this leg, to order it among other legs.
+   */
   index: number;
 }
 ```
@@ -123,7 +142,9 @@ is, properties not explicitly marked as optional may not be null.
   id: number;
   latitude: number;
   longitude: number;
-  // A user-readable address string.
+  /**
+   * A user-readable address string.
+   */
   address: string;
 }
 ```
