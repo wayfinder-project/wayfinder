@@ -1,10 +1,11 @@
-<agm-map [latitude]="lat" [longitude]="lng">
+<agm-map [latitude]="lat" [longitude]="lng"(mapClick)="change($event)">
   <agm-direction [origin]="origin" [destination]="destination"
   [renderOptions]="renderOptions" 
-  (onChange)="change($event)">
+  [waypoints]="waypoints"
+
+  >
   </agm-direction>
-  <agm-marker [(latitude)]="origin.lat" [(longitude)]="origin.lng" [markerDraggable]="true" (dragEnd)='markerDragEnd($event,true)'></agm-marker>
-  <agm-marker [(latitude)]="destination.lat" [(longitude)]="destination.lng" [markerDraggable]="true" (dragEnd)='markerDragEnd($event,false)'></agm-marker>
+ 
  
 </agm-map>
 
