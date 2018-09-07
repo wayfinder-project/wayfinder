@@ -19,6 +19,8 @@ import javax.persistence.TemporalType;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
  * A route is the navigation information for an entire trip, from start to
  * finish.
@@ -41,11 +43,12 @@ public class Route {
 	 */
 	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
 	private Date creationDate;
 	/**
-	 * The legs which this route contains. The list is guaranteed to be ordered
-	 * by leg index, so that the legs appear in the natural travel order (from
-	 * start to end).
+	 * The legs which this route contains. The list is guaranteed to be ordered by
+	 * leg index, so that the legs appear in the natural travel order (from start to
+	 * end).
 	 */
 	@Column(nullable = false)
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
