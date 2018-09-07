@@ -1,6 +1,5 @@
 package com.wayfinder.server.beans;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -13,13 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * A route is the navigation information for an entire trip, from start to
@@ -39,13 +34,6 @@ public class Route {
 	@GeneratedValue(generator = "seq_route_id", strategy = GenerationType.SEQUENCE)
 	private int id;
 	/**
-	 * The date/time on which the route was created.
-	 */
-	@Column(nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
-	private Date creationDate;
-	/**
 	 * The legs which this route contains. The list is guaranteed to be ordered by
 	 * leg index, so that the legs appear in the natural travel order (from start to
 	 * end).
@@ -61,5 +49,13 @@ public class Route {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public List<Leg> getLegs() {
+		return legs;
+	}
+
+	public void setLegs(List<Leg> legs) {
+		this.legs = legs;
 	}
 }
