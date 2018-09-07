@@ -39,6 +39,7 @@ users alike.
 - **leg**: a portion of the route between two adjacent waypoints
 
 ## Git Process Directions
+
 - IN YOUR BRANCH (make changes to files)
 - Git add .
 - Git commit -m “ ”
@@ -48,11 +49,80 @@ users alike.
 - Git checkout (YOUR BRANCH)
 - Git merge dev -m “ “
 - If you get merge conflicts
-    - RESOLVE merge conflicts
-    - REPEAT all steps
+  - RESOLVE merge conflicts
+  - REPEAT all steps
 - MERGE REQUEST SHOULD BE SENT IN GITHUB GUI
 
 ## Information for developers
+
+### Server API
+
+The following is an (evolving) specification for the back-end API, organized
+by endpoint and method (and any parameters).
+
+#### Type reference
+
+Type definitions are given here in TypeScript notation. TODO: fill in other
+types.
+
+##### `ErrorMessage`
+
+```ts
+{
+  message: string;
+}
+```
+
+##### `User`
+
+```ts
+{
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  routes: Route[];
+}
+```
+
+#### `/users`
+
+##### GET
+
+**Response status**: 200 (OK)
+
+**Response type**: `User[]`
+
+**Response body**: An array of all users in the database (empty if no users;
+the status is successful either way).
+
+##### GET `/{id}`
+
+**Response status**: 200 (OK) or 404 (not found)
+
+**Response type**: `User[] | ''`
+
+**Response body**: The user with the given ID.
+
+##### GET `?username={username}`
+
+**Response status**: 200 (OK) or 404 (not found)
+
+**Response type**: `User[] | ''`
+
+**Response body**: The user with the given username.
+
+##### POST
+
+**Response status**: 201 (created) or 409 (conflict)
+
+**Request body**: `{ user: User; password: string; }`
+
+**Response type**: `User | ErrorMessage`
+
+**Response body**: The newly created user, or an error message describing the
+reason for failure.
 
 ### Project layout
 
