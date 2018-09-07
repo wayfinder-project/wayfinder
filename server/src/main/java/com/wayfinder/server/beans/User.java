@@ -132,33 +132,39 @@ public class User implements UserDetails {
 		this.trips = trips;
 	}
 
+	@JsonIgnore
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		GrantedAuthority auth = () -> "USER";
 		return Arrays.asList(auth);
 	}
 
+	@JsonIgnore
 	@Override
 	public String getPassword() {
 		// We don't store passwords in plain text!
 		return "";
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isEnabled() {
 		return true;
