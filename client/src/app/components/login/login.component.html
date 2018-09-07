@@ -4,8 +4,8 @@
       <div class="panel panel-default form-group text-center loginStyle" >
         <div class="panel-body">
           <h1>Login</h1>
-          <input type="text" placeholder="Username" id="username" name="username" class="form-control justify-content-center">
-          <input type="password" placeholder="Password" id="password" name="password" class="form-control justify-content-center" style="margin-top:2px">
+          <input [(ngModel)]="username" type="text" placeholder="Username" id="username" name="username" class="form-control justify-content-center">
+          <input [(ngModel)]="password" type="password" placeholder="Password" id="password" name="password" class="form-control justify-content-center" style="margin-top:2px">
           <div style="padding:10px">
             <button class="btn btn-block" style="background-color: #7DAA92;" id="login">Login</button>
             <a href="" id="registerLink" >forgot password</a> | <a href="#modalRegister" data-toggle="modal" >register</a>

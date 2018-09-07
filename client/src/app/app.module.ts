@@ -9,22 +9,26 @@ import { MapComponent } from './components/map/map.component';
 import { FormsModule } from '@angular/forms';
 import { AgmCoreModule, GoogleMapsAPIWrapper } from '@agm/core';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { AppRoutingModule } from './app-routing/app-routing.module';
+import { HomeComponent } from './components/home/home.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     MapComponent,
-    NavbarComponent
+    NavbarComponent,
+    HomeComponent
   ],
   imports: [
-    AgmCoreModule.forRoot({apiKey: 'AIzaSyBrZkV0T-ZJncle1r0SqiwQ2MJB6Qxz3mU'}),
+    AgmCoreModule.forRoot({ apiKey: 'AIzaSyBrZkV0T-ZJncle1r0SqiwQ2MJB6Qxz3mU' }),
     BrowserModule,
     FormsModule,
-    NgbModule.forRoot()
+    NgbModule.forRoot(),
+    AppRoutingModule
   ],
   providers: [
-    GoogleMapsAPIWrapper 
+    GoogleMapsAPIWrapper
   ],
   bootstrap: [AppComponent]
 })
