@@ -3,7 +3,6 @@ import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse
 import { Observable } from 'rxjs';
 import { TokenStorage } from './token.storage';
 import { Router } from '@angular/router';
-import 'rxjs/add/operator/do';
 
 @Injectable({
   providedIn: 'root'

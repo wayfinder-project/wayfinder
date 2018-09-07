@@ -7,7 +7,6 @@ import { TokenStorage } from '../../utils/token.storage';
 @Injectable({
   providedIn: 'root'
 })
-
 export class AuthService {
 
   private authUrl = 'http://localhost:8888/token/generate-token';
