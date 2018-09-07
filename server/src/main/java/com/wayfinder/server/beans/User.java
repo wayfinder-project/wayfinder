@@ -11,13 +11,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Component
 @Scope("prototype")
 @Entity
+// We must specify a custom table name here, because "User" is not a valid table
+// name in Oracle.
+@Table(name = "WayfinderUser")
 public class User {
 	@Id
 	@SequenceGenerator(name = "seq_user_id", sequenceName = "seq_user_id")
@@ -28,7 +34,12 @@ public class User {
 	private String username;
 
 	@Column(nullable = false)
-	private String password;
+	@JsonIgnore
+	private byte[] passwordHash;
+	
+	@Column(nullable = false)
+	@JsonIgnore
+	private byte[] passwordSalt;
 
 	@Column(nullable = false)
 	private String firstName;
@@ -36,21 +47,13 @@ public class User {
 	@Column(nullable = false)
 	private String lastName;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	private String email;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Route> routes;
 
 	public User() {
-	}
-
-	public User(String username, String password, String firstName, String lastName, String email) {
-		this.username = username;
-		this.password = password;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
 	}
 
 	public int getId() {
@@ -69,12 +72,20 @@ public class User {
 		this.username = username;
 	}
 
-	public String getPassword() {
-		return password;
+	public byte[] getPasswordHash() {
+		return passwordHash;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPasswordHash(byte[] passwordHash) {
+		this.passwordHash = passwordHash;
+	}
+
+	public byte[] getPasswordSalt() {
+		return passwordSalt;
+	}
+
+	public void setPasswordSalt(byte[] passwordSalt) {
+		this.passwordSalt = passwordSalt;
 	}
 
 	public String getFirstName() {
