@@ -62,8 +62,9 @@ by endpoint and method (and any parameters).
 
 #### Type reference
 
-Type definitions are given here in TypeScript notation. TODO: fill in other
-types.
+Type definitions are given here in TypeScript notation. The definitions
+should be interpreted as if written using TypeScripts `strict` option; that
+is, properties not explicitly marked as optional may not be null.
 
 ##### `ErrorMessage`
 
@@ -82,7 +83,48 @@ types.
   firstName: string;
   lastName: string;
   email: string;
-  routes: Route[];
+  routes?: Route[];
+}
+```
+
+##### `Route`
+
+```ts
+{
+  id: number;
+  // As a UTC timestamp in the format "yyyy-MM-dd'T'HH:mm:ss'Z'"; e.g.
+  // "2018-09-06T21:45:45Z".
+  creationDate: string;
+  // Always ordered from start to finish.
+  legs: Leg[];
+}
+```
+
+##### `Leg`
+
+```ts
+{
+  id: number;
+  start: Waypoint;
+  end: Waypoint;
+  // In seconds.
+  travelTime: number;
+  // In meters.
+  distance: number;
+  // The zero-based index of this leg, to order it among other legs.
+  index: number;
+}
+```
+
+##### `Waypoint`
+
+```ts
+{
+  id: number;
+  latitude: number;
+  longitude: number;
+  // A user-readable address string.
+  address: string;
 }
 ```
 
