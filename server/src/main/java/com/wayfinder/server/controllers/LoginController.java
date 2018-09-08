@@ -3,7 +3,6 @@ package com.wayfinder.server.controllers;
 import java.util.Arrays;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
