@@ -7,6 +7,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { MapComponent } from './components/map/map.component';
+import { UserpageComponent } from './components/userpage/userpage.component';
 
 import { FormsModule } from '@angular/forms';
 import { AgmCoreModule, GoogleMapsAPIWrapper } from '@agm/core';
@@ -22,7 +23,8 @@ import { HttpClientModule } from '@angular/common/http';
     LoginComponent,
     MapComponent,
     NavbarComponent,
-    HomeComponent
+    HomeComponent,
+    UserpageComponent
   ],
   imports: [
     AgmCoreModule.forRoot({ apiKey: 'AIzaSyBrZkV0T-ZJncle1r0SqiwQ2MJB6Qxz3mU', libraries: ['places'] }),
