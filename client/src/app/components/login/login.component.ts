@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
-import { TokenStorage } from '../../utils/token.storage';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user/user.service';
 
@@ -15,29 +14,15 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private userService: UserService,
-    private tokenStorage: TokenStorage,
     private router: Router
   ) {}
 
-  ngOnInit() {
-    this.userService.create(
-      {
-        username: 'ianprime0509',
-        firstName: 'Ian',
-        lastName: 'Ian',
-        email: 'ianprime0509@gmail.com',
-      },
-      'password'
-    ).subscribe(user => console.log('Created user!', user));
-  }
+  ngOnInit() {}
 
   login() {
     this.authService
       .authenticate(this.username, this.password)
-      .subscribe(data => {
-        this.tokenStorage.saveToken(data.token);
-        // data package can have user object, we can save user object in localStorage also, if we need to see its details
+      .subscribe(() => {
         this.router.navigate(['home']);
       });
   }

@@ -72,6 +72,10 @@
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
 
 		<!-- Logging with log4j -->
 		<dependency>
@@ -115,6 +119,7 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 		</dependency>
 
+		<!-- JSON Web Tokens -->
 		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
