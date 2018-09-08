@@ -18,6 +18,7 @@ export class AccessGuard implements CanActivate {
     if (this.tokenStorage.getToken()) {
       return true;
     }
+    this.router.navigate(['login']);
     return false;
   }
 }
