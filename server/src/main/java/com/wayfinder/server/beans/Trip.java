@@ -11,6 +11,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -41,11 +42,13 @@ public class Trip {
 	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+	@NotNull
 	private Date creationDate;
 	/**
 	 * The route corresponding to this trip.
 	 */
 	@OneToOne
+	@NotNull
 	private Route route;
 
 	public int getId() {
