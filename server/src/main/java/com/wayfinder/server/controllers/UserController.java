@@ -23,7 +23,7 @@ import com.wayfinder.server.services.UserService;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = { "http://localhost:4200", "https://wayfinder-project.github.io" })
+@CrossOrigin
 public class UserController {
 	@Autowired
 	private UserService userService;

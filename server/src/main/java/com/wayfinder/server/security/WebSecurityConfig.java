@@ -19,8 +19,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		// Matchers for routes that can be accessed without authentication.
-		RequestMatcher[] allowable = { new AntPathRequestMatcher("/login"),
-				new AntPathRequestMatcher("/users", "POST") };
+		RequestMatcher[] allowable = { new AntPathRequestMatcher("/login"), new AntPathRequestMatcher("/users", "POST"),
+				new AntPathRequestMatcher("/*", "OPTIONS") };
 
 		http.csrf().disable();
 		http.authorizeRequests().requestMatchers(allowable).permitAll().anyRequest().authenticated();
