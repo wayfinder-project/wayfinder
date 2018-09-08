@@ -40,7 +40,7 @@ public class LoginController {
 			return new ResponseError("Incorrect username or password.").toEntity(HttpStatus.FORBIDDEN);
 		}
 		// Login successful; generate a token.
-		String token = tokenProvider.generateToken(found.getUsername());
+		String token = tokenProvider.generateToken(found.getId());
 		return ResponseEntity.ok('"' + token + '"');
 	}
 }

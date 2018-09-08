@@ -1,10 +1,19 @@
 package com.wayfinder.server.security;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -17,43 +26,71 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.wayfinder.server.beans.User;
 import com.wayfinder.server.services.UserService;
 
+/**
+ * A class for generating and parsing JSON Web Tokens.
+ * 
+ * @author Ian Johnson, Vien Ly
+ */
 @Component
-public class JwtTokenProvider {
-	private final static Algorithm algorithm = Algorithm.HMAC256("secret");
-	private final static JWTVerifier verifier = JWT.require(algorithm).withIssuer("wayfinder").build();
-	
+public class JwtTokenProvider implements InitializingBean {
+	private static final Logger logger = LogManager.getLogger();
+	private static final String ISSUER = "wayfinder";
+
+	@Value("${JWT_SECRET}")
+	private String secret;
+	private Algorithm algorithm;
+	private JWTVerifier verifier;
+
 	@Autowired
 	private UserService userService;
-	
-	public String generateToken(String username) {
-		String token = "";
-		Date now = new Date();
-		Date validity = new Date(now.getTime() + (24 * 3600 * 1000));
-		try {
-			token = JWT.create()
-					.withIssuer("wayfinder")
-					.withSubject(username)
-					.withIssuedAt(now)
-					.withExpiresAt(validity)
-					.sign(algorithm);
-		} catch(JWTCreationException e) {
-			// handle later
-		}
-		
-		return token;
+
+	@Override
+	public void afterPropertiesSet() {
+		algorithm = Algorithm.HMAC256(secret);
+		verifier = JWT.require(algorithm).withIssuer(ISSUER).build();
 	}
-	
-	public Authentication getAuthentication(String token) {
+
+	/**
+	 * Generates a new JWT which can be used to authenticate the user with the given
+	 * ID.
+	 * 
+	 * @param userId the ID of the user to be authenticated by the token
+	 * @return the JWT corresponding to the given user ID
+	 */
+	public String generateToken(int userId) {
+		Instant now = Instant.now();
+		Instant expires = now.plus(Period.ofDays(1));
 		try {
-			String username = verifier.verify(token).getSubject();
-			User user = userService.findByUsername(username);
-			return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
-		} catch (JWTVerificationException e) {
-			// handle later
+			return JWT.create().withIssuer(ISSUER).withSubject(Integer.toString(userId)).withIssuedAt(Date.from(now))
+					.withExpiresAt(Date.from(expires)).sign(algorithm);
+		} catch (JWTCreationException e) {
+			logger.error("Unexpected error in creating JWT.", e);
 			return null;
 		}
 	}
-	
+
+	/**
+	 * Converts the given JWT into an authentication token that can be stored as the
+	 * authentication principal in Spring's SecurityContext.
+	 * 
+	 * @param token the JWT to convert
+	 * @return the authentication token, or null if the given JWT was invalid
+	 */
+	public Authentication getAuthentication(String token) {
+		try {
+			int userId = Integer.parseInt(verifier.verify(token).getSubject());
+			User user = userService.findById(userId);
+			if (user == null) {
+				return null;
+			}
+			return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
+		} catch (NumberFormatException e) {
+			return null;
+		} catch (JWTVerificationException e) {
+			return null;
+		}
+	}
+
 	/**
 	 * Extracts the JWT from the given request.
 	 * 

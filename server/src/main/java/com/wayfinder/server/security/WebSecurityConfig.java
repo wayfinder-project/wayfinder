@@ -10,6 +10,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+/**
+ * A configuration class for web security, which sets up the JwtTokenFilter.
+ * 
+ * @author Ian Johnson, Vien Ly
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
