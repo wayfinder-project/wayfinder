@@ -69,7 +69,6 @@ public class User implements UserDetails {
 	 * date/time.
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@Column(nullable = false)
 	@OrderBy("creationDate")
 	@NotNull
 	@Valid

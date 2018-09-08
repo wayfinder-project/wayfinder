@@ -6,8 +6,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
-import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -32,19 +32,17 @@ public class Waypoint {
 	 * The latitude coordinate of the waypoint.
 	 */
 	@Column(nullable = false)
-	@NotNull
 	private double latitude;
 	/**
 	 * The longitude coordinate of the waypoint.
 	 */
 	@Column(nullable = false)
-	@NotNull
 	private double longitude;
 	/**
 	 * The address of the waypoint, as a user-readable string.
 	 */
 	@Column(nullable = false)
-	@NotNull
+	@NotEmpty
 	private String address;
 
 	public double getLatitude() {
