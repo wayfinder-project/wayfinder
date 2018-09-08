@@ -1,3 +1,5 @@
+/// <reference types="@types/googlemaps" />
+
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -23,8 +25,9 @@ import { HttpClientModule } from '@angular/common/http';
     HomeComponent
   ],
   imports: [
-    AgmCoreModule.forRoot({ apiKey: 'AIzaSyBrZkV0T-ZJncle1r0SqiwQ2MJB6Qxz3mU' }),
+    AgmCoreModule.forRoot({ apiKey: 'AIzaSyBrZkV0T-ZJncle1r0SqiwQ2MJB6Qxz3mU', libraries: ['places'] }),
     BrowserModule,
+    HttpClientModule,
     FormsModule,
     AgmDirectionModule,
     NgbModule.forRoot(),
