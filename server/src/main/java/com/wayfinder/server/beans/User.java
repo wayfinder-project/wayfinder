@@ -1,5 +1,7 @@
 package com.wayfinder.server.beans;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -17,6 +19,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,7 +31,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 // We must specify a custom table name here, because "User" is not a valid table
 // name in Oracle.
 @Table(name = "WayfinderUser")
-public class User {
+public class User implements UserDetails {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@SequenceGenerator(name = "seq_user_id", sequenceName = "seq_user_id")
 	@GeneratedValue(generator = "seq_user_id", strategy = GenerationType.SEQUENCE)
@@ -133,5 +139,43 @@ public class User {
 
 	public void setTrips(List<Trip> trips) {
 		this.trips = trips;
+	}
+
+	@JsonIgnore
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		GrantedAuthority auth = () -> "USER";
+		return Arrays.asList(auth);
+	}
+
+	@JsonIgnore
+	@Override
+	public String getPassword() {
+		// We don't store passwords in plain text!
+		return "";
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 }

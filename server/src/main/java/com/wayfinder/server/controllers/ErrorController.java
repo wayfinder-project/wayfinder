@@ -1,5 +1,7 @@
 package com.wayfinder.server.controllers;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +21,12 @@ public class ErrorController {
 	// TODO: update Spring to 4.3 or later and use @RequestAttribute to get the
 	// status code from the error that was actually sent.
 	@RequestMapping()
-	public ResponseEntity<ResponseError> handleError() {
-		return new ResponseError("Unexpected server error.").toEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+	public ResponseEntity<ResponseError> handleError(HttpServletRequest req) {
+		int statusCode = (Integer) req.getAttribute("javax.servlet.error.status_code");
+		String message = (String) req.getAttribute("javax.servlet.error.message");
+		if (message == null) {
+			message = "Unexpected error.";
+		}
+		return new ResponseError(message).toEntity(HttpStatus.valueOf(statusCode));
 	}
 }
