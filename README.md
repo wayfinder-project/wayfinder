@@ -89,17 +89,32 @@ that your PR is based off the dev branch and not master!
 The following is an (evolving) specification for the back-end API, organized
 by endpoint and method (and any parameters).
 
+The Content-Type for all requests and responses is
+`"application/json; charset=UTF-8"`.
+
+Note that, in addition to any status codes listed on the endpoints, a status
+code of 403 (forbidden) may be returned from any endpoint except `/login` and
+`POST /users` to indicate that the user is not logged in or does not have
+sufficient permissions to access the resource.
+
 #### Type reference
 
 Type definitions are given here in TypeScript notation. The definitions
 should be interpreted as if written using TypeScripts `strict` option; that
 is, properties not explicitly marked as optional may not be null.
 
-##### `ErrorMessage`
+##### `ApiError`
 
 ```ts
 {
+  /**
+   * The primary message describing the error.
+   */
   message: string;
+  /**
+   * Any additional details that may be present.
+   */
+  details: string[];
 }
 ```
 
@@ -112,7 +127,7 @@ is, properties not explicitly marked as optional may not be null.
   firstName: string;
   lastName: string;
   email: string;
-  trips?: Trip[];
+  trips: Trip[];
 }
 ```
 
@@ -211,7 +226,7 @@ the status is successful either way).
 
 **Request body**: `{ user: User; password: string; }`
 
-**Response type**: `User | ErrorMessage`
+**Response type**: `User | ApiError`
 
 **Response body**: The newly created user, or an error message describing the
 reason for failure.
@@ -222,11 +237,24 @@ reason for failure.
 
 **Request body**: `User`
 
-**Response type**: `User | ErrorMessage`
+**Response type**: `User | ApiError`
 
 **Response body**: The updated user, or an error message describing the
 reason for failure (e.g. if no user exists with the same ID to be updated, or
 the user attempts to change their username to one that is already taken).
+
+#### `/login`
+
+##### POST
+
+**Response status**: 200 (OK) or 403 (forbidden)
+
+**Request body**: `{ username: string, password: string }`
+
+**Response type**: `string | ApiError`
+
+**Response body**: A JSON Web Token which can be used for authenticating the
+logged-in user, or an error if the login failed.
 
 ### Project layout
 

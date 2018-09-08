@@ -13,14 +13,17 @@
 		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.8.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
 
+	<!-- Enable using environment variables as values. -->
+	<context:property-placeholder />
+
+	<!-- Set up annotation support. -->
 	<context:annotation-config />
 	<context:component-scan
 		base-package="com.wayfinder.server" />
-	<context:property-placeholder />
-
 	<tx:annotation-driven />
 	<mvc:annotation-driven />
 
+	<!-- Set up contextual sessions. -->
 	<jpa:repositories
 		base-package="com.wayfinder.server.repository" />
 

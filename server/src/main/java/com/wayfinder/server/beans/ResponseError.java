@@ -1,5 +1,8 @@
 package com.wayfinder.server.beans;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -9,13 +12,25 @@ import org.springframework.http.ResponseEntity;
  * @author Ian Johnson
  */
 public class ResponseError {
+	/**
+	 * The primary message describing the error.
+	 */
 	private String message;
+	/**
+	 * Additional details which may be included.
+	 */
+	private List<String> details = new ArrayList<>();
 
 	public ResponseError() {
 	}
 
 	public ResponseError(String message) {
 		this.message = message;
+	}
+	
+	public ResponseError(String message, List<String> details) {
+		this(message);
+		this.details = details;
 	}
 	
 	public ResponseError(Exception e) {
@@ -28,6 +43,14 @@ public class ResponseError {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public List<String> getDetails() {
+		return details;
+	}
+
+	public void setDetails(List<String> details) {
+		this.details = details;
 	}
 
 	/**

@@ -15,7 +15,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,6 +41,7 @@ public class User implements UserDetails {
 	private int id;
 
 	@Column(nullable = false, unique = true)
+	@NotEmpty
 	private String username;
 
 	@Column(nullable = false)
@@ -49,12 +53,15 @@ public class User implements UserDetails {
 	private byte[] passwordSalt;
 
 	@Column(nullable = false)
+	@NotNull
 	private String firstName;
 
 	@Column(nullable = false)
+	@NotNull
 	private String lastName;
 
 	@Column(nullable = false)
+	@NotNull
 	private String email;
 
 	/**
@@ -62,7 +69,10 @@ public class User implements UserDetails {
 	 * date/time.
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@Column(nullable = false)
 	@OrderBy("creationDate")
+	@NotNull
+	@Valid
 	private List<Trip> trips;
 
 	public User() {

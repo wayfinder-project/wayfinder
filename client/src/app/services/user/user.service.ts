@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import { environment } from '../../../environments/environment';
+import { Trip } from '../../models/trip.model';
 
 @Injectable({
   providedIn: 'root',
@@ -24,11 +25,21 @@ export class UserService {
     });
   }
 
+  /**
+   * Creates a new user with the given data and password.
+   *
+   * @param user the user data object, with the ID and trips fields optional
+   * @param password the new user's password
+   */
   create(
-    user: Overwrite<User, { id?: number }>,
+    user: Overwrite<User, { id?: number; trips?: Trip[] }>,
     password: string
   ): Observable<User> {
-    console.log('Creating user');
+    // The server requires the trips property to be non-null, so we provide a
+    // default empty array.
+    if (!user.trips) {
+      user.trips = [];
+    }
     return this.http.post<User>(environment.apiUrl + '/users', {
       user,
       password,

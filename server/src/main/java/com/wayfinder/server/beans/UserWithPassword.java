@@ -1,5 +1,9 @@
 package com.wayfinder.server.beans;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +16,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("prototype")
 public class UserWithPassword {
+	@NotNull
+	@Valid
 	private User user;
+	@NotEmpty
 	private String password;
 
 	public User getUser() {
