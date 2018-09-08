@@ -43,4 +43,14 @@ export class UserService {
   update(user: User): Observable<User> {
     return this.http.patch<User>(environment.apiUrl + '/users/', user);
   }
+
+  private currentUser: User;
+
+  getCurrentUser() {
+    return this.currentUser;
+  }
+  setCurrentUser(u: User) {
+    return this.currentUser = u;
+  }
+
 }
