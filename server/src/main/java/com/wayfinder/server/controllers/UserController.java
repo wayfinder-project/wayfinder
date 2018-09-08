@@ -2,6 +2,10 @@ package com.wayfinder.server.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,21 +38,21 @@ public class UserController {
 	}
 
 	@RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<User> findById(@PathVariable("id") int id) {
+	public ResponseEntity<User> findById(@PathVariable("id") @Min(0) int id) {
 		User user = userService.findById(id);
 		HttpStatus status = user == null ? HttpStatus.NOT_FOUND : HttpStatus.OK;
 		return new ResponseEntity<>(user, status);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<User> findByUsername(@RequestParam("username") String username) {
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, params = "username")
+	public ResponseEntity<User> findByUsername(@RequestParam("username") @NotEmpty String username) {
 		User user = userService.findByUsername(username);
 		HttpStatus status = user == null ? HttpStatus.NOT_FOUND : HttpStatus.OK;
 		return new ResponseEntity<>(user, status);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<?> add(@RequestBody UserWithPassword userWithPassword) {
+	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<?> add(@RequestBody @Valid UserWithPassword userWithPassword) {
 		try {
 			return new ResponseEntity<User>(
 					userService.add(userWithPassword.getUser(), userWithPassword.getPassword().toCharArray()),
@@ -58,8 +62,8 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<?> update(@RequestBody User user) {
+	@RequestMapping(method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<?> update(@RequestBody @Valid User user) {
 		try {
 			return new ResponseEntity<User>(userService.update(user), HttpStatus.OK);
 		} catch (UserNotFoundException e) {

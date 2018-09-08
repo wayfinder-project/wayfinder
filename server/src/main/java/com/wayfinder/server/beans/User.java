@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,16 +41,14 @@ public class User implements UserDetails {
 	private int id;
 
 	@Column(nullable = false, unique = true)
-	@NotNull
+	@NotEmpty
 	private String username;
 
 	@Column(nullable = false)
-	@NotNull
 	@JsonIgnore
 	private byte[] passwordHash;
 
 	@Column(nullable = false)
-	@NotNull
 	@JsonIgnore
 	private byte[] passwordSalt;
 
@@ -70,7 +69,9 @@ public class User implements UserDetails {
 	 * date/time.
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@Column(nullable = false)
 	@OrderBy("creationDate")
+	@NotNull
 	@Valid
 	private List<Trip> trips;
 

@@ -2,6 +2,9 @@ package com.wayfinder.server.controllers;
 
 import java.util.Arrays;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,7 +33,7 @@ public class LoginController {
 	private JwtTokenProvider tokenProvider;
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<?> login(@RequestBody UserCredentials credentials) {
+	public ResponseEntity<?> login(@RequestBody @Valid UserCredentials credentials) {
 		// Attempt to log the user in.
 		User found = userService.findByUsername(credentials.getUsername());
 		if (found == null || !Arrays.equals(found.getPasswordHash(),
