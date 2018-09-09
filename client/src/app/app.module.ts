@@ -1,5 +1,3 @@
-/// <reference types="@types/googlemaps" />
-
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -15,7 +13,9 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { AgmDirectionModule } from 'agm-direction';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { HomeComponent } from './components/home/home.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { JwtInterceptor } from './utils/jwt.interceptor';
+import { ErrorInterceptor } from './utils/error.interceptor';
 
 @NgModule({
   declarations: [
@@ -24,21 +24,34 @@ import { HttpClientModule } from '@angular/common/http';
     MapComponent,
     NavbarComponent,
     HomeComponent,
-    UserpageComponent
+    UserpageComponent,
   ],
   imports: [
-    AgmCoreModule.forRoot({ apiKey: 'AIzaSyBrZkV0T-ZJncle1r0SqiwQ2MJB6Qxz3mU', libraries: ['places'] }),
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyBrZkV0T-ZJncle1r0SqiwQ2MJB6Qxz3mU',
+      libraries: ['places'],
+    }),
     BrowserModule,
     HttpClientModule,
     FormsModule,
     AgmDirectionModule,
     NgbModule.forRoot(),
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
   ],
   providers: [
-    GoogleMapsAPIWrapper
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true,
+    },
+    GoogleMapsAPIWrapper,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

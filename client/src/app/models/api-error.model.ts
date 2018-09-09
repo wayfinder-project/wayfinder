@@ -17,6 +17,11 @@ export enum ApiErrorType {
  */
 export interface ApiError {
   /**
+   * The HTTP status that accompanied the error. This is not returned by the
+   * API, but is provided as a convenience by the ErrorInterceptor.
+   */
+  status: number;
+  /**
    * The type of the error, if a specific type can be associated.
    */
   type?: ApiErrorType;
