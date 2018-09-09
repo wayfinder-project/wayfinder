@@ -231,11 +231,15 @@ the status is successful either way).
 **Response body**: The newly created user, or an error message describing the
 reason for failure.
 
-##### PATCH
+##### PUT `/{id}`
 
 **Response status**: 200 (OK), 404 (not found) or 409 (conflict)
 
 **Request body**: `User`
+
+**Request notes**: The ID property of the request body will be ignored and
+replaced by the ID specified in the path. This is for consistency with
+conventional HTTP method semantics.
 
 **Response type**: `User | ApiError`
 
@@ -252,7 +256,7 @@ the user attempts to change their username to one that is already taken).
 **Response type**: `User`
 
 **Response body**: User information for the currently logged-in user, as
-*determined by the authentication token.
+\*determined by the authentication token.
 
 ##### POST
 

@@ -72,14 +72,16 @@ export class UserService {
    * @param user the user to update
    */
   update(user: User): Observable<User> {
-    return this.http.patch<User>(environment.apiUrl + '/users/', user).pipe(
-      tap(updated => {
-        // We need to make sure that we refresh the current user if that's the
-        // one that was updated.
-        if (this.currentUser && this.currentUser.id === updated.id) {
-          this.currentUser = updated;
-        }
-      })
-    );
+    return this.http
+      .put<User>(environment.apiUrl + `/users/${user.id}`, user)
+      .pipe(
+        tap(updated => {
+          // We need to make sure that we refresh the current user if that's the
+          // one that was updated.
+          if (this.currentUser && this.currentUser.id === updated.id) {
+            this.currentUser = updated;
+          }
+        })
+      );
   }
 }
