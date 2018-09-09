@@ -6,7 +6,6 @@ const TOKEN_KEY = 'authToken';
   providedIn: 'root'
 })
 export class TokenStorage {
-
   constructor() { }
 
   signOut() {

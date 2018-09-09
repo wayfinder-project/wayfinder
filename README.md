@@ -89,17 +89,53 @@ that your PR is based off the dev branch and not master!
 The following is an (evolving) specification for the back-end API, organized
 by endpoint and method (and any parameters).
 
+The Content-Type for all requests and responses is
+`"application/json; charset=UTF-8"`.
+
+Note that, in addition to any status codes listed on the endpoints, a status
+code of 403 (forbidden) may be returned from any endpoint except
+`POST /login` and `POST /users` to indicate that the user is not logged in or
+does not have sufficient permissions to access the resource. A status code of
+400 (bad request) will be returned if the request parameters and/or body are
+in an invalid format.
+
 #### Type reference
 
 Type definitions are given here in TypeScript notation. The definitions
 should be interpreted as if written using TypeScripts `strict` option; that
 is, properties not explicitly marked as optional may not be null.
 
-##### `ErrorMessage`
+##### `ApiErrorType` (enum)
 
 ```ts
 {
+  /**
+   * The user is not logged in.
+   */
+  NotLoggedIn = 'NOT_LOGGED_IN',
+  /**
+   * The user is logged in, but does not have permission to access an endpoint.
+   */
+  Unauthorized = 'UNAUTHORIZED',
+}
+```
+
+##### `ApiError`
+
+```ts
+{
+  /**
+   * The type of the error, if a specific type can be associated.
+   */
+  type?: ApiErrorType;
+  /**
+   * The primary message describing the error.
+   */
   message: string;
+  /**
+   * Any additional details that may be present.
+   */
+  details: string[];
 }
 ```
 
@@ -112,7 +148,7 @@ is, properties not explicitly marked as optional may not be null.
   firstName: string;
   lastName: string;
   email: string;
-  trips?: Trip[];
+  trips: Trip[];
 }
 ```
 
@@ -209,24 +245,64 @@ the status is successful either way).
 
 **Response status**: 201 (created) or 409 (conflict)
 
-**Request body**: `{ user: User; password: string; }`
+**Request body**: `{ user: User; password: string }`
 
-**Response type**: `User | ErrorMessage`
+**Response type**: `User | ApiError`
 
 **Response body**: The newly created user, or an error message describing the
 reason for failure.
 
-##### PATCH
+##### PUT `/{id}`
 
 **Response status**: 200 (OK), 404 (not found) or 409 (conflict)
 
 **Request body**: `User`
 
-**Response type**: `User | ErrorMessage`
+**Request notes**: The ID property of the request body will be ignored and
+replaced by the ID specified in the path. This is for consistency with
+conventional HTTP method semantics.
+
+**Response type**: `User | ApiError`
 
 **Response body**: The updated user, or an error message describing the
 reason for failure (e.g. if no user exists with the same ID to be updated, or
 the user attempts to change their username to one that is already taken).
+
+##### POST `/{id}/password`
+
+**Response status**: 200 (OK), 403 (forbidden) or 404 (not found)
+
+**Request body**: `{ oldPassword: string; newPassword: string }`
+
+**Request notes**: For security reasons, the user's current password must be
+sent with the request for verification.
+
+**Response type**: `void | ApiError`
+
+**Response body**: Nothing (upon success), or the reason for failure (either
+the old password was incorrect or the user ID did not correspond to a user).
+
+#### `/login`
+
+##### GET
+
+**Response status**: 200 (OK)
+
+**Response type**: `User`
+
+**Response body**: User information for the currently logged-in user, as
+\*determined by the authentication token.
+
+##### POST
+
+**Response status**: 200 (OK) or 403 (forbidden)
+
+**Request body**: `{ username: string, password: string }`
+
+**Response type**: `string | ApiError`
+
+**Response body**: A JSON Web Token which can be used for authenticating the
+logged-in user, or an error if the login failed.
 
 ### Project layout
 
@@ -243,6 +319,7 @@ set. The following is a comprehensive list of all such environment variables:
 - `JDBC_URL`: the URL of the database
 - `JDBC_USER`: the database user
 - `JDBC_PASSWORD`: the database password
+- `JWT_SECRET`: the secret used in signing JSON Web Tokens
 
 ### Deployment
 

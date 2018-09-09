@@ -6,5 +6,5 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  trips?: Trip[];
+  trips: Trip[];
 }
