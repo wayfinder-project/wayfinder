@@ -92,4 +92,22 @@ public class UserService {
 
 		return saved;
 	}
+
+	/**
+	 * Updates the password of the user with the given ID.
+	 * 
+	 * @param userId   the ID of the user whose password to update
+	 * @param password the user's new password
+	 * @throws UserNotFoundException if no user exists with the given ID
+	 */
+	public void updatePassword(int userId, char[] password) throws UserNotFoundException {
+		User user = findById(userId);
+		if (user == null) {
+			throw new UserNotFoundException(userId);
+		}
+		// Generate a new salt and hash the password.
+		user.setPasswordSalt(Passwords.generateSalt());
+		user.setPasswordHash(Passwords.hashPassword(password, user.getPasswordSalt()));
+		userRepo.save(user);
+	}
 }

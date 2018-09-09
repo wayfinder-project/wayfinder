@@ -73,4 +73,24 @@ public class UserController {
 			return new ResponseError(e).toEntity(HttpStatus.CONFLICT);
 		}
 	}
+
+	@RequestMapping(path = "/{id}/password", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<?> updatePassword(@PathVariable("id") @Min(0) int id,
+			@RequestBody @NotEmpty String newPassword) {
+		// For whatever reason, Spring ignores the "consumes" attribute key
+		// above and will not actually parse the request body as a JSON string,
+		// so we have to do it ourselves. Note that this is not actually robust,
+		// because it doesn't ensure that the contents of the string are valid
+		// JSON and doesn't parse escape characters.
+		if (!newPassword.startsWith("\"") || !newPassword.endsWith("\"")) {
+			return new ResponseError("Invalid JSON string.").toEntity(HttpStatus.BAD_REQUEST);
+		}
+		newPassword = newPassword.substring(1, newPassword.length() - 1);
+		try {
+			userService.updatePassword(id, newPassword.toCharArray());
+			return ResponseEntity.ok().build();
+		} catch (UserNotFoundException e) {
+			return new ResponseError(e).toEntity(HttpStatus.NOT_FOUND);
+		}
+	}
 }

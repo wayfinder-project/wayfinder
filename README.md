@@ -95,7 +95,9 @@ The Content-Type for all requests and responses is
 Note that, in addition to any status codes listed on the endpoints, a status
 code of 403 (forbidden) may be returned from any endpoint except
 `POST /login` and `POST /users` to indicate that the user is not logged in or
-does not have sufficient permissions to access the resource.
+does not have sufficient permissions to access the resource. A status code of
+400 (bad request) will be returned if the request parameters and/or body are
+in an invalid format.
 
 #### Type reference
 
@@ -246,6 +248,18 @@ conventional HTTP method semantics.
 **Response body**: The updated user, or an error message describing the
 reason for failure (e.g. if no user exists with the same ID to be updated, or
 the user attempts to change their username to one that is already taken).
+
+##### PUT `/{id}/password`
+
+**Response status**: 200 (OK) or 404 (not found)
+
+**Request body**: `string`
+
+**Request notes**: The request body will be used as the user's new password.
+
+**Response type**: `void | ApiError`
+
+**Response body**: Nothing (upon success), or the reason for failure.
 
 #### `/login`
 
