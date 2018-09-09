@@ -62,9 +62,10 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<?> update(@RequestBody @Valid User user) {
+	@RequestMapping(path = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<?> update(@PathVariable("id") @Min(0) int id, @RequestBody @Valid User user) {
 		try {
+			user.setId(id);
 			return new ResponseEntity<User>(userService.update(user), HttpStatus.OK);
 		} catch (UserNotFoundException e) {
 			return new ResponseError(e).toEntity(HttpStatus.NOT_FOUND);

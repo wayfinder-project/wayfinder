@@ -93,9 +93,9 @@ The Content-Type for all requests and responses is
 `"application/json; charset=UTF-8"`.
 
 Note that, in addition to any status codes listed on the endpoints, a status
-code of 403 (forbidden) may be returned from any endpoint except `/login` and
-`POST /users` to indicate that the user is not logged in or does not have
-sufficient permissions to access the resource.
+code of 403 (forbidden) may be returned from any endpoint except
+`POST /login` and `POST /users` to indicate that the user is not logged in or
+does not have sufficient permissions to access the resource.
 
 #### Type reference
 
@@ -231,11 +231,15 @@ the status is successful either way).
 **Response body**: The newly created user, or an error message describing the
 reason for failure.
 
-##### PATCH
+##### PUT `/{id}`
 
 **Response status**: 200 (OK), 404 (not found) or 409 (conflict)
 
 **Request body**: `User`
+
+**Request notes**: The ID property of the request body will be ignored and
+replaced by the ID specified in the path. This is for consistency with
+conventional HTTP method semantics.
 
 **Response type**: `User | ApiError`
 
@@ -244,6 +248,15 @@ reason for failure (e.g. if no user exists with the same ID to be updated, or
 the user attempts to change their username to one that is already taken).
 
 #### `/login`
+
+##### GET
+
+**Response status**: 200 (OK)
+
+**Response type**: `User`
+
+**Response body**: User information for the currently logged-in user, as
+\*determined by the authentication token.
 
 ##### POST
 
