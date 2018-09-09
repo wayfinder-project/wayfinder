@@ -1,5 +1,6 @@
 package com.wayfinder.server.controllers;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -18,12 +19,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wayfinder.server.beans.PasswordChangeRequest;
 import com.wayfinder.server.beans.ResponseError;
 import com.wayfinder.server.beans.User;
 import com.wayfinder.server.beans.UserWithPassword;
 import com.wayfinder.server.exceptions.UserAlreadyExistsException;
 import com.wayfinder.server.exceptions.UserNotFoundException;
 import com.wayfinder.server.services.UserService;
+import com.wayfinder.server.util.Passwords;
 
 @RestController
 @RequestMapping("/users")
@@ -71,6 +74,26 @@ public class UserController {
 			return new ResponseError(e).toEntity(HttpStatus.NOT_FOUND);
 		} catch (UserAlreadyExistsException e) {
 			return new ResponseError(e).toEntity(HttpStatus.CONFLICT);
+		}
+	}
+
+	@RequestMapping(path = "/{id}/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<?> updatePassword(@PathVariable("id") @Min(0) int id,
+			@RequestBody @Valid PasswordChangeRequest request) {
+		try {
+			User user = userService.findById(id);
+			if (user == null) {
+				throw new UserNotFoundException(id);
+			}
+			// Make sure that the given old password is correct.
+			byte[] oldHash = Passwords.hashPassword(request.getOldPassword().toCharArray(), user.getPasswordSalt());
+			if (!Arrays.equals(user.getPasswordHash(), oldHash)) {
+				return new ResponseError("Old password is incorrect.").toEntity(HttpStatus.FORBIDDEN);
+			}
+			userService.updatePassword(id, request.getNewPassword().toCharArray());
+			return ResponseEntity.ok().build();
+		} catch (UserNotFoundException e) {
+			return new ResponseError(e).toEntity(HttpStatus.NOT_FOUND);
 		}
 	}
 }

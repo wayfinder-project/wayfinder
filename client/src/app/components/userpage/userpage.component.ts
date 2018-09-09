@@ -38,25 +38,17 @@ export class UserpageComponent implements OnInit {
       if (this.inputPassword1 !== this.inputPassword2) {
         alert('New passwords do not match.');
       } else {
-        // this.authService.checkLogin(this.password).subscribe(
-        //   t => {
-        //     if (t != null) {
-        //       this.data.updateUserPassword(this.inputPassword1).subscribe(
-        //         v => {
-        //           if (v != null) {
-        //             this.password = "";
-        //             this.inputPassword1 = "";
-        //             this.inputPassword2 = "";
-        //             alert("Password updated!");
-        //           }
-        //         }
-        //       )
-        //     }
-        //     else {
-        //       alert("Incorrect Password.");
-        //     }
-        //   }
-        // );
+        this.userService
+          .updatePassword(this.user.id, this.password, this.inputPassword1)
+          .subscribe(
+            () => {
+              this.password = this.inputPassword1 = this.inputPassword2 = '';
+              alert('Password updated!');
+            },
+            _ => {
+              alert('Incorrect password.');
+            }
+          );
       }
     }
   }
