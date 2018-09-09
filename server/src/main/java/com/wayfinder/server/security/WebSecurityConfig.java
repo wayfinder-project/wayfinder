@@ -10,6 +10,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import com.wayfinder.server.controllers.ErrorController;
+
 /**
  * A configuration class for web security, which sets up the JwtTokenFilter.
  * 
@@ -20,6 +22,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private JwtTokenProvider tokenProvider;
+	@Autowired
+	private ErrorController errorController;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -31,5 +35,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().requestMatchers(allowable).permitAll().anyRequest().authenticated();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.addFilterBefore(new JwtTokenFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+		http.exceptionHandling().accessDeniedHandler(errorController).authenticationEntryPoint(errorController);
 	}
 }
