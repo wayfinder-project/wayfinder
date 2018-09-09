@@ -8,11 +8,21 @@ import { HttpClient } from '@angular/common/http';
 
 declare var google: any;
 
+
+
 interface Marker {
   lat: number;
   lng: number;
   label?: string;
-  draggable: boolean;
+  waypointId?: number;
+  draggable?: boolean;
+}
+
+interface Circle {
+  lat: number;
+  lng: number;
+  radius: number;
+  fillColor: string;
 }
 
 
@@ -26,26 +36,43 @@ interface Marker {
 })
 export class MapComponent implements OnInit {
 
-  public lat: Number;
-  public lng: Number;
   public origin: any;
   public destination: any;
   geocoder: any;
 
   public renderOptions = {
-    suppressMarkers: false,
-    draggable: true,
-    visible: true
+    suppressMarkers: true,
+    draggable: false,
+    visible: false,
+    polylineOptions: {
+      strokeColor: '#6fa5fcD3',
+      strokeWeight: 5,
+      zIndex: -1,
+      clickable: true
+    }
   };
 
   markers: Marker[] = [
+
   ];
 
-  directions: any = [];
+  circles: Circle[] = [
+
+  ];
+
+  legs: any[] = [
+
+  ];
+
+  polyPoints: any[] = [
+
+  ];
 
 
  waypoints: any = [
  ];
+
+
 
 
   @ViewChild(AgmMap) map: AgmMap;
@@ -59,74 +86,96 @@ export class MapComponent implements OnInit {
   constructor(private http: HttpClient) {
 
   }
-
+  circleRadius: number; // Radius of the place radius
   public location: LocationModel;
   public waypoint: WaypointModel;
-
-  public change(event: any) {
-    console.log(this.location);
-    const  loc: LocationModel = {
-      lat : 5,
-      lng : 3
-    };
-    loc.lat = event.coords.lat;
-    loc.lng = event.coords.lng;
-    const way: WaypointModel = {
-      location : null,
-    };
-    way.location = loc;
-   this.waypoints.push(way);
-    console.log(way);
-    console.log(this.waypoints);
-    this.getDirection();
-  }
+  public directions: any;
+  public  directionInfo: any;
+  public legInfo: any; // single leg info
 
   ngOnInit() {
-    this.lat = 38.9586;
-    this.lng = -77.3570;
-    console.log(this.lat);
+    this.circleRadius = 500;
     this.origin = { lat: 38.9586, lng: -77.3570 };
     this.destination = { lat: 38.9072, lng: -77.0369 };
-    console.log(this.origin);
     this.getLocation();
     this.getDirection();
   }
 
-  getDirection() {
-    this.origin = { lat: this.origin.lat, lng: this.origin.lng };
-    this.destination = { lat: this.destination.lat, lng: this.destination.lng };
-    this.map.triggerResize();
-    this.getPlaces.bind(this)();
-  }
 
-  markerDragEnd(m: any, origin: boolean) {
-    if (origin) {
-      this.origin.lat = m.coords.lat;
-      this.origin.lng = m.coords.lng;
-    } else {
-      this.destination.lat = m.coords.lat;
-      this.destination.lng = m.coords.lng;
+   // Adds a waypoint to the map
+  public addWaypoint(event: any) {
+    const  loc: LocationModel = {
+      lat : event.coords.lat,
+      lng : event.coords.lng
+    };
+    const way: WaypointModel = {
+      location : loc,
+    };
+   this.waypoints.push(way);
+   this.markers.push(
+     {lat: loc.lat,
+    lng: loc.lng,
+    waypointId: this.waypoints.length - 1,
+    draggable: true
     }
-    this.getPlaces.bind(this)();
+   );
     this.getDirection();
   }
 
-  mapClicked($event) {
-    this.markers.push({
-      lat: $event.coords.lat,
-      lng: $event.coords.lng,
-      draggable: true
-    });
-    console.log(this.markers[0]);
-    if (this.markers.length % 2 === 0 ) {
-      this.directions.push({
-        origin: this.markers[this.markers.length - 2],
-        destination: this.markers[this.markers.length - 1]
+  // Creates a direction based on origin and destination. based on AGM Direction api
+  getDirection() {
+    this.origin = { lat: this.origin.lat, lng: this.origin.lng };
+    this.destination = { lat: this.destination.lat, lng: this.destination.lng };
+    if (this.markers.length === 0) {
+      this.markers.push({
+        lat: this.origin.lat,
+        lng: this.origin.lng,
+        draggable: true,
+        label: 'START'
       });
+      this.markers.push({
+        lat: this.destination.lat,
+        lng: this.destination.lng,
+        draggable: true,
+        label: 'END'
+      });
+    } else {
+      this.markers[0].lat = this.origin.lat;
+      this.markers[0].lng = this.origin.lng;
+
     }
-    console.log(this.directions);
+
+  }
+  // Gets called when a marker(waypoint) is dragged.
+  moveWaypoint(index: number, event: any) {
+    const marker = this.markers[index];
+    marker.lat = event.coords.lat;
+    marker.lng = event.coords.lng;
+    const way = this.waypoints[this.markers[index].waypointId];
+    if (way != null) {
+      way.location.lat = marker.lat;
+      way.location.lng = marker.lng;
+    } else {
+      this.markerDragEnd(this.markers[index], true);
+    }
+    this.getDirection();
   }
 
+  // If a marker(origin/destination) is dragged.
+  markerDragEnd(m: any, origin: boolean) {
+    console.log(m);
+    if (origin) {
+      this.origin.lat = m.lat;
+      this.origin.lng = m.lng;
+    } else {
+      this.destination.lat = m.lat;
+      this.destination.lng = m.lng;
+    }
+    this.getDirection();
+  }
+
+
+  // Gets the current location of the user.
   getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(this.showPosition.bind(this));
@@ -134,8 +183,81 @@ export class MapComponent implements OnInit {
       console.log('error');
     }
   }
+  showPosition(position) {
+    this.origin.lat = position.coords.latitude;
+    this.origin.lng = position.coords.longitude;
+  }
 
-  getPlaces() {
+  // Updates the direction info and updates the legs.
+  directionChanged(event: any) {
+    this.directions = event;
+    console.log(this.directions);
+    this.directionInfo = this.directions.routes[0].legs[0].distance.text;
+    const routeLegs = this.directions.routes[0].legs;
+    this.legs = [];
+    for (let i = 0; i < routeLegs.length; i++) {
+      this.legs.push(routeLegs[i]);
+    }
+    this.polyPoints = [];
+  }
+
+
+
+  // Creates buttons for each leg. Highlights and centers on the leg when pressed.
+  legButton(i: number) {
+    this.legInfo = this.legs[i];
+    console.log(this.legInfo);
+    const end = this.legs[i].end_location;
+    const start = this.legs[i].start_location;
+    this.controlmap.fitBounds({east: Math.max(start.lng(), end.lng()),
+      north: Math.max(start.lat(), end.lat()),
+      west: Math.min(start.lng(), end.lng()),
+      south: Math.min(start.lat(), end.lat())});
+    this.polyPoints = [];
+    const legsLength = this.legs[i].steps.length;
+    let count = 0;
+    for (let q = 0; q < legsLength; q++) {
+      const pathLength = this.legs[i].steps[q].path.length;
+      if (pathLength  < 1000) {
+        for ( let z = 0; z < pathLength; z++) {
+          count++;
+          const pathPoint = this.legs[i].steps[q].path[z];
+          this.polyPoints.push({lat: pathPoint.lat(), lng: pathPoint.lng()});
+        }
+      } else {
+        const pathPoints: any[] = [];
+        pathPoints.push(this.legs[i].steps[q].path[0]);
+        pathPoints.push(this.legs[i].steps[q].path[1]);
+
+        pathPoints.push(this.legs[i].steps[q].path[pathLength - 2]);
+        pathPoints.push(this.legs[i].steps[q].path[pathLength - 1]);
+
+        for (const p of pathPoints) {
+          this.polyPoints.push({lat: p.lat(), lng: p.lng()});
+        }
+
+      }
+    }
+    console.log(count);
+}
+
+  // Tries to find the point in the path.
+  findPointinPath(paths: any, point: any, round: number) {
+    const pointIndex = paths.findIndex(x =>
+      this.roundTo(x.lat(), round) === this.roundTo(point.lat(), round) &&
+      this.roundTo(x.lng(), round) === this.roundTo(point.lng(), round)
+    );
+    if (pointIndex === -1 && (round - 1) > -1) {
+      this.findPointinPath(paths, point, round - 1);
+    }
+      return pointIndex;
+  }
+
+  roundTo(x: number, r: number) {
+    return (Math.round(x  * (10 ** (r - 1))) / (10 ** (r - 1)) );
+  }
+
+  getPlaces(coords: any) {
 
 
     // var nmap = new google.maps.Map(document.getElementById('map'), {
@@ -144,12 +266,20 @@ export class MapComponent implements OnInit {
     //  });
 
     const request = {
-      location: this.destination,
-      radius: '500',
+      location: coords,
+      radius: this.circleRadius,
       types: [this.currentLocationSearchType]
     };
 
-    console.log(this.controlmap);
+    const circle = {
+      lat: coords.lat,
+      lng: coords.lng,
+      radius: this.circleRadius,
+      fillColor: 'blue'
+    };
+    this.circles = [];
+    this.circles.push(circle);
+
 
     for (let i = 0; i < this.currentMarkers.length; i++) {
       this.currentMarkers[i].setMap(null);
@@ -208,14 +338,15 @@ mapReady($event: any) {
   // and you can put your logic here to get lat lng for marker. I have just put a sample code. You can refactor it the way you want.
   // this.getLatLong('ChIJN1t_tDeuEmsRUsoyG83frY4', $event, null);
   this.controlmap = $event;
+  console.log(this.controlmap);
 }
 
-  showPosition(position) {
-    console.log('Latitude: ' + position.coords.latitude +
-      'Longitude: ' + position.coords.longitude);
-    this.origin.lat = position.coords.latitude;
-    this.origin.lng = position.coords.longitude;
+
+
+  showMarkerPlaces(index: number) {
+    this.getPlaces.bind(this)({lat: this.markers[index].lat, lng: this.markers[index].lng});
   }
+
 
 }
 
