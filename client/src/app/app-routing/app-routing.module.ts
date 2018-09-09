@@ -16,7 +16,7 @@ export const routes: Routes = [
     canActivate: [AccessGuard],
     children: [
       { path: 'account', component: UserpageComponent },
-      { path: 'map', component: MapComponent },
+      { path: 'create-route', component: MapComponent },
       { path: '', redirectTo: 'account', pathMatch: 'full' },
     ],
   },
