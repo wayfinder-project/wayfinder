@@ -105,10 +105,29 @@ Type definitions are given here in TypeScript notation. The definitions
 should be interpreted as if written using TypeScripts `strict` option; that
 is, properties not explicitly marked as optional may not be null.
 
+##### `ApiErrorType` (enum)
+
+```ts
+{
+  /**
+   * The user is not logged in.
+   */
+  NotLoggedIn = 'NOT_LOGGED_IN',
+  /**
+   * The user is logged in, but does not have permission to access an endpoint.
+   */
+  Unauthorized = 'UNAUTHORIZED',
+}
+```
+
 ##### `ApiError`
 
 ```ts
 {
+  /**
+   * The type of the error, if a specific type can be associated.
+   */
+  type?: ApiErrorType;
   /**
    * The primary message describing the error.
    */

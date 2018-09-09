@@ -1,25 +1,44 @@
 import { Injectable } from '@angular/core';
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
+import {
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpInterceptor,
+  HttpErrorResponse,
+} from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+
+import { ApiError, ApiErrorType } from '../models/api-error.model';
 import { AuthService } from '../services/auth/auth.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private router: Router) {}
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(request).pipe(catchError(err => {
-      if (err.status === 403) {
-        // auto logout if 403 response returned from api
-        this.authService.logout();
-        location.reload(true);
-      }
-
-      const error = err.error.message || err.statusText;
-      return throwError(error);
-    }));
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+    return next.handle(request).pipe(
+      catchError((err: HttpErrorResponse) => {
+        if (err.error instanceof ErrorEvent) {
+          // A client-side or network error occurred.
+          console.error('Network error:', err.error);
+          return throwError(err.error);
+        } else {
+          // API error.
+          const apiError = <ApiError>err.error;
+          apiError.status = err.status;
+          // Automatically log out if the error was due to being not logged in.
+          if (apiError.type === ApiErrorType.NotLoggedIn) {
+            this.authService.logout();
+            this.router.navigate(['login']);
+          }
+          return throwError(apiError);
+        }
+      })
+    );
   }
 }
