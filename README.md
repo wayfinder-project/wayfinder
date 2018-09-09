@@ -93,9 +93,9 @@ The Content-Type for all requests and responses is
 `"application/json; charset=UTF-8"`.
 
 Note that, in addition to any status codes listed on the endpoints, a status
-code of 403 (forbidden) may be returned from any endpoint except `/login` and
-`POST /users` to indicate that the user is not logged in or does not have
-sufficient permissions to access the resource.
+code of 403 (forbidden) may be returned from any endpoint except
+`POST /login` and `POST /users` to indicate that the user is not logged in or
+does not have sufficient permissions to access the resource.
 
 #### Type reference
 
@@ -244,6 +244,15 @@ reason for failure (e.g. if no user exists with the same ID to be updated, or
 the user attempts to change their username to one that is already taken).
 
 #### `/login`
+
+##### GET
+
+**Response status**: 200 (OK)
+
+**Response type**: `User`
+
+**Response body**: User information for the currently logged-in user, as
+*determined by the authentication token.
 
 ##### POST
 
