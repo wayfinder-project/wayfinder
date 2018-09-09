@@ -271,6 +271,7 @@ set. The following is a comprehensive list of all such environment variables:
 - `JDBC_URL`: the URL of the database
 - `JDBC_USER`: the database user
 - `JDBC_PASSWORD`: the database password
+- `JWT_SECRET`: the secret used in signing JSON Web Tokens
 
 ### Deployment
 

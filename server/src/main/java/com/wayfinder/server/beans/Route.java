@@ -3,7 +3,6 @@ package com.wayfinder.server.beans;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -40,7 +39,6 @@ public class Route {
 	 * leg index, so that the legs appear in the natural travel order (from start to
 	 * end).
 	 */
-	@Column(nullable = false)
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@OrderBy("index")
 	@NotNull

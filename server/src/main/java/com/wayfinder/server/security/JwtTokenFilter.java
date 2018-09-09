@@ -11,6 +11,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * A filter that intercepts JSON Web Tokens in incoming requests and passes
+ * along authentication data to the UsernamePasswordAuthenticationFilter.
+ * 
+ * @author Ian Johnson
+ */
 public class JwtTokenFilter extends OncePerRequestFilter {
 	private JwtTokenProvider tokenProvider;
 

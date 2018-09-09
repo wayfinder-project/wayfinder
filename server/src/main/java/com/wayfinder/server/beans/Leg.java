@@ -1,7 +1,9 @@
 package com.wayfinder.server.beans;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,14 +35,14 @@ public class Leg {
 	/**
 	 * The starting point of the leg.
 	 */
-	@OneToOne
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@NotNull
 	@Valid
 	private Waypoint start;
 	/**
 	 * The ending point of the leg.
 	 */
-	@OneToOne
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@NotNull
 	@Valid
 	private Waypoint end;
