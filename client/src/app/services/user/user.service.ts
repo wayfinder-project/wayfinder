@@ -92,4 +92,22 @@ export class UserService {
         })
       );
   }
+
+  /**
+   * Updates the password of the user with the given ID.
+   *
+   * @param id the ID of the user whose password to update
+   * @param oldPassword the user's current password, for verification
+   * @param newPassword the desired new password
+   */
+  updatePassword(
+    id: number,
+    oldPassword: string,
+    newPassword: string
+  ): Observable<void> {
+    return this.http.post<void>(environment.apiUrl + `/users/${id}/password`, {
+      oldPassword,
+      newPassword,
+    });
+  }
 }

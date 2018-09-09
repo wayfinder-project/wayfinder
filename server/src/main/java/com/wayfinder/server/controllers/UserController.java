@@ -1,5 +1,6 @@
 package com.wayfinder.server.controllers;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -18,12 +19,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wayfinder.server.beans.PasswordChangeRequest;
 import com.wayfinder.server.beans.ResponseError;
 import com.wayfinder.server.beans.User;
 import com.wayfinder.server.beans.UserWithPassword;
 import com.wayfinder.server.exceptions.UserAlreadyExistsException;
 import com.wayfinder.server.exceptions.UserNotFoundException;
 import com.wayfinder.server.services.UserService;
+import com.wayfinder.server.util.Passwords;
 
 @RestController
 @RequestMapping("/users")
@@ -74,20 +77,20 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/{id}/password", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(path = "/{id}/password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<?> updatePassword(@PathVariable("id") @Min(0) int id,
-			@RequestBody @NotEmpty String newPassword) {
-		// For whatever reason, Spring ignores the "consumes" attribute key
-		// above and will not actually parse the request body as a JSON string,
-		// so we have to do it ourselves. Note that this is not actually robust,
-		// because it doesn't ensure that the contents of the string are valid
-		// JSON and doesn't parse escape characters.
-		if (!newPassword.startsWith("\"") || !newPassword.endsWith("\"")) {
-			return new ResponseError("Invalid JSON string.").toEntity(HttpStatus.BAD_REQUEST);
-		}
-		newPassword = newPassword.substring(1, newPassword.length() - 1);
+			@RequestBody @Valid PasswordChangeRequest request) {
 		try {
-			userService.updatePassword(id, newPassword.toCharArray());
+			User user = userService.findById(id);
+			if (user == null) {
+				throw new UserNotFoundException(id);
+			}
+			// Make sure that the given old password is correct.
+			byte[] oldHash = Passwords.hashPassword(request.getOldPassword().toCharArray(), user.getPasswordSalt());
+			if (!Arrays.equals(user.getPasswordHash(), oldHash)) {
+				return new ResponseError("Old password is incorrect.").toEntity(HttpStatus.FORBIDDEN);
+			}
+			userService.updatePassword(id, request.getNewPassword().toCharArray());
 			return ResponseEntity.ok().build();
 		} catch (UserNotFoundException e) {
 			return new ResponseError(e).toEntity(HttpStatus.NOT_FOUND);

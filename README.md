@@ -226,7 +226,7 @@ the status is successful either way).
 
 **Response status**: 201 (created) or 409 (conflict)
 
-**Request body**: `{ user: User; password: string; }`
+**Request body**: `{ user: User; password: string }`
 
 **Response type**: `User | ApiError`
 
@@ -249,17 +249,19 @@ conventional HTTP method semantics.
 reason for failure (e.g. if no user exists with the same ID to be updated, or
 the user attempts to change their username to one that is already taken).
 
-##### PUT `/{id}/password`
+##### POST `/{id}/password`
 
-**Response status**: 200 (OK) or 404 (not found)
+**Response status**: 200 (OK), 403 (forbidden) or 404 (not found)
 
-**Request body**: `string`
+**Request body**: `{ oldPassword: string; newPassword: string }`
 
-**Request notes**: The request body will be used as the user's new password.
+**Request notes**: For security reasons, the user's current password must be
+sent with the request for verification.
 
 **Response type**: `void | ApiError`
 
-**Response body**: Nothing (upon success), or the reason for failure.
+**Response body**: Nothing (upon success), or the reason for failure (either
+the old password was incorrect or the user ID did not correspond to a user).
 
 #### `/login`
 
