@@ -85,12 +85,12 @@ public class UserService {
 		user.setPasswordSalt(existing.getPasswordSalt());
 		user.setPasswordHash(existing.getPasswordHash());
 
-		User saved = userRepo.save(user);
+		userRepo.save(user);
 		// Replace the original password data.
-		saved.setPasswordSalt(salt);
-		saved.setPasswordHash(hash);
+		user.setPasswordSalt(salt);
+		user.setPasswordHash(hash);
 
-		return saved;
+		return user;
 	}
 
 	/**
