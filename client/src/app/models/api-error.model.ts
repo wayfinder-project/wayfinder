@@ -1,7 +1,25 @@
 /**
+ * A specific type of error which can be returned by the API.
+ */
+export enum ApiErrorType {
+  /**
+   * The user is not logged in.
+   */
+  NotLoggedIn = 'NOT_LOGGED_IN',
+  /**
+   * The user is logged in, but does not have permission to access an endpoint.
+   */
+  Unauthorized = 'UNAUTHORIZED',
+}
+
+/**
  * An error returned from the backend API.
  */
 export interface ApiError {
+  /**
+   * The type of the error, if a specific type can be associated.
+   */
+  type?: ApiErrorType;
   /**
    * The primary message describing the error.
    */
