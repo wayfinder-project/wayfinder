@@ -67,6 +67,14 @@ export class UserService {
   }
 
   /**
+   * Invalidates the cached data for the current user, forcing the next call to
+   * getCurrentUser to contact the server for new data.
+   */
+  invalidateCurrentUser(): void {
+    this.currentUser = undefined;
+  }
+
+  /**
    * Updates the given user.
    *
    * @param user the user to update
