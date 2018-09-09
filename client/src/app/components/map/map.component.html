@@ -1,34 +1,72 @@
-<agm-map [latitude]="lat" [longitude]="lng" id="map" (mapReady)="mapReady($event)" (mapClick)="change($event)">
-  <agm-direction [origin]="origin" [destination]="destination"
+<agm-map [latitude]="mapLat" [longitude]="mapLng" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
+  <agm-direction [origin]="origin" [destination]="destination "
   [renderOptions]="renderOptions" 
   [waypoints]="waypoints"
-
+ (onChange)="directionChanged($event)"
   >
   </agm-direction>
- 
- 
-</agm-map>
+  <agm-marker
+  *ngFor="let m of markers, let i = index"
+    [latitude]="m.lat"
+    [longitude]="m.lng" 
+    [markerDraggable]="m.draggable"
+    [label]="m.label"
+    (markerClick)="showMarkerPlaces(i)"
+    (dragEnd)="moveWaypoint(i, $event)">
 
+  </agm-marker>
+ 
+  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10" > 
+    <agm-polyline-point
+    *ngFor="let p of polyPoints, let i = index"
+      [latitude]="p.lat"
+      [longitude]="p.lng"
+    >
+
+    </agm-polyline-point>
+
+  </agm-polyline>
+
+  <agm-circle
+    *ngFor="let c of circles, let i = index"
+      [latitude]="c.lat" [longitude]="c.lng"
+      [(radius)]="c.radius"
+      [fillColor]="c.fillColor"
+      [circleDraggable]="false"
+      [editable]="false">
+  </agm-circle>
+</agm-map>
+<button
+  *ngFor="let l of legs, let i = index"
+  (click)="legButton(i)"
+>
+{{legs[i].distance.text}}
+</button>
 <div class="container">
   <div class="row">
-    <div class="col-4 text-center">
-      <h1>Origin</h1>
-      Latitude
-      <input type=number  [(ngModel)]='origin.lat' class='form-control' placeholder='State'>
-      Longitude
-      <input type=number  [(ngModel)]='origin.lng' class='form-control' placeholder='State'>
+    <div class="col-8 text-center">
+    <ng-container *ngIf="legInfo" >
+      <div>
+      distance:{{legInfo.distance.text}}
     </div>
-    <div class="col-4 text-center">
-      <div style="margin-top:75px">
-        <button (click)="getDirection()">Find route!</button>
+    <div>
+        duration:{{legInfo.duration.text}}
+    </div>
+    <div>
+      directions:
+      <div *ngFor="let s of legInfo.steps, let i = index">
+        Step {{i}} : 
+        <span [innerHtml] = "legInfo.steps[i].instructions"></span>
+
       </div>
     </div>
-    <div class="col-4 text-center">
-        <h1>Destination</h1>
-        Latitude
-        <input type=number  [(ngModel)]='destination.lat' class='form-control' placeholder='State'>
-        Longitude
-        <input type=number  [(ngModel)]='destination.lng' class='form-control' placeholder='State'>
+    </ng-container>
+    </div>
+    <div class="col-2 text-center">
+  
+    </div>
+    <div class="col-2 text-center">
+    
     </div>
     <div class="input-group mb-3 col-4">
         <div class="input-group-prepend">
