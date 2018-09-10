@@ -9,13 +9,16 @@ import { HttpClient } from '@angular/common/http';
 declare var google: any;
 
 
-
 interface Marker {
   lat: number;
   lng: number;
   label?: string;
   waypointId?: number;
   draggable?: boolean;
+  placeId?: string;
+  icon?: string;
+  updateIcon?: google.maps.Icon;
+  infoWindow?: boolean;
 }
 
 interface Circle {
@@ -69,9 +72,13 @@ export class MapComponent implements OnInit {
 
   ];
 
+  polyLines: any[] = [
 
- waypoints: any = [
- ];
+  ];
+
+
+  waypoints: any = [
+  ];
 
 
 
@@ -82,7 +89,8 @@ export class MapComponent implements OnInit {
   controlmap;
   locationSearchTypes: string[] = ['lodging', 'restaurant', 'gas_station', 'supermarket', 'rv_park', 'parking', 'park'];
   currentLocationSearchType: string = this.locationSearchTypes[0];
-  currentMarkers: google.maps.Marker[] = [];
+
+  currentMarkers: Marker[] = [];
 
   constructor(private http: HttpClient) {
 
@@ -104,23 +112,24 @@ export class MapComponent implements OnInit {
   }
 
 
-   // Adds a waypoint to the map
+  // Adds a waypoint to the map
   public addWaypoint(event: any) {
-    const  loc: LocationModel = {
-      lat : event.coords.lat,
-      lng : event.coords.lng
+    const loc: LocationModel = {
+      lat: event.coords.lat,
+      lng: event.coords.lng
     };
     const way: WaypointModel = {
-      location : loc,
+      location: loc,
     };
-   this.waypoints.push(way);
-   this.markers.push(
-     {lat: loc.lat,
-    lng: loc.lng,
-    waypointId: this.waypoints.length - 1,
-    draggable: true
-    }
-   );
+    this.waypoints.push(way);
+    this.markers.push(
+      {
+        lat: loc.lat,
+        lng: loc.lng,
+        waypointId: this.waypoints.length - 1,
+        draggable: true
+      }
+    );
     this.getDirection();
   }
 
@@ -216,37 +225,33 @@ export class MapComponent implements OnInit {
     console.log(this.legInfo);
     const end = this.legs[i].end_location;
     const start = this.legs[i].start_location;
-    this.controlmap.fitBounds({east: Math.max(start.lng(), end.lng()),
+    this.controlmap.fitBounds({
+      east: Math.max(start.lng(), end.lng()),
       north: Math.max(start.lat(), end.lat()),
       west: Math.min(start.lng(), end.lng()),
-      south: Math.min(start.lat(), end.lat())});
+      south: Math.min(start.lat(), end.lat())
+    });
     this.polyPoints = [];
+    this.polyLines = [];
     const legsLength = this.legs[i].steps.length;
     let count = 0;
     for (let q = 0; q < legsLength; q++) {
       const pathLength = this.legs[i].steps[q].path.length;
-      if (pathLength  < 1000) {
-        for ( let z = 0; z < pathLength; z++) {
+      if (pathLength < 1000) {
+        for (let z = 0; z < pathLength; z++) {
           count++;
           const pathPoint = this.legs[i].steps[q].path[z];
-          this.polyPoints.push({lat: pathPoint.lat(), lng: pathPoint.lng()});
+          const polyLine: any = { points: []};
+          polyLine.points.push({ lat: pathPoint.lat(), lng: pathPoint.lng() });
+          this.polyLines.push(polyLine);
         }
       } else {
-        const pathPoints: any[] = [];
-        pathPoints.push(this.legs[i].steps[q].path[0]);
-        pathPoints.push(this.legs[i].steps[q].path[1]);
-
-        pathPoints.push(this.legs[i].steps[q].path[pathLength - 2]);
-        pathPoints.push(this.legs[i].steps[q].path[pathLength - 1]);
-
-        for (const p of pathPoints) {
-          this.polyPoints.push({lat: p.lat(), lng: p.lng()});
-        }
+        const pathPoints: any = { points: []};
 
       }
     }
     console.log(count);
-}
+  }
 
 totalLegsButton() {
   const end = this.destination;
@@ -330,11 +335,11 @@ totalLegsButton() {
     if (pointIndex === -1 && (round - 1) > -1) {
       this.findPointinPath(paths, point, round - 1);
     }
-      return pointIndex;
+    return pointIndex;
   }
 
   roundTo(x: number, r: number) {
-    return (Math.round(x  * (10 ** (r - 1))) / (10 ** (r - 1)) );
+    return (Math.round(x * (10 ** (r - 1))) / (10 ** (r - 1)));
   }
 
   getPlaces(coords: any) {
@@ -360,66 +365,78 @@ totalLegsButton() {
     this.circles = [];
     this.circles.push(circle);
 
-
-    for (let i = 0; i < this.currentMarkers.length; i++) {
-      this.currentMarkers[i].setMap(null);
-    }
     this.currentMarkers = [];
 
     const service = new google.maps.places.PlacesService(this.controlmap);
-    service.nearbySearch(request, this.callback.bind(this));
+    service.nearbySearch(request, this.callbackPlaces.bind(this));
   }
 
- callback(results, status) {
-  if (status === google.maps.places.PlacesServiceStatus.OK) {
+  callbackPlaces(results, status) {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
       this.createMarkers.bind(this)(results);
       console.log(results);
+    }
   }
-}
-createMarkers(places) {
-  const bounds: LatLngBounds = new google.maps.LatLngBounds();
-  // var placesList = document.getElementById('places');
+  createMarkers(places) {
+    const bounds: LatLngBounds = new google.maps.LatLngBounds();
 
-  for (let i = 0, place; place = places[i]; i++) {
+    for (let i = 0; i < places.length; i++) {
 
-    const image = {
-      url: place.icon,
-      size: new google.maps.Size(71, 71),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(17, 34),
-      scaledSize: new google.maps.Size(25, 25)
+      const inputPlace = places[i];
+
+      const image: google.maps.Icon = {
+        url: inputPlace.icon,
+        scaledSize: new google.maps.Size(30, 30)
+      };
+
+      this.currentMarkers.push({
+        lat: inputPlace.geometry.location.lat(),
+        lng: inputPlace.geometry.location.lng(),
+        label: inputPlace.name,
+        draggable: false,
+        placeId: inputPlace.place_id,
+        updateIcon: image,
+        infoWindow: true
+      }
+      );
+      bounds.extend(inputPlace.geometry.location);
+    }
+    this.controlmap.fitBounds(bounds);
+  }
+  getPlaceDetails(newPlaceId: string) {
+
+
+    const request = {
+      placeId: newPlaceId,
+      fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
     };
+    const service = new google.maps.places.PlacesService(this.controlmap);
+    service.getDetails(request, this.callbackDetails.bind(this));
 
-    const marker = new google.maps.Marker({
-      map: this.controlmap,
-      icon: image,
-      title: place.name,
-      position: place.geometry.location
-    });
-
-    this.currentMarkers.push(marker);
-
-    bounds.extend(place.geometry.location);
   }
-  this.controlmap.fitBounds(bounds);
-}
+  callbackDetails(results, status) {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+      // this.createMarkers.bind(this)(results);
+      console.log(results);
+    }
+  }
 
-getLatLong(placeid: string, map: any, fn) {
-  const placeService = new google.maps.places.PlacesService(map);
-  placeService.getDetails({
-    placeId: placeid
-  }, function (result, status) {
-    console.log(result.geometry.location.lat());
-    console.log(result.geometry.location.lng());
-  });
-}
-mapReady($event: any) {
-  // here $event will be of type google.maps.Map
-  // and you can put your logic here to get lat lng for marker. I have just put a sample code. You can refactor it the way you want.
-  // this.getLatLong('ChIJN1t_tDeuEmsRUsoyG83frY4', $event, null);
-  this.controlmap = $event;
-  console.log(this.controlmap);
-}
+  getLatLong(placeid: string, map: any, fn) {
+    const placeService = new google.maps.places.PlacesService(map);
+    placeService.getDetails({
+      placeId: placeid
+    }, function (result, status) {
+      console.log(result.geometry.location.lat());
+      console.log(result.geometry.location.lng());
+    });
+  }
+  mapReady($event: any) {
+    // here $event will be of type google.maps.Map
+    // and you can put your logic here to get lat lng for marker. I have just put a sample code. You can refactor it the way you want.
+    // this.getLatLong('ChIJN1t_tDeuEmsRUsoyG83frY4', $event, null);
+    this.controlmap = $event;
+    console.log(this.controlmap);
+  }
 
 
 
