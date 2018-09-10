@@ -1,0 +1,12 @@
+.sebm-google-map-container {
+    height:550px;
+  }
+
+.map{
+  position:absolute;
+  bottom:0%;
+  left:50%;
+  height:50%;
+  width:50%;
+
+}

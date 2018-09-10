@@ -1,18 +1,25 @@
 .background{
-    background-image: url("../../../assets/images/park.jpg"); background-repeat: no-repeat;
+    background-image: url("/assets/images/park.jpg"); background-repeat: no-repeat;
 
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
     height:100%;
-    width:100%; 
+    width:100%;
 }
 
+.navbar.center .navbar-inner {
+    text-align: center;
+}
+
+.navbar.center .navbar-inner .nav {
+    text-align:center;
+}
 
 @font-face {
     font-family: 'Futura';
-    src: url("../../../assets/fonts/futura/FuturaStd-Medium.otf");
+    src: url("/assets/fonts/futura/FuturaStd-Medium.otf");
 }
 
 .font-mont{
@@ -41,14 +48,14 @@ a, p {
     }
 
     .loginImage{
-        position:absolute; 
-        bottom:0px; 
-        right:20px; 
+        position:absolute;
+        bottom:0px;
+        right:20px;
         min-width:25%;
-        min-height:50%; 
+        min-height:50%;
         max-width:50%;
-        max-height:100%; 
-        width:auto; 
+        max-height:100%;
+        width:auto;
         height:auto;
         margin-left:150px;
         z-index: -1;
@@ -71,24 +78,24 @@ a, p {
             1px -1px 0 white,
             -1px 1px 0 white,
             1px 1px 0 white;
-            
+
     }
 
     .modal-dialog {
         max-width: 70%;
         width: auto;
     }
-    
+
 
     .loginImage{
-        position:absolute; 
-        bottom:0px; 
-        right:25%; 
+        position:absolute;
+        bottom:0px;
+        right:25%;
         min-width:20%;
-        min-height:40%; 
+        min-height:40%;
         max-width:40%;
         max-height:80%;
-        width:auto; 
+        width:auto;
         height:auto;
         opacity:.2;
         z-index: -1;
@@ -110,7 +117,7 @@ a, p {
     }
 
     .webTitleStyle{
-    position:relative; 
+    position:relative;
     font-size:45px; background-color:rgba(125, 170, 146, 0.0);  text-shadow:
             -1px -1px 0 white,
             1px -1px 0 white,
@@ -119,12 +126,12 @@ a, p {
     }
 
     .loginImage{
-        position:absolute; 
+        position:absolute;
         top:-10%;
-        right:-10%; 
+        right:-10%;
         max-width:50%;
-        max-height:50%; 
-        width:50%; 
+        max-height:50%;
+        width:50%;
         height:50%;
         opacity:.2;
     }

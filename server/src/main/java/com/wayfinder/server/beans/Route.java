@@ -1,10 +1,8 @@
 package com.wayfinder.server.beans;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -13,8 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -37,19 +35,14 @@ public class Route {
 	@GeneratedValue(generator = "seq_route_id", strategy = GenerationType.SEQUENCE)
 	private int id;
 	/**
-	 * The date/time on which the route was created.
+	 * The legs which this route contains. The list is guaranteed to be ordered by
+	 * leg index, so that the legs appear in the natural travel order (from start to
+	 * end).
 	 */
-	@Column(nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date creationDate;
-	/**
-	 * The legs which this route contains. The list is guaranteed to be ordered
-	 * by leg index, so that the legs appear in the natural travel order (from
-	 * start to end).
-	 */
-	@Column(nullable = false)
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@OrderBy("index")
+	@NotNull
+	@Valid
 	private List<Leg> legs;
 
 	public int getId() {
@@ -58,5 +51,13 @@ public class Route {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public List<Leg> getLegs() {
+		return legs;
+	}
+
+	public void setLegs(List<Leg> legs) {
+		this.legs = legs;
 	}
 }
