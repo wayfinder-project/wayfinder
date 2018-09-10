@@ -12,11 +12,12 @@
     [markerDraggable]="m.draggable"
     [label]="m.label"
     (markerClick)="showMarkerPlaces(i)"
+    (markerRightClick)="delete(i)"
     (dragEnd)="moveWaypoint(i, $event)">
 
   </agm-marker>
  
-  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10" > 
+  <agm-polyline [strokeColor]="'green'" [strokeWeight]="5" > 
     <agm-polyline-point
     *ngFor="let p of polyPoints, let i = index"
       [latitude]="p.lat"
@@ -37,6 +38,9 @@
   </agm-circle>
 </agm-map>
 <button
+*ngIf="legs.length > 1" (click)="totalLegsButton()">{{bigLegInfo}} mi</button>
+<button
+
   *ngFor="let l of legs, let i = index"
   (click)="legButton(i)"
 >

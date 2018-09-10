@@ -52,6 +52,7 @@ export class MapComponent implements OnInit {
     }
   };
 
+
   markers: Marker[] = [
 
   ];
@@ -91,6 +92,7 @@ export class MapComponent implements OnInit {
   public waypoint: WaypointModel;
   public directions: any;
   public  directionInfo: any;
+  public bigLegInfo: any;
   public legInfo: any; // single leg info
 
   ngOnInit() {
@@ -156,18 +158,18 @@ export class MapComponent implements OnInit {
       way.location.lat = marker.lat;
       way.location.lng = marker.lng;
     } else {
-      this.markerDragEnd(this.markers[index], true);
+      this.markerDragEnd(this.markers[index], index);
     }
     this.getDirection();
   }
 
   // If a marker(origin/destination) is dragged.
-  markerDragEnd(m: any, origin: boolean) {
+  markerDragEnd(m: any, index: number) {
     console.log(m);
-    if (origin) {
+    if (index === 0) { // Origin
       this.origin.lat = m.lat;
       this.origin.lng = m.lng;
-    } else {
+    } else { // Destination
       this.destination.lat = m.lat;
       this.destination.lng = m.lng;
     }
@@ -195,10 +197,15 @@ export class MapComponent implements OnInit {
     this.directionInfo = this.directions.routes[0].legs[0].distance.text;
     const routeLegs = this.directions.routes[0].legs;
     this.legs = [];
+    let totalDistance = 0;
     for (let i = 0; i < routeLegs.length; i++) {
       this.legs.push(routeLegs[i]);
+      totalDistance += routeLegs[i].distance.value;
     }
     this.polyPoints = [];
+    totalDistance *= 0.000621371192;
+    totalDistance = this.roundTo(totalDistance, 2);
+    this.bigLegInfo = totalDistance;
   }
 
 
@@ -240,6 +247,79 @@ export class MapComponent implements OnInit {
     }
     console.log(count);
 }
+
+totalLegsButton() {
+  const end = this.destination;
+  const start = this.origin;
+  // this.zoomFinder();
+  this.controlmap.fitBounds({east: Math.max(start.lng, end.lng),
+    north: Math.max(start.lat, end.lat),
+    west: Math.min(start.lng, end.lng),
+    south: Math.min(start.lat, end.lat)});
+    this.polyPoints = [];
+    const pathLength = this.directions.routes[0].overview_path.length;
+
+    for (let q = 0; q < pathLength; q++) {
+      const pathPoint = this.directions.routes[0].overview_path[q];
+     this.polyPoints.push({lat: pathPoint.lat(), lng: pathPoint.lng()});
+    }
+
+}
+
+/* zoomFinder() {
+  const originDestination = Math.sqrt(Math.pow(this.origin.lat - this.destination.lat, 2) +
+     Math.pow(this.origin.lng - this.destination.lng, 2));
+    console.log(this.origin.lat);
+  let longestDistance = originDestination;
+  let longestWay: any;
+  let bool: boolean;
+  let distanceDestinationFinal = this.destination;
+   let distanceOriginFinal = this.origin;
+  for (let i = 0; i < this.legs.length; i++) {
+    const endPoint = this.legs[i].end_location;
+    const distanceDestination = Math.sqrt(Math.pow(endPoint.lat() - this.destination.lat, 2) +
+    Math.pow(endPoint.lng() - this.destination.lng, 2));
+    const distanceOrigin = Math.sqrt(Math.pow(this.origin.lat - endPoint.lat(), 2) +
+    Math.pow(this.origin.lng - endPoint.lng(), 2));
+    console.log(longestDistance);
+    if (distanceDestinationFinal < distanceDestination)
+           {
+               distanceDestinationFinal = distanceDestination;
+           }
+           else if (distanceOriginFinal < distanceOrigin)
+           {
+               distanceOriginFinal = distanceOrigin;
+           }
+
+           if (longestDistance < distanceOriginFinal)
+           {
+               bool = true;
+               longestDistance = distanceOriginFinal;
+               longestWay = this.legs[i].end_location;
+               console.log(longestDistance);
+           }
+           else if(longestDistance < distanceDestinationFinal)
+           {
+               bool = false;
+               longestDistance = distanceDestinationFinal;
+               longestWay = this.legs[i].end_location;
+               console.log(longestDistance);
+           }
+  }
+  if (longestDistance > originDestination) {
+    if (bool) {
+  this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.origin.lng),
+    north: Math.max(longestWay.lat(), this.origin.lat),
+    west: Math.min(longestWay.lng(),  this.origin.lng),
+    south: Math.min(longestWay.lat(), this.origin.lat)});
+  } else {
+    this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.destination.lng),
+      north: Math.max(longestWay.lat(), this.destination.lat),
+      west: Math.min(longestWay.lng(),  this.destination.lng),
+      south: Math.min(longestWay.lat(), this.destination.lat)});
+  }
+  }
+} */
 
   // Tries to find the point in the path.
   findPointinPath(paths: any, point: any, round: number) {
@@ -344,7 +424,22 @@ mapReady($event: any) {
 
 
   showMarkerPlaces(index: number) {
+    console.log(this.directions);
+    console.log(index);
+    console.log(this.legs);
     this.getPlaces.bind(this)({lat: this.markers[index].lat, lng: this.markers[index].lng});
+    if (this.markers[index].waypointId != null) {
+      console.log(this.waypoints);
+      const waypointOrder = this.directions.routes[0].waypoint_order.indexOf(this.markers[index].waypointId) + 1;
+      console.log(waypointOrder);
+      console.log(this.legs[waypointOrder]);
+    } else {
+      console.log(this.legs[index]);
+    }
+  }
+
+  delete(index: number) {
+    console.log('a');
   }
 
 
