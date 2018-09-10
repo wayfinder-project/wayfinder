@@ -16,6 +16,7 @@ import { HomeComponent } from './components/home/home.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './utils/jwt.interceptor';
 import { ErrorInterceptor } from './utils/error.interceptor';
+import { AnnotatedWaypoint } from './models/annotated-waypoint.model/annotated-waypoint.model.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { ErrorInterceptor } from './utils/error.interceptor';
     NavbarComponent,
     HomeComponent,
     UserpageComponent,
+    AnnotatedWaypoint.ModelComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({
