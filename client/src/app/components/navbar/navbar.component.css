@@ -1,17 +1,20 @@
-.navbar-container {
-    background-color: rgb(92, 214, 92);
+a {
+    cursor: pointer;
 }
-.topnav-right {
-    float: right !important;
+
+.navbar {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+}
+.navbar-offset {
+    top: -40px; /*Offsets the top navbar 40px from the top of the viewport*/
+}
+.navbar-container-color {
+    background-color: #7DAA92;
 }
 .logo-config {
-    /*max-width: 100%;
-    height: auto;*/
     height: 30px;
     width: 30px;
-}
-.button-height {
-    height: 100%;
 }
 .font-mont{
     font-family: 'Montserrat', sans-serif;
@@ -21,20 +24,20 @@
     font-family: 'Futura';
 }
 .web-title {
-    font-size:30px; 
-    background-color:rgba(125, 170, 146, 0.0); 
+    font-size:30px;
     }
 .web-item {
-    font-size:20px; 
+    font-size:20px;
 }
 .between-navbar {
-    /*border-right:solid 2px #000;
-    padding-left: 15px;*/
+    padding-right: 5px;
+}
+.after-image {
     padding-right: 10px;
 }
-/*.navbar-nav > li > a, .navbar-brand {
-    padding-top:5px !important; padding-bottom:0 !important;
-    height: 30px;
-}*/
-.navbar {min-height:40px !important;}
-.navbar {max-height:40px !important}
+.navbar-nav > li > a, .navbar-brand {
+    padding-top:0px !important; padding-bottom:0 !important;
+}
+.navbar-nav > li > a, .nav-item {
+    padding-top:0px !important; padding-bottom:0 !important;
+}

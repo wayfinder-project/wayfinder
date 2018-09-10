@@ -1,6 +1,8 @@
 package com.wayfinder.server.beans;
 
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,47 +12,69 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Component
 @Scope("prototype")
 @Entity
-public class User {
+// We must specify a custom table name here, because "User" is not a valid table
+// name in Oracle.
+@Table(name = "WayfinderUser")
+public class User implements UserDetails {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@SequenceGenerator(name = "seq_user_id", sequenceName = "seq_user_id")
 	@GeneratedValue(generator = "seq_user_id", strategy = GenerationType.SEQUENCE)
 	private int id;
 
 	@Column(nullable = false, unique = true)
+	@NotEmpty
 	private String username;
 
 	@Column(nullable = false)
-	private String password;
+	@JsonIgnore
+	private byte[] passwordHash;
 
 	@Column(nullable = false)
+	@JsonIgnore
+	private byte[] passwordSalt;
+
+	@Column(nullable = false)
+	@NotNull
 	private String firstName;
 
 	@Column(nullable = false)
+	@NotNull
 	private String lastName;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
+	@NotNull
 	private String email;
 
+	/**
+	 * The user's trips. This list is always in descending order of creation
+	 * date/time.
+	 */
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private Set<Route> routes;
+	@OrderBy("creationDate")
+	@NotNull
+	@Valid
+	private List<Trip> trips;
 
 	public User() {
-	}
-
-	public User(String username, String password, String firstName, String lastName, String email) {
-		this.username = username;
-		this.password = password;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
 	}
 
 	public int getId() {
@@ -69,12 +93,20 @@ public class User {
 		this.username = username;
 	}
 
-	public String getPassword() {
-		return password;
+	public byte[] getPasswordHash() {
+		return passwordHash;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPasswordHash(byte[] passwordHash) {
+		this.passwordHash = passwordHash;
+	}
+
+	public byte[] getPasswordSalt() {
+		return passwordSalt;
+	}
+
+	public void setPasswordSalt(byte[] passwordSalt) {
+		this.passwordSalt = passwordSalt;
 	}
 
 	public String getFirstName() {
@@ -101,11 +133,49 @@ public class User {
 		this.email = email;
 	}
 
-	public Set<Route> getRoutes() {
-		return routes;
+	public List<Trip> getTrips() {
+		return trips;
 	}
 
-	public void setRoutes(Set<Route> routes) {
-		this.routes = routes;
+	public void setTrips(List<Trip> trips) {
+		this.trips = trips;
+	}
+
+	@JsonIgnore
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		GrantedAuthority auth = () -> "USER";
+		return Arrays.asList(auth);
+	}
+
+	@JsonIgnore
+	@Override
+	public String getPassword() {
+		// We don't store passwords in plain text!
+		return "";
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 }
