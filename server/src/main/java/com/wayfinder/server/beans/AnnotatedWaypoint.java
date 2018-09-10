@@ -2,10 +2,8 @@ package com.wayfinder.server.beans;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.context.annotation.Scope;
@@ -22,7 +20,7 @@ public class AnnotatedWaypoint extends Waypoint {
 	/**
 	 * Any comments that the user may have added to the waypoint.
 	 */
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ElementCollection
 	@NotNull
 	private List<String> comments;
 
