@@ -1,24 +1,36 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { AuthService } from '../services/auth/auth.service';
-import { Observable } from 'rxjs';
-import { TokenStorage } from '../utils/token.storage';
+import {
+  CanActivate,
+  Router,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+} from '@angular/router';
+import { catchError, mapTo } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+
+import { UserService } from '../services/user/user.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AccessGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router, private tokenStorage: TokenStorage) { }
+  constructor(private userService: UserService, private router: Router) {}
 
   // RouterStateSnapshot to cache the url attempted to be accessed on the auth service
   // after user logs in, use this url to direct them to the page they want
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-    const requiresLogin = route.data.requiresLogin || false;
-    // const requiresAdmin = route.data.requiresAdmin || false;
-    if (this.tokenStorage.getToken()) {
-      return true;
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean | Observable<boolean> {
+    if (route.data.requiresLogin) {
+      return this.userService.getCurrentUser().pipe(
+        mapTo(true),
+        catchError(_ => {
+          this.router.navigate(['login']);
+          return of(false);
+        })
+      );
     }
-    this.router.navigate(['login']);
-    return false;
+    return true;
   }
 }

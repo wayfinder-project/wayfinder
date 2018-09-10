@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth/auth.service';
 import { Router } from '@angular/router';
+
+import { AuthService } from '../../services/auth/auth.service';
 import { UserService } from '../../services/user/user.service';
-import { User } from '../../models/user.model';
+import { ApiError } from '../../models/api-error.model';
 
 @Component({
   selector: 'app-login',
@@ -10,8 +11,18 @@ import { User } from '../../models/user.model';
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
-  private username: string;
-  private password: string;
+  username = '';
+  password = '';
+  loginError?: string;
+
+  // Registration form
+  regUsername = '';
+  regFirstName = '';
+  regLastName = '';
+  regEmail = '';
+  regPassword = '';
+  regPasswordConfirm = '';
+  registrationError?: string;
 
   constructor(
     private authService: AuthService,
@@ -26,6 +37,34 @@ export class LoginComponent implements OnInit {
       .authenticate(this.username, this.password)
       .subscribe(() => {
         this.router.navigate(['home']);
+      }, (err: ApiError) => {
+        this.loginError = err.message;
       });
+  }
+
+  register(): void {
+    // Make sure passwords match (TODO: do more validation later).
+    if (this.regPassword !== this.regPasswordConfirm) {
+      this.registrationError = 'Passwords do not match.';
+      return;
+    }
+    this.registrationError = '';
+    const newUser = {
+      username: this.regUsername,
+      firstName: this.regFirstName,
+      lastName: this.regLastName,
+      email: this.regEmail,
+    };
+    this.userService.create(newUser, this.regPassword).subscribe(user => {
+      // User created successfully.
+      this.authService
+        .authenticate(user.username, this.regPassword)
+        .subscribe(() => {
+          this.router.navigate(['home']);
+        });
+    }, (err: ApiError) => {
+      // Error in creating user.
+      this.registrationError = err.message;
+    });
   }
 }

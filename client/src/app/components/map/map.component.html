@@ -1,6 +1,6 @@
-<agm-map [latitude]="mapLat" [longitude]="mapLng" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
+<agm-map id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
   <agm-direction [origin]="origin" [destination]="destination "
-  [renderOptions]="renderOptions" 
+  [renderOptions]="renderOptions"
   [waypoints]="waypoints"
  (onChange)="directionChanged($event)"
   >
@@ -8,7 +8,7 @@
   <agm-marker
   *ngFor="let m of markers, let i = index"
     [latitude]="m.lat"
-    [longitude]="m.lng" 
+    [longitude]="m.lng"
     [markerDraggable]="m.draggable"
     [label]="m.label"
     (markerClick)="showMarkerPlaces(i)"
@@ -16,8 +16,8 @@
     (dragEnd)="moveWaypoint(i, $event)">
 
   </agm-marker>
- 
-  <agm-polyline [strokeColor]="'green'" [strokeWeight]="5" > 
+
+  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10" >
     <agm-polyline-point
     *ngFor="let p of polyPoints, let i = index"
       [latitude]="p.lat"
@@ -59,7 +59,7 @@
     <div>
       directions:
       <div *ngFor="let s of legInfo.steps, let i = index">
-        Step {{i}} : 
+        Step {{i}} :
         <span [innerHtml] = "legInfo.steps[i].instructions"></span>
 
       </div>
@@ -67,10 +67,10 @@
     </ng-container>
     </div>
     <div class="col-2 text-center">
-  
+
     </div>
     <div class="col-2 text-center">
-    
+
     </div>
     <div class="input-group mb-3 col-4">
         <div class="input-group-prepend">
