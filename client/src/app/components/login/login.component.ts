@@ -11,18 +11,18 @@ import { ApiError } from '../../models/api-error.model';
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
-  private username = '';
-  private password = '';
-  private loginError?: string;
+  username = '';
+  password = '';
+  loginError?: string;
 
   // Registration form
-  private regUsername = '';
-  private regFirstName = '';
-  private regLastName = '';
-  private regEmail = '';
-  private regPassword = '';
-  private regPasswordConfirm = '';
-  private registrationError?: string;
+  regUsername = '';
+  regFirstName = '';
+  regLastName = '';
+  regEmail = '';
+  regPassword = '';
+  regPasswordConfirm = '';
+  registrationError?: string;
 
   constructor(
     private authService: AuthService,
