@@ -1,74 +1,55 @@
-<agm-map id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
-  <agm-direction [origin]="origin" [destination]="destination "
-  [renderOptions]="renderOptions"
-  [waypoints]="waypoints"
- (onChange)="directionChanged($event)"
-  >
+<agm-map [latitude]="mapLat" [longitude]="mapLng" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
+  <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
   </agm-direction>
-  <agm-marker
-  *ngFor="let m of markers, let i = index"
-    [latitude]="m.lat"
-    [longitude]="m.lng"
-    [markerDraggable]="m.draggable"
-    [label]="m.label"
-    (markerClick)="showMarkerPlaces(i)"
-    (dragEnd)="moveWaypoint(i, $event)">
+  <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
+    [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
 
   </agm-marker>
+  <agm-marker
+    *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId)">
+  </agm-marker>
 
-  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10" >
-    <agm-polyline-point
-    *ngFor="let p of polyPoints, let i = index"
-      [latitude]="p.lat"
-      [longitude]="p.lng"
-    >
+  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
+    <agm-polyline-point *ngFor="let p of polyPoints, let i = index" [latitude]="p.lat" [longitude]="p.lng">
 
     </agm-polyline-point>
 
   </agm-polyline>
 
-  <agm-circle
-    *ngFor="let c of circles, let i = index"
-      [latitude]="c.lat" [longitude]="c.lng"
-      [(radius)]="c.radius"
-      [fillColor]="c.fillColor"
-      [circleDraggable]="false"
-      [editable]="false">
+  <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius" [fillColor]="c.fillColor"
+    [circleDraggable]="false" [editable]="false">
   </agm-circle>
 </agm-map>
-<button
-  *ngFor="let l of legs, let i = index"
-  (click)="legButton(i)"
->
-{{legs[i].distance.text}}
+<button *ngFor="let l of legs, let i = index" (click)="legButton(i)">
+  {{legs[i].distance.text}}
 </button>
 <div class="container">
   <div class="row">
     <div class="col-8 text-center">
-    <ng-container *ngIf="legInfo" >
-      <div>
-      distance:{{legInfo.distance.text}}
-    </div>
-    <div>
-        duration:{{legInfo.duration.text}}
-    </div>
-    <div>
-      directions:
-      <div *ngFor="let s of legInfo.steps, let i = index">
-        Step {{i}} :
-        <span [innerHtml] = "legInfo.steps[i].instructions"></span>
-
-      </div>
-    </div>
-    </ng-container>
-    </div>
-    <div class="col-2 text-center">
-
+      <ng-container *ngIf="legInfo">
+        <div>
+          distance:{{legInfo.distance.text}}
+        </div>
+        <div>
+          duration:{{legInfo.duration.text}}
+        </div>
+        <div>
+          directions:
+          <div *ngFor="let s of legInfo.steps, let i = index">
+            Step {{i}} :
+            <span [innerHtml]="legInfo.steps[i].instructions"></span>
+          </div>
+        </div>
+      </ng-container>
     </div>
     <div class="col-2 text-center">
 
     </div>
-    <div class="input-group mb-3 col-4">
+    <div class="col-2 text-center">
+
+    </div>
+    <div class="row">
+      <div class="input-group mb-3 col-6">
         <div class="input-group-prepend">
           <label class="input-group-text" for="inputGroupSelect01">Search By:</label>
         </div>
@@ -79,5 +60,12 @@
           </ng-container>
         </select>
       </div>
+      <div class="input-group input-group-md mb-3 col-6">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Radius (Meters):</span>
+        </div>
+        <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" [(ngModel)]="circleRadius">
+      </div>
+    </div>
   </div>
 </div>
