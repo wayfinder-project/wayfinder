@@ -24,7 +24,7 @@ import { ErrorInterceptor } from './utils/error.interceptor';
     MapComponent,
     NavbarComponent,
     HomeComponent,
-    UserpageComponent,
+    UserpageComponent
   ],
   imports: [
     AgmCoreModule.forRoot({
