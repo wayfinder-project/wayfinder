@@ -143,7 +143,7 @@ is, properties not explicitly marked as optional may not be null.
 
 ```ts
 {
-  id: number;
+  id?: number;
   username: string;
   firstName: string;
   lastName: string;
@@ -156,7 +156,7 @@ is, properties not explicitly marked as optional may not be null.
 
 ```ts
 {
-  id: number;
+  id?: number;
   /**
    * As a UTC timestamp in the format "yyyy-MM-dd'T'HH:mm:ss'Z'"; e.g.
    * "2018-09-06T21:45:45Z".
@@ -175,7 +175,7 @@ is, properties not explicitly marked as optional may not be null.
 
 ```ts
 {
-  id: number;
+  id?: number;
   /**
    * Always ordered from start to finish.
    */
@@ -187,7 +187,7 @@ is, properties not explicitly marked as optional may not be null.
 
 ```ts
 {
-  id: number;
+  id?: number;
   start: Waypoint;
   end: Waypoint;
   /**
@@ -198,10 +198,6 @@ is, properties not explicitly marked as optional may not be null.
    * In meters.
    */
   distance: number;
-  /**
-   * The zero-based index of this leg, to order it among other legs.
-   */
-  index: number;
 }
 ```
 
@@ -209,13 +205,17 @@ is, properties not explicitly marked as optional may not be null.
 
 ```ts
 {
-  id: number;
+  id?: number;
   latitude: number;
   longitude: number;
   /**
    * A user-readable address string.
    */
-  address: string;
+  address?: string;
+  /**
+   * The place ID, as defined by Google.
+   */
+  placeId?: string;
 }
 ```
 
@@ -226,6 +226,10 @@ is, properties not explicitly marked as optional may not be null.
 {
   name?: string;
   comments: string[];
+  /**
+   * The URL of an icon representing the type of this waypoint.
+   */
+  iconUrl: string;
 }
 ```
 

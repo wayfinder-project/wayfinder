@@ -1,5 +1,7 @@
 package com.wayfinder.server.controllers;
 
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,6 +53,10 @@ public class UserControllerTest {
 	 */
 	User user;
 	/**
+	 * Another user object for testing.
+	 */
+	User user2;
+	/**
 	 * The list of all user objects in the "database".
 	 */
 	List<User> users;
@@ -58,6 +64,10 @@ public class UserControllerTest {
 	 * The JSON representation of the user object.
 	 */
 	String userJson;
+	/**
+	 * The JSON representation of the second user object.
+	 */
+	String user2Json;
 
 	@Before
 	public void setUp() {
@@ -71,28 +81,37 @@ public class UserControllerTest {
 		user.setPasswordSalt(Passwords.generateSalt());
 		user.setPasswordHash(Passwords.hashPassword("password".toCharArray(), user.getPasswordSalt()));
 
-		users = new ArrayList<>(Arrays.asList(user));
+		user2 = new User();
+		user2.setId(2);
+		user2.setFirstName("Kelly");
+		user2.setLastName("Smithson");
+		user2.setUsername("ksmithson");
+		user2.setEmail("ksmithson@gmail.com");
+		user2.setTrips(new ArrayList<>());
+		user2.setPasswordSalt(Passwords.generateSalt());
+		user2.setPasswordHash(Passwords.hashPassword("password".toCharArray(), user2.getPasswordSalt()));
+
+		users = new ArrayList<>(Arrays.asList(user, user2));
 
 		userJson = "{" + "\"id\": 1," + "\"firstName\": \"Ian\"," + "\"lastName\": \"Johnson\","
 				+ "\"username\": \"ianprime0509\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}";
+		user2Json = "{" + "\"id\": 2," + "\"firstName\": \"Kelly\"," + "\"lastName\": \"Smithson\","
+				+ "\"username\": \"ksmithson\"," + "\"email\": \"ksmithson@gmail.com\"," + "\"trips\": []" + "}";
 
 		Mockito.reset(userService);
 		when(userService.findAll()).thenReturn(users);
 		when(userService.findById(user.getId())).thenReturn(user);
+		when(userService.findById(user2.getId())).thenReturn(user2);
 		when(userService.findByUsername(user.getUsername())).thenReturn(user);
+		when(userService.findByUsername(user2.getUsername())).thenReturn(user2);
 
 		mvc = MockMvcBuilders.webAppContextSetup(appContext).apply(springSecurity()).build();
 	}
 
 	@Test
 	public void testFindAll() throws Exception {
-		String usersJson = "[" + userJson + "]";
-
-		mvc.perform(get("/users").with(user(user))).andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(content().json(usersJson, true));
-
-		verify(userService).findAll();
+		mvc.perform(get("/users").with(user(user))).andExpect(status().isForbidden())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
 	}
 
 	@Test
@@ -116,6 +135,11 @@ public class UserControllerTest {
 	}
 
 	@Test
+	public void testFindByOtherId() throws Exception {
+		mvc.perform(get("/users/{id}", user2.getId()).with(user(user))).andExpect(status().isForbidden());
+	}
+
+	@Test
 	public void testFindByUsername() throws Exception {
 		mvc.perform(get("/users").param("username", user.getUsername()).with(user(user))).andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -130,6 +154,12 @@ public class UserControllerTest {
 
 		when(userService.findByUsername(username)).thenReturn(null);
 		mvc.perform(get("/users").with(user(user)).param("username", username)).andExpect(status().isNotFound());
+	}
+
+	@Test
+	public void testFindByOtherUsername() throws Exception {
+		mvc.perform(get("/users").with(user(user)).param("username", user2.getUsername()))
+				.andExpect(status().isForbidden());
 	}
 
 	@Test
@@ -202,6 +232,14 @@ public class UserControllerTest {
 	}
 
 	@Test
+	public void testUpdateOtherUser() throws Exception {
+		mvc.perform(put("/users/{id}", user2.getId()).with(user(user)).content(user2Json)
+				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isForbidden());
+
+		verify(userService, never()).update(anyObject());
+	}
+
+	@Test
 	public void testUpdatePassword() throws Exception {
 		char[] password = "password2".toCharArray();
 		String requestJson = "{\"oldPassword\": \"password\"," + "\"newPassword\": \"password2\"}";
@@ -214,12 +252,21 @@ public class UserControllerTest {
 
 	@Test
 	public void testUpdatePasswordIncorrectPassword() throws Exception {
-		char[] password = "password2".toCharArray();
 		String requestJson = "{\"oldPassword\": \"password123\"," + "\"newPassword\": \"password2\"}";
 
 		mvc.perform(post("/users/{id}/password", user.getId()).with(user(user)).content(requestJson)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isForbidden());
 
-		verify(userService, never()).updatePassword(user.getId(), password);
+		verify(userService, never()).updatePassword(anyInt(), anyObject());
+	}
+
+	@Test
+	public void testUpdateOtherUserPassword() throws Exception {
+		String requestJson = "{\"oldPassword\": \"password\"," + "\"newPassword\": \"password2\"}";
+
+		mvc.perform(post("/users/{id}/password", user2.getId()).with(user(user)).content(requestJson)
+				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isForbidden());
+
+		verify(userService, never()).updatePassword(anyInt(), anyObject());
 	}
 }

@@ -7,7 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -42,8 +41,19 @@ public class Waypoint {
 	 * The address of the waypoint, as a user-readable string.
 	 */
 	@Column(nullable = false)
-	@NotEmpty
 	private String address;
+	/**
+	 * The (optional) place ID, as defined by Google.
+	 */
+	private String placeId;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public double getLatitude() {
 		return latitude;
@@ -67,5 +77,13 @@ public class Waypoint {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getPlaceId() {
+		return placeId;
+	}
+
+	public void setPlaceId(String placeId) {
+		this.placeId = placeId;
 	}
 }

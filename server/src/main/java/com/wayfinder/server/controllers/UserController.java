@@ -1,7 +1,6 @@
 package com.wayfinder.server.controllers;
 
 import java.util.Arrays;
-import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -11,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,22 +37,39 @@ public class UserController {
 	private UserService userService;
 
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, params = "!username")
-	public ResponseEntity<List<User>> findAll() {
-		return ResponseEntity.ok(userService.findAll());
+	public ResponseEntity<ResponseError> findAll() {
+		// Currently, there are no admins, so nobody is allowed to list all user
+		// data.
+		return new ResponseError("Cannot retrieve data for arbitrary users.").withType(ResponseError.Type.UNAUTHORIZED)
+				.toEntity(HttpStatus.FORBIDDEN);
 	}
 
 	@RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<User> findById(@PathVariable("id") @Min(0) int id) {
+	public ResponseEntity<?> findById(@PathVariable("id") @Min(0) int id) {
 		User user = userService.findById(id);
-		HttpStatus status = user == null ? HttpStatus.NOT_FOUND : HttpStatus.OK;
-		return new ResponseEntity<>(user, status);
+		if (user == null) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+		User loggedIn = getLoggedInUser();
+		if (loggedIn.getId() != user.getId()) {
+			return new ResponseError("Cannot retrieve arbitrary user data.").withType(ResponseError.Type.UNAUTHORIZED)
+					.toEntity(HttpStatus.FORBIDDEN);
+		}
+		return ResponseEntity.ok(user);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, params = "username")
-	public ResponseEntity<User> findByUsername(@RequestParam("username") @NotEmpty String username) {
+	public ResponseEntity<?> findByUsername(@RequestParam("username") @NotEmpty String username) {
 		User user = userService.findByUsername(username);
-		HttpStatus status = user == null ? HttpStatus.NOT_FOUND : HttpStatus.OK;
-		return new ResponseEntity<>(user, status);
+		if (user == null) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+		User loggedIn = getLoggedInUser();
+		if (!loggedIn.getUsername().equals(user.getUsername())) {
+			return new ResponseError("Cannot retrieve arbitrary user data.").withType(ResponseError.Type.UNAUTHORIZED)
+					.toEntity(HttpStatus.FORBIDDEN);
+		}
+		return ResponseEntity.ok(user);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -68,6 +86,10 @@ public class UserController {
 	@RequestMapping(path = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<?> update(@PathVariable("id") @Min(0) int id, @RequestBody @Valid User user) {
 		try {
+			if (id != getLoggedInUser().getId()) {
+				return new ResponseError("Cannot update other users' data.").withType(ResponseError.Type.UNAUTHORIZED)
+						.toEntity(HttpStatus.FORBIDDEN);
+			}
 			user.setId(id);
 			return new ResponseEntity<User>(userService.update(user), HttpStatus.OK);
 		} catch (UserNotFoundException e) {
@@ -85,6 +107,10 @@ public class UserController {
 			if (user == null) {
 				throw new UserNotFoundException(id);
 			}
+			if (user.getId() != getLoggedInUser().getId()) {
+				return new ResponseError("Cannot update other users' passwords.").withType(ResponseError.Type.UNAUTHORIZED)
+						.toEntity(HttpStatus.FORBIDDEN);
+			}
 			// Make sure that the given old password is correct.
 			byte[] oldHash = Passwords.hashPassword(request.getOldPassword().toCharArray(), user.getPasswordSalt());
 			if (!Arrays.equals(user.getPasswordHash(), oldHash)) {
@@ -95,5 +121,15 @@ public class UserController {
 		} catch (UserNotFoundException e) {
 			return new ResponseError(e).toEntity(HttpStatus.NOT_FOUND);
 		}
+	}
+
+	/**
+	 * Gets the currently logged-in user (if any).
+	 * 
+	 * @return the currently logged-in user, or null if none is logged in
+	 */
+	private User getLoggedInUser() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return auth == null ? null : (User) auth.getPrincipal();
 	}
 }

@@ -3,9 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import { User, NewUser } from '../../models/user.model';
+import { User, NewUser, UserWithId } from '../../models/user.model';
 import { environment } from '../../../environments/environment';
-import { Trip } from '../../models/trip.model';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +13,7 @@ export class UserService {
   /**
    * The currently logged-in user (cached from calls to getCurrentUser).
    */
-  private currentUser?: User;
+  private currentUser?: UserWithId;
 
   constructor(private http: HttpClient) {}
 
@@ -35,13 +34,13 @@ export class UserService {
   /**
    * Gets the currently logged-in user.
    */
-  getCurrentUser(): Observable<User> {
+  getCurrentUser(): Observable<UserWithId> {
     // We cache the current user in a local variable to prevent making too many
     // calls to the database.
     return this.currentUser
       ? of(this.currentUser)
       : this.http
-          .get<User>(environment.apiUrl + '/login')
+          .get<UserWithId>(environment.apiUrl + '/login')
           .pipe(tap(user => (this.currentUser = user)));
   }
 
@@ -74,11 +73,12 @@ export class UserService {
   /**
    * Updates the given user.
    *
-   * @param user the user to update
+   * @param user the user to update. The ID property is required, to identify
+   * the user to update.
    */
-  update(user: User): Observable<User> {
+  update(user: UserWithId): Observable<UserWithId> {
     return this.http
-      .put<User>(environment.apiUrl + `/users/${user.id}`, user)
+      .put<UserWithId>(environment.apiUrl + `/users/${user.id}`, user)
       .pipe(
         tap(updated => {
           // We need to make sure that we refresh the current user if that's the

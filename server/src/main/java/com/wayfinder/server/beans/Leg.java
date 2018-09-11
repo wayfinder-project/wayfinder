@@ -58,12 +58,6 @@ public class Leg {
 	@Column(nullable = false)
 	@Min(0)
 	private long distance;
-	/**
-	 * The index of this leg in the route which contains it (as a 0-based index).
-	 */
-	@Column(name = "legIndex", nullable = false)
-	@Min(0)
-	private int index;
 
 	public int getId() {
 		return id;

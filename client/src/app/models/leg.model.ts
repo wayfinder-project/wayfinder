@@ -1,7 +1,7 @@
 import { Waypoint } from './waypoint.model';
 
 export interface Leg {
-  id: number;
+  id?: number;
   start: Waypoint;
   end: Waypoint;
   /**
@@ -12,8 +12,4 @@ export interface Leg {
    * In meters.
    */
   distance: number;
-  /**
-   * The zero-based index of this leg, to order it among other legs.
-   */
-  index: number;
 }
