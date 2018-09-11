@@ -4,11 +4,12 @@ import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { WaypointModel, LocationModel } from '../../models/mapwaypoint.model';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { UserService } from '../../services/user/user.service';
+import { AnnotatedWaypoint } from '../../models/annotated-waypoint.model';
 import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
 
 declare var google: any;
-
 
 interface Marker {
   lat: number;
@@ -31,6 +32,7 @@ interface Circle {
 
 // ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
 interface Place {
+  marker: Marker;
   name: string;
   rating: number;
   phoneNumber: string;
@@ -47,10 +49,6 @@ interface Place {
   };
   url: string;
 }
-
-
-
-
 
 @Component({
   selector: 'app-map',
@@ -118,6 +116,7 @@ export class MapComponent implements OnInit {
   private tabset: NgbTabset;
 
   // Logan Smith's Variables (To be added to service)
+  savedPlaces: Marker[];
   controlmap;
   locationSearchTypes: string[] = ['lodging', 'restaurant', 'gas_station', 'supermarket', 'rv_park', 'parking', 'park'];
   currentLocationSearchType: string = this.locationSearchTypes[0];
@@ -125,9 +124,10 @@ export class MapComponent implements OnInit {
   currentMarkers: Marker[] = [];
   currentPlace: Place = null;
 
-  constructor() {
+  constructor(private http: HttpClient, private userService: UserService) {
 
   }
+
   circleRadius: number; // Radius of the place radius
   public location: LocationModel;
   public waypoint: WaypointModel;
@@ -144,6 +144,7 @@ export class MapComponent implements OnInit {
     this.getLocation();
     this.getDirection();
   }
+
 
 
   // Adds a waypoint to the map
@@ -277,94 +278,96 @@ export class MapComponent implements OnInit {
     if (this.legs[i].distance.value < 350000) {
       for (let q = 0; q < legsLength; q++) {
         const pathLength = this.legs[i].steps[q].path.length;
-          for (let z = 0; z < pathLength; z++) {
-            const pathPoint = this.legs[i].steps[q].path[z];
-            this.polyPoints.push({ lat: pathPoint.lat(), lng: pathPoint.lng() });
-          }
+        for (let z = 0; z < pathLength; z++) {
+          const pathPoint = this.legs[i].steps[q].path[z];
+          this.polyPoints.push({ lat: pathPoint.lat(), lng: pathPoint.lng() });
+        }
       }
     } else {
       console.log('toobig');
-      const or = {lat: this.legs[i].start_location.lat(), lng: this.legs[i].start_location.lng()};
-      const de = {lat: this.legs[i].end_location.lat(), lng: this.legs[i].end_location.lng()};
-      this.longLeg = ({origin: or, destination: de, visible: true});
+      const or = { lat: this.legs[i].start_location.lat(), lng: this.legs[i].start_location.lng() };
+      const de = { lat: this.legs[i].end_location.lat(), lng: this.legs[i].end_location.lng() };
+      this.longLeg = ({ origin: or, destination: de, visible: true });
     }
     console.log(this.longLeg);
     this.tabset.select('directions');
   }
 
-totalLegsButton() {
-  const end = this.destination;
-  const start = this.origin;
-  // this.zoomFinder();
-  this.controlmap.fitBounds({east: Math.max(start.lng, end.lng),
-    north: Math.max(start.lat, end.lat),
-    west: Math.min(start.lng, end.lng),
-    south: Math.min(start.lat, end.lat)});
+  totalLegsButton() {
+    const end = this.destination;
+    const start = this.origin;
+    // this.zoomFinder();
+    this.controlmap.fitBounds({
+      east: Math.max(start.lng, end.lng),
+      north: Math.max(start.lat, end.lat),
+      west: Math.min(start.lng, end.lng),
+      south: Math.min(start.lat, end.lat)
+    });
     this.polyPoints = [];
     this.destroyLongLeg();
     const pathLength = this.directions.routes[0].overview_path.length;
 
     for (let q = 0; q < pathLength; q++) {
       const pathPoint = this.directions.routes[0].overview_path[q];
-     this.polyPoints.push({lat: pathPoint.lat(), lng: pathPoint.lng()});
+      this.polyPoints.push({ lat: pathPoint.lat(), lng: pathPoint.lng() });
     }
 
-}
+  }
 
-/* zoomFinder() {
-  const originDestination = Math.sqrt(Math.pow(this.origin.lat - this.destination.lat, 2) +
-     Math.pow(this.origin.lng - this.destination.lng, 2));
-    console.log(this.origin.lat);
-  let longestDistance = originDestination;
-  let longestWay: any;
-  let bool: boolean;
-  let distanceDestinationFinal = this.destination;
-   let distanceOriginFinal = this.origin;
-  for (let i = 0; i < this.legs.length; i++) {
-    const endPoint = this.legs[i].end_location;
-    const distanceDestination = Math.sqrt(Math.pow(endPoint.lat() - this.destination.lat, 2) +
-    Math.pow(endPoint.lng() - this.destination.lng, 2));
-    const distanceOrigin = Math.sqrt(Math.pow(this.origin.lat - endPoint.lat(), 2) +
-    Math.pow(this.origin.lng - endPoint.lng(), 2));
-    console.log(longestDistance);
-    if (distanceDestinationFinal < distanceDestination)
-           {
-               distanceDestinationFinal = distanceDestination;
-           }
-           else if (distanceOriginFinal < distanceOrigin)
-           {
-               distanceOriginFinal = distanceOrigin;
-           }
+  /* zoomFinder() {
+    const originDestination = Math.sqrt(Math.pow(this.origin.lat - this.destination.lat, 2) +
+       Math.pow(this.origin.lng - this.destination.lng, 2));
+      console.log(this.origin.lat);
+    let longestDistance = originDestination;
+    let longestWay: any;
+    let bool: boolean;
+    let distanceDestinationFinal = this.destination;
+     let distanceOriginFinal = this.origin;
+    for (let i = 0; i < this.legs.length; i++) {
+      const endPoint = this.legs[i].end_location;
+      const distanceDestination = Math.sqrt(Math.pow(endPoint.lat() - this.destination.lat, 2) +
+      Math.pow(endPoint.lng() - this.destination.lng, 2));
+      const distanceOrigin = Math.sqrt(Math.pow(this.origin.lat - endPoint.lat(), 2) +
+      Math.pow(this.origin.lng - endPoint.lng(), 2));
+      console.log(longestDistance);
+      if (distanceDestinationFinal < distanceDestination)
+             {
+                 distanceDestinationFinal = distanceDestination;
+             }
+             else if (distanceOriginFinal < distanceOrigin)
+             {
+                 distanceOriginFinal = distanceOrigin;
+             }
 
-           if (longestDistance < distanceOriginFinal)
-           {
-               bool = true;
-               longestDistance = distanceOriginFinal;
-               longestWay = this.legs[i].end_location;
-               console.log(longestDistance);
-           }
-           else if(longestDistance < distanceDestinationFinal)
-           {
-               bool = false;
-               longestDistance = distanceDestinationFinal;
-               longestWay = this.legs[i].end_location;
-               console.log(longestDistance);
-           }
-  }
-  if (longestDistance > originDestination) {
-    if (bool) {
-  this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.origin.lng),
-    north: Math.max(longestWay.lat(), this.origin.lat),
-    west: Math.min(longestWay.lng(),  this.origin.lng),
-    south: Math.min(longestWay.lat(), this.origin.lat)});
-  } else {
-    this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.destination.lng),
-      north: Math.max(longestWay.lat(), this.destination.lat),
-      west: Math.min(longestWay.lng(),  this.destination.lng),
-      south: Math.min(longestWay.lat(), this.destination.lat)});
-  }
-  }
-} */
+             if (longestDistance < distanceOriginFinal)
+             {
+                 bool = true;
+                 longestDistance = distanceOriginFinal;
+                 longestWay = this.legs[i].end_location;
+                 console.log(longestDistance);
+             }
+             else if(longestDistance < distanceDestinationFinal)
+             {
+                 bool = false;
+                 longestDistance = distanceDestinationFinal;
+                 longestWay = this.legs[i].end_location;
+                 console.log(longestDistance);
+             }
+    }
+    if (longestDistance > originDestination) {
+      if (bool) {
+    this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.origin.lng),
+      north: Math.max(longestWay.lat(), this.origin.lat),
+      west: Math.min(longestWay.lng(),  this.origin.lng),
+      south: Math.min(longestWay.lat(), this.origin.lat)});
+    } else {
+      this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.destination.lng),
+        north: Math.max(longestWay.lat(), this.destination.lat),
+        west: Math.min(longestWay.lng(),  this.destination.lng),
+        south: Math.min(longestWay.lat(), this.destination.lat)});
+    }
+    }
+  } */
 
   // Tries to find the point in the path.
   findPointinPath(paths: any, point: any, round: number) {
@@ -443,20 +446,42 @@ totalLegsButton() {
     }
     this.controlmap.fitBounds(bounds);
   }
-  getPlaceDetails(newPlaceId: string) {
-
-
+  getPlaceDetails(newPlaceId: string, marker: Marker) {
     const request = {
       placeId: newPlaceId,
       fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
     };
     const service = new google.maps.places.PlacesService(this.controlmap);
-    service.getDetails(request, this.callbackDetails.bind(this));
-
+    service.getDetails(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        this.currentPlace = {
+          marker: marker,
+          name: results.name,
+          rating: results.rating,
+          phoneNumber: results.formatted_phone_number,
+          address: results.formatted_address,
+          openNow: results.opening_hours && results.opening_hours.open_now,
+          hours: {
+            monday: results.opening_hours && results.opening_hours.weekday_text[0],
+            tuesday: results.opening_hours && results.opening_hours.weekday_text[1],
+            wednesday: results.opening_hours && results.opening_hours.weekday_text[2],
+            thursday: results.opening_hours && results.opening_hours.weekday_text[3],
+            friday: results.opening_hours && results.opening_hours.weekday_text[4],
+            saturday: results.opening_hours && results.opening_hours.weekday_text[5],
+            sunday: results.opening_hours && results.opening_hours.weekday_text[6]
+          },
+          url: results.url
+        };
+        console.log('currentplace ' + this.currentPlace);
+      }
+    });
   }
+
+
   callbackDetails(results, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
       this.currentPlace = {
+        marker: null,
         name: results.name,
         rating: results.rating,
         phoneNumber: results.formatted_phone_number,
@@ -473,8 +498,24 @@ totalLegsButton() {
         },
         url: results.url
       };
-      console.log(this.currentPlace);
+      console.log('currentplace ' + this.currentPlace);
     }
+  }
+
+  // VIEN
+  saveMarker() {
+    // this.currentPlace;
+    const annotatedWayPoint: AnnotatedWaypoint = {
+      latitude: this.currentPlace.marker.lat,
+      longitude: this.currentPlace.marker.lng,
+      address: this.currentPlace.address,
+      placeId: this.currentPlace.marker.placeId,
+      name: this.currentPlace.marker.label,
+      comments: [],
+      iconUrl: this.currentPlace.marker.updateIcon.url
+    };
+
+
   }
 
   getLatLong(placeid: string, map: any, fn) {
@@ -494,13 +535,11 @@ totalLegsButton() {
     console.log(this.controlmap);
   }
 
-
-
   showMarkerPlaces(index: number) {
     console.log(this.directions);
     console.log(index);
     console.log(this.legs);
-    this.getPlaces.bind(this)({lat: this.markers[index].lat, lng: this.markers[index].lng});
+    this.getPlaces.bind(this)({ lat: this.markers[index].lat, lng: this.markers[index].lng });
     if (this.markers[index].waypointId != null) {
       console.log(this.waypoints);
       const waypointOrder = this.directions.routes[0].waypoint_order.indexOf(this.markers[index].waypointId) + 1;

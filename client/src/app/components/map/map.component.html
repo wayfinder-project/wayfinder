@@ -96,7 +96,7 @@
 
       </agm-marker>
       <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"
-        [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId)">
+        [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
       </agm-marker>
 
       <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
