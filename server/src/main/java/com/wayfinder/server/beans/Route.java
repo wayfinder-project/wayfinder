@@ -14,17 +14,12 @@ import javax.persistence.SequenceGenerator;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 /**
  * A route is the navigation information for an entire trip, from start to
  * finish.
  * 
  * @author Logan Smith
  */
-@Component
-@Scope("prototype")
 @Entity
 public class Route {
 	/**

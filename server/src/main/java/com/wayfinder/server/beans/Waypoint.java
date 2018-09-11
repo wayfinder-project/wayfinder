@@ -7,17 +7,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 /**
  * A waypoint is a single stop on a route. The starting and ending points of a
  * route are themselves considered waypoints.
  * 
  * @author Ian Johnson
  */
-@Component
-@Scope("prototype")
 @Entity
 public class Waypoint {
 	/**

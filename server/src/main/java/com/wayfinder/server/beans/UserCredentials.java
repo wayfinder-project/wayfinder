@@ -1,11 +1,7 @@
 package com.wayfinder.server.beans;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope("prototype")
 public class UserCredentials {
 	@NotEmpty
 	private String username;

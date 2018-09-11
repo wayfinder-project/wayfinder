@@ -7,11 +7,13 @@ import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope("prototype")
+/**
+ * An annotated waypoint is a waypoint along with user-provided information such
+ * as a name and comments.
+ * 
+ * @author Ian Johnson
+ */
 @Entity
 public class AnnotatedWaypoint extends Waypoint {
 	/**

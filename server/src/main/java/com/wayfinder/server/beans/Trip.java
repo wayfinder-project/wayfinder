@@ -18,9 +18,6 @@ import javax.persistence.TemporalType;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
@@ -30,8 +27,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * 
  * @author Ian Johnson
  */
-@Component
-@Scope("prototype")
 @Entity
 public class Trip {
 	/**

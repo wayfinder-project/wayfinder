@@ -4,8 +4,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * The combination of a user object with a password. This corresponds to the
@@ -13,8 +11,6 @@ import org.springframework.stereotype.Component;
  * 
  * @author Ian Johnson
  */
-@Component
-@Scope("prototype")
 public class UserWithPassword {
 	@NotNull
 	@Valid
