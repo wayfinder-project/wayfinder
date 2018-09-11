@@ -1,7 +1,7 @@
 import { Waypoint } from './waypoint.model';
 
 export interface Leg {
-  id: number;
+  id?: number;
   start: Waypoint;
   end: Waypoint;
   /**
