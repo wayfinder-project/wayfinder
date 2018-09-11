@@ -216,6 +216,10 @@ is, properties not explicitly marked as optional may not be null.
    * A user-readable address string.
    */
   address: string;
+  /**
+   * The place ID, as defined by Google.
+   */
+  placeId?: string;
 }
 ```
 
