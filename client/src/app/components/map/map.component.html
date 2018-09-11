@@ -1,6 +1,8 @@
 <agm-map [latitude]="mapLat" [longitude]="mapLng" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
   <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
   </agm-direction>
+  <agm-direction *ngIf="longLeg"[origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg" [visible]="longLeg.visible">
+  </agm-direction>
   <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
     [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
 
@@ -9,8 +11,8 @@
     *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId)">
   </agm-marker>
 
-  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10" *ngFor="let p of polyLines, let i = index">
-    <agm-polyline-point *ngFor="let pt of polyLines[i].points, let q = index" [latitude]="pt.lat" [longitude]="pt.lng">
+  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
+    <agm-polyline-point *ngFor="let p of polyPoints, let i = index" [latitude]="p.lat" [longitude]="p.lng">
     </agm-polyline-point>
   </agm-polyline>
 

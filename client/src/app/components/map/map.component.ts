@@ -55,6 +55,18 @@ export class MapComponent implements OnInit {
     }
   };
 
+  public renderOptionsForLongLeg = {
+    suppressMarkers: true,
+    draggable: false,
+    visible: false,
+    polylineOptions: {
+      strokeColor: 'green',
+      strokeWeight: 5,
+      zIndex: 1,
+      clickable: true
+    }
+  };
+
 
   markers: Marker[] = [
 
@@ -72,13 +84,10 @@ export class MapComponent implements OnInit {
 
   ];
 
-  polyLines: any[] = [
-
-  ];
-
-
   waypoints: any = [
   ];
+
+  longLeg: any = undefined;
 
 
 
@@ -99,7 +108,8 @@ export class MapComponent implements OnInit {
   public location: LocationModel;
   public waypoint: WaypointModel;
   public directions: any;
-  public  directionInfo: any;
+  public directionInfo: any;
+
   public bigLegInfo: any;
   public legInfo: any; // single leg info
 
@@ -215,8 +225,13 @@ export class MapComponent implements OnInit {
     totalDistance *= 0.000621371192;
     totalDistance = this.roundTo(totalDistance, 2);
     this.bigLegInfo = totalDistance;
+    this.destroyLongLeg();
   }
-
+  destroyLongLeg() {
+    if (this.longLeg) {
+      this.longLeg.visible = false;
+    }
+  }
 
 
   // Creates buttons for each leg. Highlights and centers on the leg when pressed.
@@ -232,25 +247,24 @@ export class MapComponent implements OnInit {
       south: Math.min(start.lat(), end.lat())
     });
     this.polyPoints = [];
-    this.polyLines = [];
+    this.destroyLongLeg();
     const legsLength = this.legs[i].steps.length;
-    let count = 0;
-    for (let q = 0; q < legsLength; q++) {
-      const pathLength = this.legs[i].steps[q].path.length;
-      if (pathLength < 1000) {
-        for (let z = 0; z < pathLength; z++) {
-          count++;
-          const pathPoint = this.legs[i].steps[q].path[z];
-          const polyLine: any = { points: []};
-          polyLine.points.push({ lat: pathPoint.lat(), lng: pathPoint.lng() });
-          this.polyLines.push(polyLine);
-        }
-      } else {
-        const pathPoints: any = { points: []};
-
+    console.log(this.legs[i].distance.value);
+    if (this.legs[i].distance.value < 350000) {
+      for (let q = 0; q < legsLength; q++) {
+        const pathLength = this.legs[i].steps[q].path.length;
+          for (let z = 0; z < pathLength; z++) {
+            const pathPoint = this.legs[i].steps[q].path[z];
+            this.polyPoints.push({ lat: pathPoint.lat(), lng: pathPoint.lng() });
+          }
       }
+    } else {
+      console.log('toobig');
+      const or = {lat: this.legs[i].start_location.lat(), lng: this.legs[i].start_location.lng()};
+      const de = {lat: this.legs[i].end_location.lat(), lng: this.legs[i].end_location.lng()};
+      this.longLeg = ({origin: or, destination: de, visible: true});
     }
-    console.log(count);
+    console.log(this.longLeg);
   }
 
 totalLegsButton() {
@@ -262,6 +276,7 @@ totalLegsButton() {
     west: Math.min(start.lng, end.lng),
     south: Math.min(start.lat, end.lat)});
     this.polyPoints = [];
+    this.destroyLongLeg();
     const pathLength = this.directions.routes[0].overview_path.length;
 
     for (let q = 0; q < pathLength; q++) {
@@ -458,6 +473,9 @@ totalLegsButton() {
   delete(index: number) {
     console.log('a');
   }
+
+
+
 
 
 }
