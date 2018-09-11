@@ -4,6 +4,7 @@ import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { WaypointModel, LocationModel } from '../../models/mapwaypoint.model';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
 
 declare var google: any;
@@ -54,7 +55,10 @@ interface Place {
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css'],
+  providers: [
+    NgbTabset
+  ]
 })
 export class MapComponent implements OnInit {
 
@@ -109,9 +113,9 @@ export class MapComponent implements OnInit {
   longLeg: any = undefined;
 
 
-
-
   @ViewChild(AgmMap) map: AgmMap;
+  @ViewChild(NgbTabset)
+  private tabset: NgbTabset;
 
   // Logan Smith's Variables (To be added to service)
   controlmap;
@@ -121,7 +125,7 @@ export class MapComponent implements OnInit {
   currentMarkers: Marker[] = [];
   currentPlace: Place = null;
 
-  constructor(private http: HttpClient) {
+  constructor() {
 
   }
   circleRadius: number; // Radius of the place radius
@@ -285,6 +289,7 @@ export class MapComponent implements OnInit {
       this.longLeg = ({origin: or, destination: de, visible: true});
     }
     console.log(this.longLeg);
+    this.tabset.select('directions');
   }
 
 totalLegsButton() {
@@ -508,6 +513,12 @@ totalLegsButton() {
 
   delete(index: number) {
     console.log('a');
+  }
+
+
+  collapseButton() {
+    const myGroup = ('#myGroup');
+
   }
 
 
