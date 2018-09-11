@@ -44,6 +44,18 @@ public class Waypoint {
 	@Column(nullable = false)
 	@NotEmpty
 	private String address;
+	/**
+	 * The (optional) place ID, as defined by Google.
+	 */
+	private String placeId;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public double getLatitude() {
 		return latitude;
@@ -67,5 +79,13 @@ public class Waypoint {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getPlaceId() {
+		return placeId;
+	}
+
+	public void setPlaceId(String placeId) {
+		this.placeId = placeId;
 	}
 }
