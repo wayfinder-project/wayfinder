@@ -40,6 +40,7 @@
               <br>
               <a href={{currentPlace.url}}>Google Maps</a>
             </div>
+            <button class="btn btn-primary" (click)="saveMarker()">Save Marker</button>
           </ng-template>
         </div>
       </ngb-tab>
@@ -85,7 +86,7 @@
     </ngb-tabset>
   </div>
   <div class="col-9" style="padding-right: 40px">
-    <agm-map class="map" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
+    <agm-map class="map" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)" (zoomChange)="updateZoomLevel()">
       <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
       </agm-direction>
       <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
@@ -93,9 +94,11 @@
       </agm-direction>
       <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
         [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
-
       </agm-marker>
       <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"
+        [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
+      </agm-marker>
+      <agm-marker *ngFor="let m of savedMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"
         [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
       </agm-marker>
 

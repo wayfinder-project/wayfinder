@@ -122,6 +122,7 @@ export class MapComponent implements OnInit {
   currentLocationSearchType: string = this.locationSearchTypes[0];
 
   currentMarkers: Marker[] = [];
+  savedMarkers: Marker[] = [];
   currentPlace: Place = null;
 
   constructor(private http: HttpClient, private userService: UserService) {
@@ -204,6 +205,9 @@ export class MapComponent implements OnInit {
     } else {
       this.markerDragEnd(this.markers[index], index);
     }
+    this.currentMarkers = [];
+    this.currentPlace = null;
+    this.circles = null;
     this.getDirection();
   }
 
@@ -514,8 +518,8 @@ export class MapComponent implements OnInit {
       comments: [],
       iconUrl: this.currentPlace.marker.updateIcon.url
     };
-
-
+    this.savedMarkers.push(this.currentPlace.marker);
+    console.log(annotatedWayPoint);
   }
 
   getLatLong(placeid: string, map: any, fn) {
@@ -560,7 +564,13 @@ export class MapComponent implements OnInit {
 
   }
 
-
+  updateZoomLevel() {
+    if (this.controlmap.zoom <= 12) {
+      this.currentMarkers = [];
+      this.currentPlace = null;
+      this.circles=[];
+    } 
+  }
 
 
 
