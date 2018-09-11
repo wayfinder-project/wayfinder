@@ -85,7 +85,7 @@
     </ngb-tabset>
   </div>
   <div class="col-9" style="padding-right: 40px">
-    <agm-map class="map" [latitude]="mapLat" [longitude]="mapLng" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
+    <agm-map class="map" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
       <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
       </agm-direction>
       <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
@@ -125,7 +125,7 @@
 
         <!-- Content -->
         <h5 class="text-uppercase font-weight-bold"></h5>
-        
+
       </div>
       <!-- Grid column -->
 
@@ -136,7 +136,7 @@
 
         <!-- Content -->
         <h5 class="text-uppercase font-weight-bold"></h5>
-       
+
 
       </div>
       <!-- Grid column -->
