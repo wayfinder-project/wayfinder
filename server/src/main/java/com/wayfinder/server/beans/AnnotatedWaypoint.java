@@ -6,6 +6,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,11 @@ public class AnnotatedWaypoint extends Waypoint {
 	@ElementCollection
 	@NotNull
 	private List<String> comments;
+	/**
+	 * The URL to an icon representing the type of this waypoint.
+	 */
+	@NotEmpty
+	private String iconUrl;
 
 	public String getName() {
 		return name;
@@ -38,5 +44,13 @@ public class AnnotatedWaypoint extends Waypoint {
 
 	public void setComments(List<String> comments) {
 		this.comments = comments;
+	}
+
+	public String getIconUrl() {
+		return iconUrl;
+	}
+
+	public void setIconUrl(String iconUrl) {
+		this.iconUrl = iconUrl;
 	}
 }
