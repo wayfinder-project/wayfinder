@@ -183,25 +183,7 @@ is, properties not explicitly marked as optional may not be null.
   /**
    * Always ordered from start to finish.
    */
-  legs: Leg[];
-}
-```
-
-##### `Leg`
-
-```ts
-{
-  id?: number;
-  start: Waypoint;
-  end: Waypoint;
-  /**
-   * In seconds.
-   */
-  travelTime: number;
-  /**
-   * In meters.
-   */
-  distance: number;
+  waypoints: Waypoint[];
 }
 ```
 
