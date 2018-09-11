@@ -4,10 +4,9 @@ import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { WaypointModel, LocationModel } from '../../models/mapwaypoint.model';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-
+import { UserService } from '../../services/user/user.service';
 
 declare var google: any;
-
 
 interface Marker {
   lat: number;
@@ -28,8 +27,9 @@ interface Circle {
   fillColor: string;
 }
 
-//['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
+// ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
 interface Place {
+  marker: Marker;
   name: string;
   rating: number;
   phoneNumber: string;
@@ -43,13 +43,9 @@ interface Place {
     friday: string;
     saturday: string;
     sunday: string;
-  }
+  };
   url: string;
 }
-
-
-
-
 
 @Component({
   selector: 'app-map',
@@ -100,6 +96,7 @@ export class MapComponent implements OnInit {
   @ViewChild(AgmMap) map: AgmMap;
 
   // Logan Smith's Variables (To be added to service)
+  savedPlaces: Marker[];
   controlmap;
   locationSearchTypes: string[] = ['lodging', 'restaurant', 'gas_station', 'supermarket', 'rv_park', 'parking', 'park'];
   currentLocationSearchType: string = this.locationSearchTypes[0];
@@ -107,9 +104,10 @@ export class MapComponent implements OnInit {
   currentMarkers: Marker[] = [];
   currentPlace: Place = null;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private userService: UserService) {
 
   }
+
   circleRadius: number; // Radius of the place radius
   public location: LocationModel;
   public waypoint: WaypointModel;
@@ -124,6 +122,7 @@ export class MapComponent implements OnInit {
     this.getLocation();
     this.getDirection();
   }
+
 
 
   // Adds a waypoint to the map
@@ -324,7 +323,7 @@ export class MapComponent implements OnInit {
 
     for (let i = 0; i < places.length; i++) {
 
-      let inputPlace = places[i];
+      const inputPlace = places[i];
 
       const image: google.maps.Icon = {
         url: inputPlace.icon,
@@ -345,20 +344,19 @@ export class MapComponent implements OnInit {
     }
     this.controlmap.fitBounds(bounds);
   }
-  getPlaceDetails(newPlaceId: string) {
-
-
+  getPlaceDetails(newPlaceId: string, marker: Marker) {
     const request = {
       placeId: newPlaceId,
       fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
-    }
+    };
     const service = new google.maps.places.PlacesService(this.controlmap);
     service.getDetails(request, this.callbackDetails.bind(this));
-
+    this.currentPlace.marker = marker;
   }
   callbackDetails(results, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
       this.currentPlace = {
+        marker: null,
         name: results.name,
         rating: results.rating,
         phoneNumber: results.formatted_phone_number,
@@ -374,7 +372,7 @@ export class MapComponent implements OnInit {
           sunday: results.opening_hours && results.opening_hours.weekday_text[6]
         },
         url: results.url
-      }
+      };
       console.log(this.currentPlace);
     }
   }

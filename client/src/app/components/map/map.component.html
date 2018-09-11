@@ -1,12 +1,13 @@
 <agm-map class="map" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
-  <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
+  <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints"
+    (onChange)="directionChanged($event)">
   </agm-direction>
   <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
     [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
 
   </agm-marker>
-  <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"
-    [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId)">
+  <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow"
+    [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
   </agm-marker>
 
   <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
@@ -16,8 +17,8 @@
 
   </agm-polyline>
 
-  <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius" [fillColor]="c.fillColor"
-    [circleDraggable]="false" [editable]="false">
+  <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius"
+    [fillColor]="c.fillColor" [circleDraggable]="false" [editable]="false">
   </agm-circle>
 </agm-map>
 <div class="col-3 z1 bg-light">
@@ -44,22 +45,23 @@
 </div>
 <br>
 <div class="col-3 z1 bg-light" *ngIf="currentPlace != null">
-<h5>{{currentPlace.name}}</h5>
-<br>
-Rating: {{currentPlace.rating}}
-<br>
-<ng-container *ngIf="currentPlace.address">
-Open Now
-</ng-container>
-<ng-container *ngIf="!currentPlace.address">
-Closed Now
-</ng-container>
-<br>
-Address: {{currentPlace.address}}
-<br>
-Phone Number: {{currentPlace.phoneNumber}}
-<br>
-<a href={{currentPlace.url}}>Google Maps</a>
+  <h5>{{currentPlace.name}}</h5>
+  <br>
+  Rating: {{currentPlace.rating}}
+  <br>
+  <ng-container *ngIf="currentPlace.address">
+    Open Now
+  </ng-container>
+  <ng-container *ngIf="!currentPlace.address">
+    Closed Now
+  </ng-container>
+  <br>
+  Address: {{currentPlace.address}}
+  <br>
+  Phone Number: {{currentPlace.phoneNumber}}
+  <br>
+  <a href={{currentPlace.url}}>Google Maps</a>
+  <button class="btn btn-outline-primary" id="saveMarker" (click)=saveMarker()>Save Place To Trip</button>
 </div>
 <br>
 <div class="col-3 z1 bg-light">
@@ -97,3 +99,5 @@ Phone Number: {{currentPlace.phoneNumber}}
     </div>
   </div>
 </div>
+
+<button class="btn btn-outline-primary z1" (click)=saveRoute()>save route</button>
