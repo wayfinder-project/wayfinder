@@ -16,6 +16,7 @@ import { HomeComponent } from './components/home/home.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './utils/jwt.interceptor';
 import { ErrorInterceptor } from './utils/error.interceptor';
+import { UserRegistrationComponent } from './components/user-registration/user-registration.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ErrorInterceptor } from './utils/error.interceptor';
     MapComponent,
     NavbarComponent,
     HomeComponent,
-    UserpageComponent
+    UserpageComponent,
+    UserRegistrationComponent
   ],
   imports: [
     AgmCoreModule.forRoot({
