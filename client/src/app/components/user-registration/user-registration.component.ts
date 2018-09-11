@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NgbActiveModal, NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { User } from '../../models/user.model';
+import { NewUser } from '../../models/user.model';
 
 @Component({
   selector: 'app-user-registration',
@@ -20,7 +20,7 @@ export class UserRegistrationComponent implements OnInit {
   modal: NgbModalRef;
 
   @Output()
-  close = new EventEmitter<{ user: User, password: string }>();
+  close = new EventEmitter<{ user: NewUser, password: string }>();
 
   constructor(private modalService: NgbModal) { }
 
@@ -32,7 +32,7 @@ export class UserRegistrationComponent implements OnInit {
   }
 
   closeModal(): void {
-    const user: User = {
+    const user: NewUser = {
       username: this.username,
       firstName: this.firstName,
       lastName: this.lastName,
