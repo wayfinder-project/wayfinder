@@ -86,11 +86,8 @@ public class UserControllerTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		String usersJson = "[" + userJson + "]";
-
-		mvc.perform(get("/users").with(user(user))).andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(content().json(usersJson, true));
+		mvc.perform(get("/users").with(user(user))).andExpect(status().isForbidden())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
 
 		verify(userService).findAll();
 	}
