@@ -1,4 +1,4 @@
-<agm-map class="map" [latitude]="mapLat" [longitude]="mapLng" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
+<agm-map class="map" [latitude]="mapLat" [longitude]="mapLng" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)" (zoomChange)="checkZoomLevel()">
   <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
   </agm-direction>
   <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"

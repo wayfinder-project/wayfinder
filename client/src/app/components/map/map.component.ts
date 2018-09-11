@@ -45,6 +45,8 @@ interface Place {
     sunday: string;
   }
   url: string;
+  website: string;
+  priceLevel: number;
 }
 
 
@@ -103,9 +105,12 @@ export class MapComponent implements OnInit {
   controlmap;
   locationSearchTypes: string[] = ['lodging', 'restaurant', 'gas_station', 'supermarket', 'rv_park', 'parking', 'park'];
   currentLocationSearchType: string = this.locationSearchTypes[0];
+  minpriceFilter: number = 0;
+  maxpriceFilter: number = 4;
 
   currentMarkers: Marker[] = [];
   currentPlace: Place = null;
+  selectedPlaces: Marker[] = [];
 
   constructor(private http: HttpClient) {
 
@@ -350,7 +355,7 @@ export class MapComponent implements OnInit {
 
     const request = {
       placeId: newPlaceId,
-      fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
+      fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo', 'website', 'price_level']
     }
     const service = new google.maps.places.PlacesService(this.controlmap);
     service.getDetails(request, this.callbackDetails.bind(this));
@@ -358,6 +363,7 @@ export class MapComponent implements OnInit {
   }
   callbackDetails(results, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
+      console.log(results);
       this.currentPlace = {
         name: results.name,
         rating: results.rating,
@@ -373,7 +379,9 @@ export class MapComponent implements OnInit {
           saturday: results.opening_hours && results.opening_hours.weekday_text[5],
           sunday: results.opening_hours && results.opening_hours.weekday_text[6]
         },
-        url: results.url
+        url: results.url,
+        website: results.website,
+        priceLevel: results.price_level
       }
       console.log(this.currentPlace);
     }
@@ -400,6 +408,12 @@ export class MapComponent implements OnInit {
 
   showMarkerPlaces(index: number) {
     this.getPlaces.bind(this)({ lat: this.markers[index].lat, lng: this.markers[index].lng });
+  }
+
+  checkZoomLevel() {
+    if (this.controlmap.zoom <= 12) {
+      this.currentMarkers = [];
+    }
   }
 
 
