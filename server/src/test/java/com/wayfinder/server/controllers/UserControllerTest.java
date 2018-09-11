@@ -2,6 +2,8 @@ package com.wayfinder.server.controllers;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -44,7 +46,7 @@ public class UserControllerTest {
 	@Before
 	public void setUp() {
 		Mockito.reset(userService);
-		mvc = MockMvcBuilders.webAppContextSetup(appContext).build();
+		mvc = MockMvcBuilders.webAppContextSetup(appContext).apply(springSecurity()).build();
 	}
 
 	@Test
@@ -62,7 +64,7 @@ public class UserControllerTest {
 
 		when(userService.findAll()).thenReturn(Arrays.asList(user));
 
-		mvc.perform(get("/users")).andExpect(status().isOk())
+		mvc.perform(get("/users").with(user(user))).andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().json(userJson, true));
 
@@ -84,7 +86,7 @@ public class UserControllerTest {
 
 		when(userService.findById(user.getId())).thenReturn(user);
 
-		mvc.perform(get("/users/{id}", user.getId())).andExpect(status().isOk())
+		mvc.perform(get("/users/{id}", user.getId()).with(user(user))).andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().json(userJson, true));
 
@@ -106,7 +108,7 @@ public class UserControllerTest {
 
 		when(userService.findByUsername(user.getUsername())).thenReturn(user);
 
-		mvc.perform(get("/users").param("username", user.getUsername())).andExpect(status().isOk())
+		mvc.perform(get("/users").param("username", user.getUsername()).with(user(user))).andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().json(userJson, true));
 
@@ -151,9 +153,9 @@ public class UserControllerTest {
 
 		when(userService.update(user)).thenReturn(user);
 
-		mvc.perform(
-				put("/users/{id}", user.getId()).content(updatedUserJson).contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+		mvc.perform(put("/users/{id}", user.getId()).with(user(user)).content(updatedUserJson)
+				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().json(updatedUserJson, true));
 
 		verify(userService).update(user);
@@ -173,10 +175,10 @@ public class UserControllerTest {
 
 		char[] password = "password2".toCharArray();
 		String requestJson = "{\"oldPassword\": \"password\"," + "\"newPassword\": \"password2\"}";
-		
+
 		when(userService.findById(user.getId())).thenReturn(user);
 
-		mvc.perform(post("/users/{id}/password", user.getId()).content(requestJson)
+		mvc.perform(post("/users/{id}/password", user.getId()).with(user(user)).content(requestJson)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk())
 				.andExpect(content().string(""));
 
