@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import { User } from '../../models/user.model';
+import { User, NewUser } from '../../models/user.model';
 import { environment } from '../../../environments/environment';
 import { Trip } from '../../models/trip.model';
 
@@ -51,10 +51,7 @@ export class UserService {
    * @param user the user data object, with the ID and trips fields optional
    * @param password the new user's password
    */
-  create(
-    user: Overwrite<User, { id?: number; trips?: Trip[] }>,
-    password: string
-  ): Observable<User> {
+  create(user: NewUser, password: string): Observable<User> {
     // The server requires the trips property to be non-null, so we provide a
     // default empty array.
     if (!user.trips) {

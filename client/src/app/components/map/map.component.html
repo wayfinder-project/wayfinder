@@ -1,83 +1,99 @@
-<agm-map id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
-  <agm-direction [origin]="origin" [destination]="destination "
-  [renderOptions]="renderOptions"
-  [waypoints]="waypoints"
- (onChange)="directionChanged($event)"
-  >
+<agm-map class="map" [latitude]="mapLat" [longitude]="mapLng" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
+  <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
   </agm-direction>
-  <agm-marker
-  *ngFor="let m of markers, let i = index"
-    [latitude]="m.lat"
-    [longitude]="m.lng"
-    [markerDraggable]="m.draggable"
-    [label]="m.label"
-    (markerClick)="showMarkerPlaces(i)"
-    (dragEnd)="moveWaypoint(i, $event)">
+  <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
+    [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
 
   </agm-marker>
+  <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"
+    [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId)">
+  </agm-marker>
 
-  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10" >
-    <agm-polyline-point
-    *ngFor="let p of polyPoints, let i = index"
-      [latitude]="p.lat"
-      [longitude]="p.lng"
-    >
+  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
+    <agm-polyline-point *ngFor="let p of polyPoints, let i = index" [latitude]="p.lat" [longitude]="p.lng">
 
     </agm-polyline-point>
 
   </agm-polyline>
 
-  <agm-circle
-    *ngFor="let c of circles, let i = index"
-      [latitude]="c.lat" [longitude]="c.lng"
-      [(radius)]="c.radius"
-      [fillColor]="c.fillColor"
-      [circleDraggable]="false"
-      [editable]="false">
+  <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius" [fillColor]="c.fillColor"
+    [circleDraggable]="false" [editable]="false">
   </agm-circle>
 </agm-map>
-<button
-  *ngFor="let l of legs, let i = index"
-  (click)="legButton(i)"
->
-{{legs[i].distance.text}}
-</button>
-<div class="container">
+<div class="col-3 z1 bg-light">
+  <br>
+  <h3>Place Filter</h3>
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <label class="input-group-text" for="inputGroupSelect01">Search By:</label>
+    </div>
+    <select [(ngModel)]="currentLocationSearchType" class="custom-select">
+      <option selected value="">Any</option>
+      <ng-container *ngFor="let v of locationSearchTypes; let i = index">
+        <option [value]="locationSearchTypes[i]">{{locationSearchTypes[i]}}</option>
+      </ng-container>
+    </select>
+  </div>
+  <div class="input-group input-group-md mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text">Radius (Meters):</span>
+    </div>
+    <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" [(ngModel)]="circleRadius">
+  </div>
+  <br>
+</div>
+<br>
+<div class="col-3 z1 bg-light" *ngIf="currentPlace != null">
+<h5>{{currentPlace.name}}</h5>
+<br>
+Rating: {{currentPlace.rating}}
+<br>
+<ng-container *ngIf="currentPlace.address">
+Open Now
+</ng-container>
+<ng-container *ngIf="!currentPlace.address">
+Closed Now
+</ng-container>
+<br>
+Address: {{currentPlace.address}}
+<br>
+Phone Number: {{currentPlace.phoneNumber}}
+<br>
+<a href={{currentPlace.url}}>Google Maps</a>
+</div>
+<br>
+<div class="col-3 z1 bg-light">
+  <h3>Routes</h3>
+  <button class="btn" *ngFor="let l of legs, let i = index" (click)="legButton(i)">
+    {{legs[i].distance.text}}
+  </button>
+</div>
+<br>
+<div class="col-3 z1 bg-light pre-scrollable">
   <div class="row">
     <div class="col-8 text-center">
-    <ng-container *ngIf="legInfo" >
-      <div>
-      distance:{{legInfo.distance.text}}
-    </div>
-    <div>
-        duration:{{legInfo.duration.text}}
-    </div>
-    <div>
-      directions:
-      <div *ngFor="let s of legInfo.steps, let i = index">
-        Step {{i}} :
-        <span [innerHtml] = "legInfo.steps[i].instructions"></span>
-
-      </div>
-    </div>
-    </ng-container>
-    </div>
-    <div class="col-2 text-center">
-
-    </div>
-    <div class="col-2 text-center">
-
-    </div>
-    <div class="input-group mb-3 col-4">
-        <div class="input-group-prepend">
-          <label class="input-group-text" for="inputGroupSelect01">Search By:</label>
+      <ng-container *ngIf="legInfo">
+        <h3>Route Details</h3>
+        <div>
+          distance:{{legInfo.distance.text}}
         </div>
-        <select [(ngModel)]="currentLocationSearchType" class="custom-select">
-          <option selected value="">Any</option>
-          <ng-container *ngFor="let v of locationSearchTypes; let i = index">
-            <option [value]="locationSearchTypes[i]">{{locationSearchTypes[i]}}</option>
-          </ng-container>
-        </select>
-      </div>
+        <div>
+          duration:{{legInfo.duration.text}}
+        </div>
+        <div>
+          directions:
+          <div *ngFor="let s of legInfo.steps, let i = index">
+            Step {{i}} :
+            <span [innerHtml]="legInfo.steps[i].instructions"></span>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <div class="col-2 text-center">
+
+    </div>
+    <div class="col-2 text-center">
+
+    </div>
   </div>
 </div>

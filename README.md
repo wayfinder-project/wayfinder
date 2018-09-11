@@ -163,6 +163,11 @@ is, properties not explicitly marked as optional may not be null.
    */
   creationDate: string;
   route: Route;
+  /**
+   * Any points of interested that the user has saved. These are not in any
+   * particular order.
+   */
+  pointsOfInterest: AnnotatedWaypoint[];
 }
 ```
 
@@ -211,6 +216,16 @@ is, properties not explicitly marked as optional may not be null.
    * A user-readable address string.
    */
   address: string;
+}
+```
+
+##### `AnnotatedWaypoint`
+
+```ts
+// extends Waypoint
+{
+  name?: string;
+  comments: string[];
 }
 ```
 
