@@ -28,6 +28,25 @@ interface Circle {
   fillColor: string;
 }
 
+// ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
+interface Place {
+  name: string;
+  rating: number;
+  phoneNumber: string;
+  address: string;
+  openNow: boolean;
+  hours: {
+    monday: string;
+    tuesday: string;
+    wednesday: string;
+    thursday: string;
+    friday: string;
+    saturday: string;
+    sunday: string;
+  };
+  url: string;
+}
+
 
 
 
@@ -100,6 +119,7 @@ export class MapComponent implements OnInit {
   currentLocationSearchType: string = this.locationSearchTypes[0];
 
   currentMarkers: Marker[] = [];
+  currentPlace: Place = null;
 
   constructor(private http: HttpClient) {
 
@@ -431,8 +451,24 @@ totalLegsButton() {
   }
   callbackDetails(results, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
-      // this.createMarkers.bind(this)(results);
-      console.log(results);
+      this.currentPlace = {
+        name: results.name,
+        rating: results.rating,
+        phoneNumber: results.formatted_phone_number,
+        address: results.formatted_address,
+        openNow: results.opening_hours && results.opening_hours.open_now,
+        hours: {
+          monday: results.opening_hours && results.opening_hours.weekday_text[0],
+          tuesday: results.opening_hours && results.opening_hours.weekday_text[1],
+          wednesday: results.opening_hours && results.opening_hours.weekday_text[2],
+          thursday: results.opening_hours && results.opening_hours.weekday_text[3],
+          friday: results.opening_hours && results.opening_hours.weekday_text[4],
+          saturday: results.opening_hours && results.opening_hours.weekday_text[5],
+          sunday: results.opening_hours && results.opening_hours.weekday_text[6]
+        },
+        url: results.url
+      };
+      console.log(this.currentPlace);
     }
   }
 
