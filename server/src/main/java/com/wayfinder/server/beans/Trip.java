@@ -62,6 +62,13 @@ public class Trip {
 	@NotNull
 	@Valid
 	private Set<AnnotatedWaypoint> pointsOfInterest;
+	/**
+	 * The checklist associated with this trip.
+	 */
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@NotNull
+	@Valid
+	private Checklist checklist;
 
 	public int getId() {
 		return id;
@@ -93,5 +100,13 @@ public class Trip {
 
 	public void setPointsOfInterest(Set<AnnotatedWaypoint> pointsOfInterest) {
 		this.pointsOfInterest = pointsOfInterest;
+	}
+
+	public Checklist getChecklist() {
+		return checklist;
+	}
+
+	public void setChecklist(Checklist checklist) {
+		this.checklist = checklist;
 	}
 }

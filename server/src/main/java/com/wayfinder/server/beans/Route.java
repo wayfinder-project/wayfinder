@@ -35,15 +35,13 @@ public class Route {
 	@GeneratedValue(generator = "seq_route_id", strategy = GenerationType.SEQUENCE)
 	private int id;
 	/**
-	 * The legs which this route contains. The list is guaranteed to be ordered by
-	 * leg index, so that the legs appear in the natural travel order (from start to
-	 * end).
+	 * The waypoints of which this route consists, ordered from start to end.
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@OrderColumn
 	@NotNull
 	@Valid
-	private List<Leg> legs;
+	private List<Waypoint> waypoints;
 
 	public int getId() {
 		return id;
@@ -53,11 +51,11 @@ public class Route {
 		this.id = id;
 	}
 
-	public List<Leg> getLegs() {
-		return legs;
+	public List<Waypoint> getWaypoints() {
+		return waypoints;
 	}
 
-	public void setLegs(List<Leg> legs) {
-		this.legs = legs;
+	public void setWaypoints(List<Waypoint> waypoints) {
+		this.waypoints = waypoints;
 	}
 }
