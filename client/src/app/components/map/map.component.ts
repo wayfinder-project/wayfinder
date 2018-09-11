@@ -5,6 +5,7 @@ import { WaypointModel, LocationModel } from '../../models/mapwaypoint.model';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../services/user/user.service';
+import { AnnotatedWaypoint } from '../../models/annotated-waypoint.model';
 
 declare var google: any;
 
@@ -89,9 +90,6 @@ export class MapComponent implements OnInit {
 
   waypoints: any = [
   ];
-
-
-
 
   @ViewChild(AgmMap) map: AgmMap;
 
@@ -377,6 +375,22 @@ export class MapComponent implements OnInit {
     }
   }
 
+  // VIEN
+  saveMarker() {
+    // this.currentPlace;
+    const annotatedWayPoint: AnnotatedWaypoint = {
+      latitude: this.currentPlace.marker.lat,
+      longitude: this.currentPlace.marker.lng,
+      address: this.currentPlace.address,
+      placeId: this.currentPlace.marker.placeId,
+      name: this.currentPlace.marker.label,
+      comments: [],
+      iconUrl: this.currentPlace.marker.updateIcon.url
+    };
+
+
+  }
+
   getLatLong(placeid: string, map: any, fn) {
     const placeService = new google.maps.places.PlacesService(map);
     placeService.getDetails({
@@ -393,8 +407,6 @@ export class MapComponent implements OnInit {
     this.controlmap = $event;
     console.log(this.controlmap);
   }
-
-
 
   showMarkerPlaces(index: number) {
     this.getPlaces.bind(this)({ lat: this.markers[index].lat, lng: this.markers[index].lng });

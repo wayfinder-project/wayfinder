@@ -1,5 +1,5 @@
 export interface Waypoint {
-  id: number;
+  id?: number;
   latitude: number;
   longitude: number;
   /**
