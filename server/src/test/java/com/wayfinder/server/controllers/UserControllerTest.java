@@ -1,5 +1,6 @@
 package com.wayfinder.server.controllers;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -29,6 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.wayfinder.server.beans.User;
 import com.wayfinder.server.config.ControllerTestConfig;
+import com.wayfinder.server.exceptions.UserAlreadyExistsException;
 import com.wayfinder.server.services.UserService;
 import com.wayfinder.server.util.Passwords;
 
@@ -103,12 +105,31 @@ public class UserControllerTest {
 	}
 
 	@Test
+	public void testFindByNonExistentId() throws Exception {
+		final int id = 100;
+
+		when(userService.findById(id)).thenReturn(null);
+
+		mvc.perform(get("/users/{id}", id).with(user(user))).andExpect(status().isNotFound());
+
+		verify(userService).findById(id);
+	}
+
+	@Test
 	public void testFindByUsername() throws Exception {
 		mvc.perform(get("/users").param("username", user.getUsername()).with(user(user))).andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().json(userJson, true));
 
 		verify(userService).findByUsername(user.getUsername());
+	}
+
+	@Test
+	public void testFindByNonExistentUsername() throws Exception {
+		final String username = "nonexistent";
+
+		when(userService.findByUsername(username)).thenReturn(null);
+		mvc.perform(get("/users").with(user(user)).param("username", username)).andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -130,6 +151,29 @@ public class UserControllerTest {
 		mvc.perform(post("/users").content(requestBody).contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().json(newUserJson, true));
+
+		verify(userService).add(newUser, "password".toCharArray());
+	}
+
+	@Test
+	public void testAddDuplicateUsername() throws Exception {
+		User newUser = new User();
+		newUser.setId(1);
+		newUser.setFirstName("Ian");
+		newUser.setLastName("Johnson");
+		newUser.setUsername("ianprime0509");
+		newUser.setEmail("ianprime0509@gmail.com");
+		newUser.setTrips(new ArrayList<>());
+
+		String newUserJson = "{" + "\"id\": 1," + "\"firstName\": \"Ian\"," + "\"lastName\": \"Johnson\","
+				+ "\"username\": \"ianprime0509\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}";
+		String requestBody = "{\"user\": " + newUserJson + ", \"password\": \"password\"}";
+
+		when(userService.add(newUser, "password".toCharArray()))
+				.thenThrow(new UserAlreadyExistsException(user.getUsername()));
+
+		mvc.perform(post("/users").content(requestBody).contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(status().isConflict()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
 
 		verify(userService).add(newUser, "password".toCharArray());
 	}
@@ -163,9 +207,19 @@ public class UserControllerTest {
 		String requestJson = "{\"oldPassword\": \"password\"," + "\"newPassword\": \"password2\"}";
 
 		mvc.perform(post("/users/{id}/password", user.getId()).with(user(user)).content(requestJson)
-				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk())
-				.andExpect(content().string(""));
+				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk());
 
 		verify(userService).updatePassword(user.getId(), password);
+	}
+
+	@Test
+	public void testUpdatePasswordIncorrectPassword() throws Exception {
+		char[] password = "password2".toCharArray();
+		String requestJson = "{\"oldPassword\": \"password123\"," + "\"newPassword\": \"password2\"}";
+
+		mvc.perform(post("/users/{id}/password", user.getId()).with(user(user)).content(requestJson)
+				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isForbidden());
+
+		verify(userService, never()).updatePassword(user.getId(), password);
 	}
 }
