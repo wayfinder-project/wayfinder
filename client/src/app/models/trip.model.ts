@@ -1,5 +1,6 @@
 import { Route } from './route.model';
 import { AnnotatedWaypoint } from './annotated-waypoint.model';
+import { Checklist } from './checklist.model';
 
 export interface Trip {
   id?: number;
@@ -14,4 +15,8 @@ export interface Trip {
    * particular order.
    */
   pointsOfInterest: AnnotatedWaypoint[];
+  /**
+   * The checklist associated with the trip.
+   */
+  checklist: Checklist;
 }
