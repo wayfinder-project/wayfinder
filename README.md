@@ -198,10 +198,6 @@ is, properties not explicitly marked as optional may not be null.
    * In meters.
    */
   distance: number;
-  /**
-   * The zero-based index of this leg, to order it among other legs.
-   */
-  index: number;
 }
 ```
 
