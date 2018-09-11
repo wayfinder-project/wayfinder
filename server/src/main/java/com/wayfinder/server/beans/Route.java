@@ -9,7 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import javax.persistence.SequenceGenerator;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -40,7 +40,7 @@ public class Route {
 	 * end).
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@OrderBy("index")
+	@OrderColumn
 	@NotNull
 	@Valid
 	private List<Leg> legs;

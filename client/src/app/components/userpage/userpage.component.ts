@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../services/user/user.service';
-import { User } from '../../models/user.model';
+import { UserWithId } from '../../models/user.model';
 
 @Component({
   selector: 'app-userpage',
@@ -9,7 +9,7 @@ import { User } from '../../models/user.model';
 })
 export class UserpageComponent implements OnInit {
   // User information
-  user: User;
+  user: UserWithId;
 
   // Password
   password: string;
@@ -53,5 +53,3 @@ export class UserpageComponent implements OnInit {
     }
   }
 }
-
-// Testing for git

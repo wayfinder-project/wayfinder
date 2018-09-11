@@ -6,6 +6,8 @@ import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../services/user/user.service';
 import { AnnotatedWaypoint } from '../../models/annotated-waypoint.model';
+import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
+
 
 declare var google: any;
 
@@ -51,7 +53,10 @@ interface Place {
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css'],
+  providers: [
+    NgbTabset
+  ]
 })
 export class MapComponent implements OnInit {
 
@@ -71,6 +76,19 @@ export class MapComponent implements OnInit {
     }
   };
 
+  public renderOptionsForLongLeg = {
+    suppressMarkers: true,
+    draggable: false,
+    visible: false,
+    polylineOptions: {
+      strokeColor: 'green',
+      strokeWeight: 5,
+      zIndex: 1,
+      clickable: true
+    }
+  };
+
+
   markers: Marker[] = [
 
   ];
@@ -87,11 +105,15 @@ export class MapComponent implements OnInit {
 
   ];
 
-
   waypoints: any = [
   ];
 
+  longLeg: any = undefined;
+
+
   @ViewChild(AgmMap) map: AgmMap;
+  @ViewChild(NgbTabset)
+  private tabset: NgbTabset;
 
   // Logan Smith's Variables (To be added to service)
   savedPlaces: Marker[];
@@ -111,6 +133,8 @@ export class MapComponent implements OnInit {
   public waypoint: WaypointModel;
   public directions: any;
   public directionInfo: any;
+
+  public bigLegInfo: any;
   public legInfo: any; // single leg info
 
   ngOnInit() {
@@ -178,18 +202,18 @@ export class MapComponent implements OnInit {
       way.location.lat = marker.lat;
       way.location.lng = marker.lng;
     } else {
-      this.markerDragEnd(this.markers[index], true);
+      this.markerDragEnd(this.markers[index], index);
     }
     this.getDirection();
   }
 
   // If a marker(origin/destination) is dragged.
-  markerDragEnd(m: any, origin: boolean) {
+  markerDragEnd(m: any, index: number) {
     console.log(m);
-    if (origin) {
+    if (index === 0) { // Origin
       this.origin.lat = m.lat;
       this.origin.lng = m.lng;
-    } else {
+    } else { // Destination
       this.destination.lat = m.lat;
       this.destination.lng = m.lng;
     }
@@ -217,12 +241,22 @@ export class MapComponent implements OnInit {
     this.directionInfo = this.directions.routes[0].legs[0].distance.text;
     const routeLegs = this.directions.routes[0].legs;
     this.legs = [];
+    let totalDistance = 0;
     for (let i = 0; i < routeLegs.length; i++) {
       this.legs.push(routeLegs[i]);
+      totalDistance += routeLegs[i].distance.value;
     }
     this.polyPoints = [];
+    totalDistance *= 0.000621371192;
+    totalDistance = this.roundTo(totalDistance, 2);
+    this.bigLegInfo = totalDistance;
+    this.destroyLongLeg();
   }
-
+  destroyLongLeg() {
+    if (this.longLeg) {
+      this.longLeg.visible = false;
+    }
+  }
 
 
   // Creates buttons for each leg. Highlights and centers on the leg when pressed.
@@ -238,32 +272,102 @@ export class MapComponent implements OnInit {
       south: Math.min(start.lat(), end.lat())
     });
     this.polyPoints = [];
+    this.destroyLongLeg();
     const legsLength = this.legs[i].steps.length;
-    let count = 0;
-    for (let q = 0; q < legsLength; q++) {
-      const pathLength = this.legs[i].steps[q].path.length;
-      if (pathLength < 1000) {
+    console.log(this.legs[i].distance.value);
+    if (this.legs[i].distance.value < 350000) {
+      for (let q = 0; q < legsLength; q++) {
+        const pathLength = this.legs[i].steps[q].path.length;
         for (let z = 0; z < pathLength; z++) {
-          count++;
           const pathPoint = this.legs[i].steps[q].path[z];
           this.polyPoints.push({ lat: pathPoint.lat(), lng: pathPoint.lng() });
         }
-      } else {
-        const pathPoints: any[] = [];
-        pathPoints.push(this.legs[i].steps[q].path[0]);
-        pathPoints.push(this.legs[i].steps[q].path[1]);
-
-        pathPoints.push(this.legs[i].steps[q].path[pathLength - 2]);
-        pathPoints.push(this.legs[i].steps[q].path[pathLength - 1]);
-
-        for (const p of pathPoints) {
-          this.polyPoints.push({ lat: p.lat(), lng: p.lng() });
-        }
-
       }
+    } else {
+      console.log('toobig');
+      const or = { lat: this.legs[i].start_location.lat(), lng: this.legs[i].start_location.lng() };
+      const de = { lat: this.legs[i].end_location.lat(), lng: this.legs[i].end_location.lng() };
+      this.longLeg = ({ origin: or, destination: de, visible: true });
     }
-    console.log(count);
+    console.log(this.longLeg);
+    this.tabset.select('directions');
   }
+
+  totalLegsButton() {
+    const end = this.destination;
+    const start = this.origin;
+    // this.zoomFinder();
+    this.controlmap.fitBounds({
+      east: Math.max(start.lng, end.lng),
+      north: Math.max(start.lat, end.lat),
+      west: Math.min(start.lng, end.lng),
+      south: Math.min(start.lat, end.lat)
+    });
+    this.polyPoints = [];
+    this.destroyLongLeg();
+    const pathLength = this.directions.routes[0].overview_path.length;
+
+    for (let q = 0; q < pathLength; q++) {
+      const pathPoint = this.directions.routes[0].overview_path[q];
+      this.polyPoints.push({ lat: pathPoint.lat(), lng: pathPoint.lng() });
+    }
+
+  }
+
+  /* zoomFinder() {
+    const originDestination = Math.sqrt(Math.pow(this.origin.lat - this.destination.lat, 2) +
+       Math.pow(this.origin.lng - this.destination.lng, 2));
+      console.log(this.origin.lat);
+    let longestDistance = originDestination;
+    let longestWay: any;
+    let bool: boolean;
+    let distanceDestinationFinal = this.destination;
+     let distanceOriginFinal = this.origin;
+    for (let i = 0; i < this.legs.length; i++) {
+      const endPoint = this.legs[i].end_location;
+      const distanceDestination = Math.sqrt(Math.pow(endPoint.lat() - this.destination.lat, 2) +
+      Math.pow(endPoint.lng() - this.destination.lng, 2));
+      const distanceOrigin = Math.sqrt(Math.pow(this.origin.lat - endPoint.lat(), 2) +
+      Math.pow(this.origin.lng - endPoint.lng(), 2));
+      console.log(longestDistance);
+      if (distanceDestinationFinal < distanceDestination)
+             {
+                 distanceDestinationFinal = distanceDestination;
+             }
+             else if (distanceOriginFinal < distanceOrigin)
+             {
+                 distanceOriginFinal = distanceOrigin;
+             }
+
+             if (longestDistance < distanceOriginFinal)
+             {
+                 bool = true;
+                 longestDistance = distanceOriginFinal;
+                 longestWay = this.legs[i].end_location;
+                 console.log(longestDistance);
+             }
+             else if(longestDistance < distanceDestinationFinal)
+             {
+                 bool = false;
+                 longestDistance = distanceDestinationFinal;
+                 longestWay = this.legs[i].end_location;
+                 console.log(longestDistance);
+             }
+    }
+    if (longestDistance > originDestination) {
+      if (bool) {
+    this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.origin.lng),
+      north: Math.max(longestWay.lat(), this.origin.lat),
+      west: Math.min(longestWay.lng(),  this.origin.lng),
+      south: Math.min(longestWay.lat(), this.origin.lat)});
+    } else {
+      this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.destination.lng),
+        north: Math.max(longestWay.lat(), this.destination.lat),
+        west: Math.min(longestWay.lng(),  this.destination.lng),
+        south: Math.min(longestWay.lat(), this.destination.lat)});
+    }
+    }
+  } */
 
   // Tries to find the point in the path.
   findPointinPath(paths: any, point: any, round: number) {
@@ -348,9 +452,32 @@ export class MapComponent implements OnInit {
       fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
     };
     const service = new google.maps.places.PlacesService(this.controlmap);
-    service.getDetails(request, this.callbackDetails.bind(this));
-    this.currentPlace.marker = marker;
+    service.getDetails(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        this.currentPlace = {
+          marker: marker,
+          name: results.name,
+          rating: results.rating,
+          phoneNumber: results.formatted_phone_number,
+          address: results.formatted_address,
+          openNow: results.opening_hours && results.opening_hours.open_now,
+          hours: {
+            monday: results.opening_hours && results.opening_hours.weekday_text[0],
+            tuesday: results.opening_hours && results.opening_hours.weekday_text[1],
+            wednesday: results.opening_hours && results.opening_hours.weekday_text[2],
+            thursday: results.opening_hours && results.opening_hours.weekday_text[3],
+            friday: results.opening_hours && results.opening_hours.weekday_text[4],
+            saturday: results.opening_hours && results.opening_hours.weekday_text[5],
+            sunday: results.opening_hours && results.opening_hours.weekday_text[6]
+          },
+          url: results.url
+        };
+        console.log('currentplace ' + this.currentPlace);
+      }
+    });
   }
+
+
   callbackDetails(results, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
       this.currentPlace = {
@@ -371,7 +498,7 @@ export class MapComponent implements OnInit {
         },
         url: results.url
       };
-      console.log(this.currentPlace);
+      console.log('currentplace ' + this.currentPlace);
     }
   }
 
@@ -409,8 +536,32 @@ export class MapComponent implements OnInit {
   }
 
   showMarkerPlaces(index: number) {
+    console.log(this.directions);
+    console.log(index);
+    console.log(this.legs);
     this.getPlaces.bind(this)({ lat: this.markers[index].lat, lng: this.markers[index].lng });
+    if (this.markers[index].waypointId != null) {
+      console.log(this.waypoints);
+      const waypointOrder = this.directions.routes[0].waypoint_order.indexOf(this.markers[index].waypointId) + 1;
+      console.log(waypointOrder);
+      console.log(this.legs[waypointOrder]);
+    } else {
+      console.log(this.legs[index]);
+    }
   }
+
+  delete(index: number) {
+    console.log('a');
+  }
+
+
+  collapseButton() {
+    const myGroup = ('#myGroup');
+
+  }
+
+
+
 
 
 }

@@ -5,7 +5,7 @@ export interface Waypoint {
   /**
    * A user-readable address string.
    */
-  address: string;
+  address?: string;
   /**
    * The place ID, as defined by Google.
    */

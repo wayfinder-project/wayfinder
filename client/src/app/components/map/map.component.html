@@ -1,103 +1,156 @@
-<agm-map class="map" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
-  <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints"
-    (onChange)="directionChanged($event)">
-  </agm-direction>
-  <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
-    [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
-
-  </agm-marker>
-  <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow"
-    [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
-  </agm-marker>
-
-  <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
-    <agm-polyline-point *ngFor="let p of polyPoints, let i = index" [latitude]="p.lat" [longitude]="p.lng">
-
-    </agm-polyline-point>
-
-  </agm-polyline>
-
-  <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius"
-    [fillColor]="c.fillColor" [circleDraggable]="false" [editable]="false">
-  </agm-circle>
-</agm-map>
-<div class="col-3 z1 bg-light">
-  <br>
-  <h3>Place Filter</h3>
-  <div class="input-group mb-3">
-    <div class="input-group-prepend">
-      <label class="input-group-text" for="inputGroupSelect01">Search By:</label>
-    </div>
-    <select [(ngModel)]="currentLocationSearchType" class="custom-select">
-      <option selected value="">Any</option>
-      <ng-container *ngFor="let v of locationSearchTypes; let i = index">
-        <option [value]="locationSearchTypes[i]">{{locationSearchTypes[i]}}</option>
-      </ng-container>
-    </select>
-  </div>
-  <div class="input-group input-group-md mb-3">
-    <div class="input-group-prepend">
-      <span class="input-group-text">Radius (Meters):</span>
-    </div>
-    <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" [(ngModel)]="circleRadius">
-  </div>
-  <br>
-</div>
-<br>
-<div class="col-3 z1 bg-light" *ngIf="currentPlace != null">
-  <h5>{{currentPlace.name}}</h5>
-  <br>
-  Rating: {{currentPlace.rating}}
-  <br>
-  <ng-container *ngIf="currentPlace.address">
-    Open Now
-  </ng-container>
-  <ng-container *ngIf="!currentPlace.address">
-    Closed Now
-  </ng-container>
-  <br>
-  Address: {{currentPlace.address}}
-  <br>
-  Phone Number: {{currentPlace.phoneNumber}}
-  <br>
-  <a href={{currentPlace.url}}>Google Maps</a>
-  <button class="btn btn-outline-primary" id="saveMarker" (click)=saveMarker()>Save Place To Trip</button>
-</div>
-<br>
-<div class="col-3 z1 bg-light">
-  <h3>Routes</h3>
-  <button class="btn" *ngFor="let l of legs, let i = index" (click)="legButton(i)">
-    {{legs[i].distance.text}}
-  </button>
-</div>
-<br>
-<div class="col-3 z1 bg-light pre-scrollable">
-  <div class="row">
-    <div class="col-8 text-center">
-      <ng-container *ngIf="legInfo">
-        <h3>Route Details</h3>
-        <div>
-          distance:{{legInfo.distance.text}}
+<div class="form-group row ">
+  <!-- <div class="col-1"></div> -->
+  <div class="col-3 " style="padding-left: 40px">
+    <ngb-tabset>
+      <br>
+      <ngb-tab title="Places">
+        <div id="placeFilter">
+          <ng-template ngbTabContent>
+            <br>
+            <h3>Place Filter</h3>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">Search By:</label>
+              </div>
+              <select [(ngModel)]="currentLocationSearchType" class="custom-select">
+                <option selected value="">Any</option>
+                <ng-container *ngFor="let v of locationSearchTypes; let i = index">
+                  <option [value]="locationSearchTypes[i]">{{locationSearchTypes[i]}}</option>
+                </ng-container>
+              </select>
+            </div>
+            <div class="input-group input-group-md mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Radius (Meters):</span>
+              </div>
+              <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" [(ngModel)]="circleRadius">
+            </div>
+            <div class="col-12 z1 bg-light" *ngIf="currentPlace != null">
+              <h5>{{currentPlace.name}}</h5>
+              <br> Rating: {{currentPlace.rating}}
+              <br>
+              <ng-container *ngIf="currentPlace.address">
+                Open Now
+              </ng-container>
+              <ng-container *ngIf="!currentPlace.address">
+                Closed Now
+              </ng-container>
+              <br> Address: {{currentPlace.address}}
+              <br> Phone Number: {{currentPlace.phoneNumber}}
+              <br>
+              <a href={{currentPlace.url}}>Google Maps</a>
+            </div>
+          </ng-template>
         </div>
-        <div>
-          duration:{{legInfo.duration.text}}
-        </div>
-        <div>
-          directions:
-          <div *ngFor="let s of legInfo.steps, let i = index">
-            Step {{i}} :
-            <span [innerHtml]="legInfo.steps[i].instructions"></span>
+      </ngb-tab>
+      <ngb-tab title="Routes">
+        <ng-template ngbTabContent>
+          <br>
+          <h3>Routes</h3>
+          <button class="btn" *ngFor="let l of legs, let i = index" (click)="legButton(i)">
+            {{legs[i].distance.text}}
+          </button>
+        </ng-template>
+      </ngb-tab>
+
+      <ngb-tab id="directions" title="Directions">
+        <ng-template ngbTabContent>
+          <br>
+          <div class="col-12 ">
+            <ng-container>
+              <div *ngIf="legInfo" class="dyn-height">
+                <h3>Route Details</h3>
+                <div>
+                  Distance: {{legInfo.distance.text}}
+                </div>
+                <div>
+                  Duration: {{legInfo.duration.text}}
+                </div>
+                <div>
+                  Directions:
+                  <div *ngFor="let s of legInfo.steps, let i = index">
+                    <hr>
+                    Step {{i}} :
+                    <span [innerHtml]="legInfo.steps[i].instructions"></span>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!legInfo">
+                <h3>Nothing Selected</h3>
+              </div>
+            </ng-container>
           </div>
-        </div>
-      </ng-container>
-    </div>
-    <div class="col-2 text-center">
-
-    </div>
-    <div class="col-2 text-center">
-
-    </div>
+        </ng-template>
+      </ngb-tab>
+    </ngb-tabset>
   </div>
+  <div class="col-9" style="padding-right: 40px">
+    <agm-map class="map" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
+      <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
+      </agm-direction>
+      <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
+        [visible]="longLeg.visible">
+      </agm-direction>
+      <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
+        [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
+
+      </agm-marker>
+      <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"
+        [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
+      </agm-marker>
+
+      <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
+        <agm-polyline-point *ngFor="let p of polyPoints, let i = index" [latitude]="p.lat" [longitude]="p.lng">
+        </agm-polyline-point>
+      </agm-polyline>
+
+      <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius" [fillColor]="c.fillColor"
+        [circleDraggable]="false" [editable]="false">
+      </agm-circle>
+    </agm-map>
+  </div>
+<!--   <div class="col-1"></div> -->
 </div>
 
-<button class="btn btn-outline-primary z1" (click)=saveRoute()>save route</button>
+<footer class="page-footer font-small teal pt-4">
+
+  <!-- Footer Text -->
+  <div class="container-fluid text-center text-md-left">
+
+    <!-- Grid row -->
+    <div class="row">
+
+      <!-- Grid column -->
+      <div class="col-md-6 mt-md-0 mt-3">
+
+        <!-- Content -->
+        <h5 class="text-uppercase font-weight-bold"></h5>
+
+      </div>
+      <!-- Grid column -->
+
+      <hr class="clearfix w-100 d-md-none pb-3">
+
+      <!-- Grid column -->
+      <div class="col-md-6 mb-md-0 mb-3">
+
+        <!-- Content -->
+        <h5 class="text-uppercase font-weight-bold"></h5>
+
+
+      </div>
+      <!-- Grid column -->
+
+    </div>
+    <!-- Grid row -->
+
+  </div>
+  <!-- Footer Text -->
+
+  <!-- Copyright -->
+  <div class="footer-copyright text-center py-3">© 2018 Copyright:
+    <a href="https://github.com/wayfinder-project/wayfinder/blob/dev/README.md"> WayfindersUnited</a>
+  </div>
+  <!-- Copyright -->
+
+</footer>
