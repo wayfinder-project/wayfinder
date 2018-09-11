@@ -168,6 +168,10 @@ is, properties not explicitly marked as optional may not be null.
    * particular order.
    */
   pointsOfInterest: AnnotatedWaypoint[];
+  /**
+   * The checklist associated with the trip.
+   */
+  checklist: Checklist;
 }
 ```
 
@@ -230,6 +234,46 @@ is, properties not explicitly marked as optional may not be null.
    * The URL of an icon representing the type of this waypoint.
    */
   iconUrl: string;
+}
+```
+
+##### `Checklist`
+
+```ts
+{
+  id?: number;
+  /**
+   * The items contained in the checklist.
+   */
+  items: ChecklistItem[];
+}
+```
+
+##### `ChecklistItem`
+
+```ts
+{
+  id?: number;
+  /**
+   * The title (contents) of the item (e.g. "pack phone charger").
+   */
+  title: string;
+  status: ChecklistItemStatus;
+}
+```
+
+##### `ChecklistItemStatus` (enum)
+
+```ts
+{
+  /**
+   * The item has been created but not completed.
+   */
+  Created = 'CREATED',
+  /**
+   * The item has been completed.
+   */
+  Done = 'DONE',
 }
 ```
 
