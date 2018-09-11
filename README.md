@@ -216,6 +216,10 @@ is, properties not explicitly marked as optional may not be null.
    * A user-readable address string.
    */
   address: string;
+  /**
+   * The place ID, as defined by Google.
+   */
+  placeId?: string;
 }
 ```
 
@@ -226,6 +230,10 @@ is, properties not explicitly marked as optional may not be null.
 {
   name?: string;
   comments: string[];
+  /**
+   * The URL of an icon representing the type of this waypoint.
+   */
+  iconUrl: string;
 }
 ```
 
