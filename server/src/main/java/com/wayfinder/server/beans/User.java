@@ -178,4 +178,69 @@ public class User implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
+		result = prime * result + id;
+		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
+		result = prime * result + Arrays.hashCode(passwordHash);
+		result = prime * result + Arrays.hashCode(passwordSalt);
+		result = prime * result + ((trips == null) ? 0 : trips.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equals(other.email))
+			return false;
+		if (firstName == null) {
+			if (other.firstName != null)
+				return false;
+		} else if (!firstName.equals(other.firstName))
+			return false;
+		if (id != other.id)
+			return false;
+		if (lastName == null) {
+			if (other.lastName != null)
+				return false;
+		} else if (!lastName.equals(other.lastName))
+			return false;
+		if (!Arrays.equals(passwordHash, other.passwordHash))
+			return false;
+		if (!Arrays.equals(passwordSalt, other.passwordSalt))
+			return false;
+		if (trips == null) {
+			if (other.trips != null)
+				return false;
+		} else if (!trips.equals(other.trips))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", username=" + username + ", passwordHash=" + Arrays.toString(passwordHash)
+				+ ", passwordSalt=" + Arrays.toString(passwordSalt) + ", firstName=" + firstName + ", lastName="
+				+ lastName + ", email=" + email + ", trips=" + trips + "]";
+	}
 }
