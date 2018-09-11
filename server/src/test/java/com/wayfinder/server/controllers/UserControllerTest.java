@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,127 +44,22 @@ public class UserControllerTest {
 	@Autowired
 	private WebApplicationContext appContext;
 
+	/**
+	 * A user object to use in tests.
+	 */
+	User user;
+	/**
+	 * The list of all user objects in the "database".
+	 */
+	List<User> users;
+	/**
+	 * The JSON representation of the user object.
+	 */
+	String userJson;
+
 	@Before
 	public void setUp() {
-		Mockito.reset(userService);
-		mvc = MockMvcBuilders.webAppContextSetup(appContext).apply(springSecurity()).build();
-	}
-
-	@Test
-	public void testFindAll() throws Exception {
-		User user = new User();
-		user.setId(1);
-		user.setFirstName("Ian");
-		user.setLastName("Johnson");
-		user.setUsername("ianprime0509");
-		user.setEmail("ianprime0509@gmail.com");
-		user.setTrips(new ArrayList<>());
-
-		String userJson = "[{" + "\"id\": 1," + "\"firstName\": \"Ian\"," + "\"lastName\": \"Johnson\","
-				+ "\"username\": \"ianprime0509\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}]";
-
-		when(userService.findAll()).thenReturn(Arrays.asList(user));
-
-		mvc.perform(get("/users").with(user(user))).andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(content().json(userJson, true));
-
-		verify(userService).findAll();
-	}
-
-	@Test
-	public void testFindById() throws Exception {
-		User user = new User();
-		user.setId(1);
-		user.setFirstName("Ian");
-		user.setLastName("Johnson");
-		user.setUsername("ianprime0509");
-		user.setEmail("ianprime0509@gmail.com");
-		user.setTrips(new ArrayList<>());
-
-		String userJson = "{" + "\"id\": 1," + "\"firstName\": \"Ian\"," + "\"lastName\": \"Johnson\","
-				+ "\"username\": \"ianprime0509\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}";
-
-		when(userService.findById(user.getId())).thenReturn(user);
-
-		mvc.perform(get("/users/{id}", user.getId()).with(user(user))).andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(content().json(userJson, true));
-
-		verify(userService).findById(user.getId());
-	}
-
-	@Test
-	public void testFindByUsername() throws Exception {
-		User user = new User();
-		user.setId(1);
-		user.setFirstName("Ian");
-		user.setLastName("Johnson");
-		user.setUsername("ianprime0509");
-		user.setEmail("ianprime0509@gmail.com");
-		user.setTrips(new ArrayList<>());
-
-		String userJson = "{" + "\"id\": 1," + "\"firstName\": \"Ian\"," + "\"lastName\": \"Johnson\","
-				+ "\"username\": \"ianprime0509\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}";
-
-		when(userService.findByUsername(user.getUsername())).thenReturn(user);
-
-		mvc.perform(get("/users").param("username", user.getUsername()).with(user(user))).andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(content().json(userJson, true));
-
-		verify(userService).findByUsername(user.getUsername());
-	}
-
-	@Test
-	public void testAdd() throws Exception {
-		User user = new User();
-		user.setId(1);
-		user.setFirstName("Ian");
-		user.setLastName("Johnson");
-		user.setUsername("ianprime0509");
-		user.setEmail("ianprime0509@gmail.com");
-		user.setTrips(new ArrayList<>());
-
-		String newUserJson = "{" + "\"id\": 1," + "\"firstName\": \"Ian\"," + "\"lastName\": \"Johnson\","
-				+ "\"username\": \"ianprime0509\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}";
-		String requestBody = "{\"user\": " + newUserJson + ", \"password\": \"password\"}";
-
-		when(userService.add(user, "password".toCharArray())).thenReturn(user);
-
-		mvc.perform(post("/users").content(requestBody).contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(content().json(newUserJson, true));
-
-		verify(userService).add(user, "password".toCharArray());
-	}
-
-	@Test
-	public void testUpdate() throws Exception {
-		User user = new User();
-		user.setId(1);
-		user.setFirstName("Ian");
-		user.setLastName("Johnson");
-		user.setUsername("ianprime0509");
-		user.setEmail("ianprime0509@gmail.com");
-		user.setTrips(new ArrayList<>());
-
-		String updatedUserJson = "{" + "\"id\": 1," + "\"firstName\": \"Ian\"," + "\"lastName\": \"Johnson\","
-				+ "\"username\": \"ianprime0509\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}";
-
-		when(userService.update(user)).thenReturn(user);
-
-		mvc.perform(put("/users/{id}", user.getId()).with(user(user)).content(updatedUserJson)
-				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(content().json(updatedUserJson, true));
-
-		verify(userService).update(user);
-	}
-
-	@Test
-	public void testUpdatePassword() throws Exception {
-		User user = new User();
+		user = new User();
 		user.setId(1);
 		user.setFirstName("Ian");
 		user.setLastName("Johnson");
@@ -173,10 +69,98 @@ public class UserControllerTest {
 		user.setPasswordSalt(Passwords.generateSalt());
 		user.setPasswordHash(Passwords.hashPassword("password".toCharArray(), user.getPasswordSalt()));
 
+		users = new ArrayList<>(Arrays.asList(user));
+
+		userJson = "{" + "\"id\": 1," + "\"firstName\": \"Ian\"," + "\"lastName\": \"Johnson\","
+				+ "\"username\": \"ianprime0509\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}";
+
+		Mockito.reset(userService);
+		when(userService.findAll()).thenReturn(users);
+		when(userService.findById(user.getId())).thenReturn(user);
+		when(userService.findByUsername(user.getUsername())).thenReturn(user);
+
+		mvc = MockMvcBuilders.webAppContextSetup(appContext).apply(springSecurity()).build();
+	}
+
+	@Test
+	public void testFindAll() throws Exception {
+		String usersJson = "[" + userJson + "]";
+
+		mvc.perform(get("/users").with(user(user))).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(content().json(usersJson, true));
+
+		verify(userService).findAll();
+	}
+
+	@Test
+	public void testFindById() throws Exception {
+		mvc.perform(get("/users/{id}", user.getId()).with(user(user))).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(content().json(userJson, true));
+
+		verify(userService).findById(user.getId());
+	}
+
+	@Test
+	public void testFindByUsername() throws Exception {
+		mvc.perform(get("/users").param("username", user.getUsername()).with(user(user))).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(content().json(userJson, true));
+
+		verify(userService).findByUsername(user.getUsername());
+	}
+
+	@Test
+	public void testAdd() throws Exception {
+		User newUser = new User();
+		newUser.setId(1);
+		newUser.setFirstName("Ian");
+		newUser.setLastName("Johnson");
+		newUser.setUsername("ianprime05092");
+		newUser.setEmail("ianprime0509@gmail.com");
+		newUser.setTrips(new ArrayList<>());
+
+		String newUserJson = "{" + "\"id\": 1," + "\"firstName\": \"Ian\"," + "\"lastName\": \"Johnson\","
+				+ "\"username\": \"ianprime05092\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}";
+		String requestBody = "{\"user\": " + newUserJson + ", \"password\": \"password\"}";
+
+		when(userService.add(newUser, "password".toCharArray())).thenReturn(newUser);
+
+		mvc.perform(post("/users").content(requestBody).contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(content().json(newUserJson, true));
+
+		verify(userService).add(newUser, "password".toCharArray());
+	}
+
+	@Test
+	public void testUpdate() throws Exception {
+		User updatedUser = new User();
+		updatedUser.setId(1);
+		updatedUser.setFirstName("John");
+		updatedUser.setLastName("Smith");
+		updatedUser.setUsername("ianprime0509");
+		updatedUser.setEmail("ianprime0509@gmail.com");
+		updatedUser.setTrips(new ArrayList<>());
+
+		String updatedUserJson = "{" + "\"id\": 1," + "\"firstName\": \"John\"," + "\"lastName\": \"Smith\","
+				+ "\"username\": \"ianprime0509\"," + "\"email\": \"ianprime0509@gmail.com\"," + "\"trips\": []" + "}";
+
+		when(userService.update(updatedUser)).thenReturn(updatedUser);
+
+		mvc.perform(put("/users/{id}", updatedUser.getId()).with(user(updatedUser)).content(updatedUserJson)
+				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(content().json(updatedUserJson, true));
+
+		verify(userService).update(updatedUser);
+	}
+
+	@Test
+	public void testUpdatePassword() throws Exception {
 		char[] password = "password2".toCharArray();
 		String requestJson = "{\"oldPassword\": \"password\"," + "\"newPassword\": \"password2\"}";
-
-		when(userService.findById(user.getId())).thenReturn(user);
 
 		mvc.perform(post("/users/{id}/password", user.getId()).with(user(user)).content(requestJson)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk())
