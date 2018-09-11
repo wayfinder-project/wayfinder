@@ -74,9 +74,10 @@ export class UserService {
   /**
    * Updates the given user.
    *
-   * @param user the user to update
+   * @param user the user to update. The ID property is required, to identify
+   * the user to update.
    */
-  update(user: User): Observable<User> {
+  update(user: Overwrite<User, { id: number }>): Observable<User> {
     return this.http
       .put<User>(environment.apiUrl + `/users/${user.id}`, user)
       .pipe(

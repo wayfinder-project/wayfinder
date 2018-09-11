@@ -1,7 +1,7 @@
 import { Trip } from './trip.model';
 
 export interface User {
-  id: number;
+  id?: number;
   username: string;
   firstName: string;
   lastName: string;
@@ -13,4 +13,4 @@ export interface User {
  * New users can omit certain "required" properties which will be provided by
  * default or by the backend.
  */
-export type NewUser = Overwrite<User, { id?: number, trips?: Trip[] }>;
+export type NewUser = Overwrite<User, { trips?: Trip[] }>;

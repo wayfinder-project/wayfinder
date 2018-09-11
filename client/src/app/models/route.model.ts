@@ -1,7 +1,7 @@
 import { Leg } from './leg.model';
 
 export interface Route {
-  id: number;
+  id?: number;
   /**
    * Always ordered from start to finish.
    */
