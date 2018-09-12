@@ -1,12 +1,12 @@
 package com.wayfinder.server.beans;
 
-import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
-@Component
-@Scope("prototype")
-public class UserCredentials {
+import org.hibernate.validator.constraints.NotEmpty;
+
+public class UserCredentials implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@NotEmpty
 	private String username;
 	@NotEmpty
@@ -26,5 +26,41 @@ public class UserCredentials {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserCredentials other = (UserCredentials) obj;
+		if (password == null) {
+			if (other.password != null)
+				return false;
+		} else if (!password.equals(other.password))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "UserCredentials [username=" + username + "]";
 	}
 }

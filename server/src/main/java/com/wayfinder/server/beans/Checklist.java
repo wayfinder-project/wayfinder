@@ -1,5 +1,6 @@
 package com.wayfinder.server.beans;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -20,7 +21,9 @@ import javax.validation.constraints.NotNull;
  * @author Ian Johnson
  */
 @Entity
-public class Checklist {
+public class Checklist implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@SequenceGenerator(name = "seq_checklist_id", sequenceName = "seq_checklist_id")
 	@GeneratedValue(generator = "seq_checklist_id", strategy = GenerationType.SEQUENCE)
@@ -47,5 +50,38 @@ public class Checklist {
 
 	public void setItems(List<ChecklistItem> items) {
 		this.items = items;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + ((items == null) ? 0 : items.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Checklist other = (Checklist) obj;
+		if (id != other.id)
+			return false;
+		if (items == null) {
+			if (other.items != null)
+				return false;
+		} else if (!items.equals(other.items))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Checklist [id=" + id + ", items=" + items + "]";
 	}
 }
