@@ -1,5 +1,5 @@
-import { Component, Input, ViewChild, NgZone, OnInit } from '@angular/core';
-import { MapsAPILoader, AgmMap, LatLngBounds, LatLngBoundsLiteral } from '@agm/core';
+import { Component, ViewChild, OnInit, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
+import { MapsAPILoader, AgmMap, LatLngBounds } from '@agm/core';
 import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -7,11 +7,11 @@ import { UserService } from '../../services/user/user.service';
 import { AnnotatedWaypoint } from '../../models/annotated-waypoint.model';
 import { AnnotateMarkerModalComponent } from '../annotate-marker-modal/annotate-marker-modal.component';
 import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
-import { Marker } from '../../models/marker.model';
+import { Marker, markerToAnnotatedWayPoint, markerToWaypoint } from '../../models/marker.model';
 import { Place } from '../../models/place.model';
 import { Circle } from '../../models/circle.model';
 import { Trip } from '../../models/trip.model';
-
+import { GeocodeService } from '../../services/geocode/geocode.service';
 
 declare var google: any;
 
@@ -23,12 +23,17 @@ declare var google: any;
     NgbTabset
   ]
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, AfterViewInit {
 
   public origin: google.maps.LatLngLiteral;
   public destination: google.maps.LatLngLiteral;
   geocoder: any;
+
+  @Input()
   currentTrip: Trip;
+
+  @Output()
+  save = new EventEmitter<Trip>();
 
   public renderOptions = {
     suppressMarkers: true,
@@ -81,7 +86,7 @@ export class MapComponent implements OnInit {
   @ViewChild(AgmMap) map: AgmMap;
   @ViewChild(NgbTabset)
   private tabset: NgbTabset;
-  
+
   @ViewChild(AnnotateMarkerModalComponent)
   annotateMarker: AnnotateMarkerModalComponent;
 
@@ -94,9 +99,9 @@ export class MapComponent implements OnInit {
   currentMarkers: Marker[] = [];
   savedMarkers: Marker[] = [];
   currentPlace: Place = null;
-  startup: boolean = false;
+  startup = false;
 
-  constructor(private http: HttpClient, private userService: UserService) {
+  constructor(private http: HttpClient, private userService: UserService, private geocodeService: GeocodeService) {
 
   }
 
@@ -112,15 +117,16 @@ export class MapComponent implements OnInit {
     this.circleRadius = 500;
     this.origin = null;
     this.destination = null;
-    //this.getLocation();
+    // this.getLocation();
     this.getDirection();
     this.currentTrip = {
-      creationDate: new Date().getTime().toString(),
+      creationDate: null,
       route: null,
       pointsOfInterest: [],
       checklist: null
     };
   }
+
   ngAfterViewInit() {
     this.map.mapReady.subscribe(map => {
       this.controlmap = map;
@@ -129,16 +135,13 @@ export class MapComponent implements OnInit {
   }
 
   setStartingPoint() {
-    console.log("here");
-    let bounds = new google.maps.LatLngBounds();
-    let point1: google.maps.LatLngLiteral = {lat: 39.01331613984985, lng: -77.50444177391341};
-    let point2: google.maps.LatLngLiteral = {lat: 39.02291890790844, lng:-77.05537561180404};
-    let point3: google.maps.LatLngLiteral = {lat: 38.71992170806351, lng:-77.07146618896485};
-    let point4: google.maps.LatLngLiteral = {lat: 38.718844051434246, lng: -77.5030315209961};
-    // bounds.extend({lat: 39.01331613984985, lng: -77.50444177391341});
-    // bounds.extend({lat: 39.02291890790844, lng:-77.05537561180404});
-    // bounds.extend({lat: 38.71992170806351, lng:-77.07146618896485});
-    // bounds.extend({lat: 38.718844051434246, lng: -77.5030315209961});
+    console.log('here');
+    const bounds = new google.maps.LatLngBounds();
+    const point1: google.maps.LatLngLiteral = { lat: 39.01331613984985, lng: -77.50444177391341 };
+    const point2: google.maps.LatLngLiteral = { lat: 39.02291890790844, lng: -77.05537561180404 };
+    const point3: google.maps.LatLngLiteral = { lat: 38.71992170806351, lng: -77.07146618896485 };
+    const point4: google.maps.LatLngLiteral = { lat: 38.718844051434246, lng: -77.5030315209961 };
+
     bounds.extend(point1);
     bounds.extend(point2);
     bounds.extend(point3);
@@ -146,32 +149,9 @@ export class MapComponent implements OnInit {
     this.controlmap.fitBounds(bounds);
   }
 
-  // when user clicks save for a particular place
-  // generate annotated wayppoint
-  // add it to the trip object of the current user
-  // call user service to update the user in the database
-  // require the user to have a trip/route saved first
-  // how do we target the current trip the user is editing?
-  // keep track of it on this component or on the map service
-  // current trip = current route + points of interest, trip has to be created before adding markers?
-
-  // currently we do not keep track of our trip nor route. Need to handle this
-  // saveMarker() {
-  //   // this.currentPlace;
-  //   const annotatedWayPoint: AnnotatedWaypoint = {
-  //     latitude: this.currentPlace.marker.lat,
-  //     longitude: this.currentPlace.marker.lng,
-  //     address: this.currentPlace.address,
-  //     placeId: this.currentPlace.marker.placeId,
-  //     name: this.currentPlace.marker.label, // default name, change later when the user edits
-  //     comments: [], // user can add comments later
-  //     iconUrl: this.currentPlace.marker.updateIcon.url
-  //   };
-  // }
-
   // Adds a waypoint to the map
   public addWaypoint(event: any) {
-    console.log(event.coords.lat + " " + event.coords.lng);
+    console.log(event.coords.lat + ' ' + event.coords.lng);
     if (this.origin != null && this.destination != null) {
       const way: Marker = {
         location: {
@@ -187,19 +167,17 @@ export class MapComponent implements OnInit {
           draggable: true
         }
       );
-    }
-    else {
+    } else {
       if (this.origin == null) {
         this.origin = {
           lat: event.coords.lat,
           lng: event.coords.lng
-        }
-      }
-      else if (this.destination == null) {
+        };
+      } else if (this.destination == null) {
         this.destination = {
           lat: event.coords.lat,
           lng: event.coords.lng
-        }
+        };
       }
     }
     this.getDirection();
@@ -218,8 +196,7 @@ export class MapComponent implements OnInit {
         draggable: true,
         label: 'START'
       });
-    }
-    else if (this.markers[1] == null && this.destination != null) {
+    } else if (this.markers[1] == null && this.destination != null) {
       this.markers.push({
         location: {
           lat: this.destination.lat,
@@ -274,6 +251,7 @@ export class MapComponent implements OnInit {
   // Updates the direction info and updates the legs.
   directionChanged(event: any) {
     this.directions = event;
+
     this.currentTrip.route = this.directions.routes[0]; // cache the directions on the map screen every time it's updated
     console.log(this.directions);
     console.log(this.currentTrip);
@@ -417,7 +395,8 @@ export class MapComponent implements OnInit {
         draggable: false,
         placeId: inputPlace.place_id,
         updateIcon: image,
-        infoWindow: true
+        infoWindow: true,
+        address: inputPlace.formatted_address
       }
       );
       bounds.extend(inputPlace.geometry.location);
@@ -451,6 +430,7 @@ export class MapComponent implements OnInit {
           url: results.url
         };
         console.log('currentplace ' + this.currentPlace);
+        this.currentPlace.marker.address = this.currentPlace.address;
       }
     });
   }
@@ -480,20 +460,35 @@ export class MapComponent implements OnInit {
     }
   }
 
-  // VIEN
-  saveMarker() {
-    // this.currentPlace;
-    const annotatedWayPoint: AnnotatedWaypoint = {
-      latitude: this.currentPlace.marker.location.lat,
-      longitude: this.currentPlace.marker.location.lng,
-      address: this.currentPlace.address,
-      placeId: this.currentPlace.marker.placeId,
-      name: this.currentPlace.marker.label,
-      comments: [],
-      iconUrl: this.currentPlace.marker.updateIcon.url
+  saveTrip() {
+    this.currentTrip.creationDate = new Date().toISOString();
+
+    this.currentTrip.route = {
+      origin: {
+        latitude: this.origin.lat,
+        longitude: this.origin.lng
+      },
+      destination: {
+        latitude: this.destination.lat,
+        longitude: this.destination.lng
+      },
+      waypoints: this.waypoints.map(markerToWaypoint),
     };
+    this.currentTrip.pointsOfInterest = this.savedMarkers.map(markerToAnnotatedWayPoint);
+    console.log(this.currentTrip);
+    this.userService.getCurrentUser().subscribe(user => {
+      user.trips.push(this.currentTrip);
+      console.log(user);
+      this.userService.update(user).subscribe(u => {
+        console.log(u);
+      });
+    });
+    this.save.emit(this.currentTrip);
+  }
+
+  saveMarker() {
     this.savedMarkers.push(this.currentPlace.marker);
-    console.log(annotatedWayPoint);
+    console.log(this.savedMarkers);
   }
 
   getLatLong(placeid: string, map: any, fn) {
