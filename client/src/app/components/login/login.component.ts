@@ -6,6 +6,7 @@ import { UserService } from '../../services/user/user.service';
 import { ApiError } from '../../models/api-error.model';
 import { UserRegistrationComponent } from '../user-registration/user-registration.component';
 import { User } from '../../models/user.model';
+import { ChecklistModalComponent } from '../checklist-modal/checklist-modal.component';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,8 @@ export class LoginComponent implements OnInit {
 
   @ViewChild(UserRegistrationComponent)
   registrationModal: UserRegistrationComponent;
+  @ViewChild(ChecklistModalComponent)
+  private modal: ChecklistModalComponent;
 
   username = '';
   password = '';
@@ -37,6 +40,12 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit() { }
+
+  openModal() {
+    console.log('a');
+    this.modal.open({ items: [] });
+  }
+
 
   login() {
     this.authService
