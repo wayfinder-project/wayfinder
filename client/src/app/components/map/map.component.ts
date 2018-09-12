@@ -7,46 +7,13 @@ import { UserService } from '../../services/user/user.service';
 import { AnnotatedWaypoint } from '../../models/annotated-waypoint.model';
 import { AnnotateMarkerModalComponent } from '../annotate-marker-modal/annotate-marker-modal.component';
 import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
+import { Marker } from '../../models/marker.model';
+import { Place } from '../../models/place.model';
+import { Circle } from '../../models/circle.model';
+import { Trip } from '../../models/trip.model';
 
 
 declare var google: any;
-
-class Marker {
-  location: google.maps.LatLngLiteral;
-  label?: string;
-  waypointId?: number;
-  draggable?: boolean;
-  placeId?: string;
-  icon?: string;
-  updateIcon?: google.maps.Icon;
-  infoWindow?: boolean;
-  notes?: string[];
-}
-
-interface Circle {
-  lat: number;
-  lng: number;
-  radius: number;
-  fillColor: string;
-}
-interface Place {
-  marker: Marker;
-  name: string;
-  rating: number;
-  phoneNumber: string;
-  address: string;
-  openNow: boolean;
-  hours: {
-    monday: string;
-    tuesday: string;
-    wednesday: string;
-    thursday: string;
-    friday: string;
-    saturday: string;
-    sunday: string;
-  };
-  url: string;
-}
 
 @Component({
   selector: 'app-map',
@@ -61,6 +28,7 @@ export class MapComponent implements OnInit {
   public origin: google.maps.LatLngLiteral;
   public destination: google.maps.LatLngLiteral;
   geocoder: any;
+  currentTrip: Trip;
 
   public renderOptions = {
     suppressMarkers: true,
@@ -146,6 +114,12 @@ export class MapComponent implements OnInit {
     this.destination = null;
     //this.getLocation();
     this.getDirection();
+    this.currentTrip = {
+      creationDate: new Date().getTime().toString(),
+      route: null,
+      pointsOfInterest: [],
+      checklist: null
+    };
   }
   ngAfterViewInit() {
     this.map.mapReady.subscribe(map => {
@@ -172,6 +146,28 @@ export class MapComponent implements OnInit {
     this.controlmap.fitBounds(bounds);
   }
 
+  // when user clicks save for a particular place
+  // generate annotated wayppoint
+  // add it to the trip object of the current user
+  // call user service to update the user in the database
+  // require the user to have a trip/route saved first
+  // how do we target the current trip the user is editing?
+  // keep track of it on this component or on the map service
+  // current trip = current route + points of interest, trip has to be created before adding markers?
+
+  // currently we do not keep track of our trip nor route. Need to handle this
+  // saveMarker() {
+  //   // this.currentPlace;
+  //   const annotatedWayPoint: AnnotatedWaypoint = {
+  //     latitude: this.currentPlace.marker.lat,
+  //     longitude: this.currentPlace.marker.lng,
+  //     address: this.currentPlace.address,
+  //     placeId: this.currentPlace.marker.placeId,
+  //     name: this.currentPlace.marker.label, // default name, change later when the user edits
+  //     comments: [], // user can add comments later
+  //     iconUrl: this.currentPlace.marker.updateIcon.url
+  //   };
+  // }
 
   // Adds a waypoint to the map
   public addWaypoint(event: any) {
@@ -278,7 +274,9 @@ export class MapComponent implements OnInit {
   // Updates the direction info and updates the legs.
   directionChanged(event: any) {
     this.directions = event;
+    this.currentTrip.route = this.directions.routes[0]; // cache the directions on the map screen every time it's updated
     console.log(this.directions);
+    console.log(this.currentTrip);
     this.directionInfo = this.directions.routes[0].legs[0].distance.text;
     const routeLegs = this.directions.routes[0].legs;
     this.legs = [];
@@ -337,7 +335,6 @@ export class MapComponent implements OnInit {
   totalLegsButton() {
     const end = this.destination;
     const start = this.origin;
-    // this.zoomFinder();
     this.controlmap.fitBounds({
       east: Math.max(start.lat, end.lng),
       north: Math.max(start.lat, end.lat),
@@ -354,61 +351,6 @@ export class MapComponent implements OnInit {
     }
 
   }
-
-  /* zoomFinder() {
-    const originDestination = Math.sqrt(Math.pow(this.origin.lat - this.destination.lat, 2) +
-       Math.pow(this.origin.lng - this.destination.lng, 2));
-      console.log(this.origin.lat);
-    let longestDistance = originDestination;
-    let longestWay: any;
-    let bool: boolean;
-    let distanceDestinationFinal = this.destination;
-     let distanceOriginFinal = this.origin;
-    for (let i = 0; i < this.legs.length; i++) {
-      const endPoint = this.legs[i].end_location;
-      const distanceDestination = Math.sqrt(Math.pow(endPoint.lat() - this.destination.lat, 2) +
-      Math.pow(endPoint.lng() - this.destination.lng, 2));
-      const distanceOrigin = Math.sqrt(Math.pow(this.origin.lat - endPoint.lat(), 2) +
-      Math.pow(this.origin.lng - endPoint.lng(), 2));
-      console.log(longestDistance);
-      if (distanceDestinationFinal < distanceDestination)
-             {
-                 distanceDestinationFinal = distanceDestination;
-             }
-             else if (distanceOriginFinal < distanceOrigin)
-             {
-                 distanceOriginFinal = distanceOrigin;
-             }
-
-             if (longestDistance < distanceOriginFinal)
-             {
-                 bool = true;
-                 longestDistance = distanceOriginFinal;
-                 longestWay = this.legs[i].end_location;
-                 console.log(longestDistance);
-             }
-             else if(longestDistance < distanceDestinationFinal)
-             {
-                 bool = false;
-                 longestDistance = distanceDestinationFinal;
-                 longestWay = this.legs[i].end_location;
-                 console.log(longestDistance);
-             }
-    }
-    if (longestDistance > originDestination) {
-      if (bool) {
-    this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.origin.lng),
-      north: Math.max(longestWay.lat(), this.origin.lat),
-      west: Math.min(longestWay.lng(),  this.origin.lng),
-      south: Math.min(longestWay.lat(), this.origin.lat)});
-    } else {
-      this.controlmap.fitBounds({east: Math.max(longestWay.lng(), this.destination.lng),
-        north: Math.max(longestWay.lat(), this.destination.lat),
-        west: Math.min(longestWay.lng(),  this.destination.lng),
-        south: Math.min(longestWay.lat(), this.destination.lat)});
-    }
-    }
-  } */
 
   // Tries to find the point in the path.
   findPointinPath(paths: any, point: any, round: number) {
@@ -427,13 +369,6 @@ export class MapComponent implements OnInit {
   }
 
   getPlaces(coords: any) {
-
-
-    // var nmap = new google.maps.Map(document.getElementById('map'), {
-    //    center: this.origin,
-    //    zoom: 15
-    //  });
-
     const request = {
       location: coords,
       radius: this.circleRadius,

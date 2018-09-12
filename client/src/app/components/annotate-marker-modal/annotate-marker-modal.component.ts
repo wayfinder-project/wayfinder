@@ -30,7 +30,7 @@ export class AnnotateMarkerModalComponent implements OnInit {
 
   addNote() {
      this.notes.push(this.comment);
-   }
+  }
 
   open(): void {
     this.modal = this.modalService.open(this.content, { centered: true });

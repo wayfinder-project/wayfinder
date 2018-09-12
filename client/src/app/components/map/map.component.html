@@ -23,7 +23,8 @@
               <div class="input-group-prepend">
                 <span class="input-group-text">Radius (Meters):</span>
               </div>
-              <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" [(ngModel)]="circleRadius">
+              <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm"
+                [(ngModel)]="circleRadius">
             </div>
             <div class="col-12 z1 bg-light" *ngIf="currentPlace != null">
               <h5>{{currentPlace.name}}</h5>
@@ -110,13 +111,16 @@
         </agm-polyline-point>
       </agm-polyline>
 
-      <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius" [fillColor]="c.fillColor"
-        [circleDraggable]="false" [editable]="false">
+      <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius"
+        [fillColor]="c.fillColor" [circleDraggable]="false" [editable]="false">
       </agm-circle>
     </agm-map>
   </div>
   <!--   <div class="col-1"></div> -->
+  <button *ngIf="false || directions" class="btn btn-outline-primary">save trip</button>
+
 </div>
+
 
 <footer class="page-footer font-small teal pt-4">
 
