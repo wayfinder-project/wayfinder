@@ -1,3 +1,16 @@
-<p>
-  trip-list works!
-</p>
+<div class="container">
+  <h2>My trips</h2>
+  <div class="row">
+    <div *ngFor="let trip of trips" class="card col-12 col-sm-6 col-md-4">
+      <div class="card-body">
+        <h4 class="card-title">Trip title</h4>
+        <h6 class="card-subtitle mb-2 text-muted">Created {{trip.creationDate | date : medium}}</h6>
+        <p class="card-text">
+          From {{trip.route.origin.address}} <br>
+          To {{trip.route.destination.address}}
+        </p>
+        <button class="btn btn-primary" (click)="handleClick(trip)">View/edit</button>
+      </div>
+    </div>
+  </div>
+</div>
