@@ -3,9 +3,11 @@
   <div class="col-3 " style="padding-left: 40px">
     <ngb-tabset>
       <br>
-      <ngb-tab title="Places">
+      <ngb-tab>
         <div id="placeFilter">
+          <ng-template ngbTabTitle> <span class="tab">Places</span></ng-template>
           <ng-template ngbTabContent>
+             
             <br>
             <h3>Place Filter</h3>
             <div class="input-group mb-3">
@@ -43,7 +45,8 @@
           </ng-template>
         </div>
       </ngb-tab>
-      <ngb-tab title="Routes">
+      <ngb-tab>
+          <ng-template ngbTabTitle> <span class="tab">Routes</span></ng-template>
         <ng-template ngbTabContent>
           <br>
           <h3>Routes</h3>
@@ -53,7 +56,8 @@
         </ng-template>
       </ngb-tab>
 
-      <ngb-tab id="directions" title="Directions">
+      <ngb-tab id="directions">
+          <ng-template ngbTabTitle> <span class="tab">Directions</span></ng-template>
         <ng-template ngbTabContent>
           <br>
           <div class="col-12 ">
@@ -86,13 +90,14 @@
   </div>
   <div class="col-9" style="padding-right: 40px">
     <agm-map class="map" [latitude]="mapLat" [longitude]="mapLng" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
-      <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
+      <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)" (onResponse)="setMarkerLabels($event)">
       </agm-direction>
       <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
         [visible]="longLeg.visible">
       </agm-direction>
-      <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
-        [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
+
+      <agm-marker *ngFor="let m of markers; let i = index"  (markerRightClick)="rightTest(i)"  [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
+        [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)" [iconUrl]="m.icon">
 
       </agm-marker>
       <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"

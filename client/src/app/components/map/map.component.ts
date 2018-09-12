@@ -156,15 +156,29 @@ export class MapComponent implements OnInit {
       location: loc,
     };
     this.waypoints.push(way);
+    const waypointIdNumber = this.waypoints.length - 1;
+    console.log(waypointIdNumber);
+    const image: any = {
+      url: 'assets/images/greenmarker.png',
+      scaledSize: new google.maps.Size(40, 40 )
+    };
+
     this.markers.push(
       {
         lat: loc.lat,
         lng: loc.lng,
-        waypointId: this.waypoints.length - 1,
-        draggable: true
+        waypointId: waypointIdNumber,
+        draggable: true,
+        icon: image
       }
     );
     this.getDirection();
+  }
+
+  setMarkerLabels(direction) {
+    for (let i = 2; i < this.markers.length ; i++) {
+      this.markers[i].label = '' +  (direction.routes[0].waypoint_order.indexOf(this.markers[i].waypointId) + 1);
+    }
   }
 
   // Creates a direction based on origin and destination. based on AGM Direction api
@@ -176,13 +190,13 @@ export class MapComponent implements OnInit {
         lat: this.origin.lat,
         lng: this.origin.lng,
         draggable: true,
-        label: 'START'
+        label: 'S'
       });
       this.markers.push({
         lat: this.destination.lat,
         lng: this.destination.lng,
         draggable: true,
-        label: 'END'
+        label: 'E'
       });
     } else {
       this.markers[0].lat = this.origin.lat;
@@ -511,7 +525,7 @@ totalLegsButton() {
     }
   }
 
-  delete(index: number) {
+  rightTest(index: number) {
     console.log('a');
   }
 
