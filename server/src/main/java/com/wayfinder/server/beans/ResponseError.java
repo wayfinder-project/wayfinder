@@ -2,6 +2,7 @@ package com.wayfinder.server.beans;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -54,6 +55,10 @@ public class ResponseError implements Serializable {
 	public ResponseError(String message, List<String> details) {
 		this(message);
 		this.details = details;
+	}
+	
+	public ResponseError(String message, String... details) {
+		this(message, Arrays.asList(details));
 	}
 
 	public ResponseError(Exception e) {

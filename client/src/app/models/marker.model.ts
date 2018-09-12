@@ -28,8 +28,8 @@ export function markerToAnnotatedWayPoint(marker: Marker): AnnotatedWaypoint {
       longitude: marker.location.lng,
       address: marker.address || '',
       placeId: marker.placeId,
-      name: marker.label,
-      comments: marker.comments, // change this
-      iconUrl: marker.updateIcon.url
+      name: marker.label || '',
+      comments: marker.comments || [], // change this
+      iconUrl: marker.updateIcon.url || ''
   };
 }

@@ -9,8 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 /**
  * A waypoint is a single stop on a route. The starting and ending points of a
  * route are themselves considered waypoints.

@@ -475,6 +475,7 @@ export class MapComponent implements OnInit, AfterViewInit {
       waypoints: this.waypoints.map(markerToWaypoint),
     };
     this.currentTrip.pointsOfInterest = this.savedMarkers.map(markerToAnnotatedWayPoint);
+    this.currentTrip.checklist = { items: [] };
     console.log(this.currentTrip);
     this.userService.getCurrentUser().subscribe(user => {
       user.trips.push(this.currentTrip);
