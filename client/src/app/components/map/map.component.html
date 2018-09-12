@@ -117,7 +117,7 @@
     </agm-map>
   </div>
   <!--   <div class="col-1"></div> -->
-  <button *ngIf="false || directions" class="btn btn-outline-primary">save trip</button>
+  <button (click)="saveTrip()" *ngIf="false || directions" class="btn btn-outline-primary">save trip</button>
 
 </div>
 
