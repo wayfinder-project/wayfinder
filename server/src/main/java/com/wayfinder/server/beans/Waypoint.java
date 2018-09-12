@@ -41,8 +41,6 @@ public class Waypoint implements Serializable {
 	/**
 	 * The address of the waypoint, as a user-readable string.
 	 */
-	@Column(nullable = false)
-	@NotEmpty
 	private String address;
 	/**
 	 * The (optional) place ID, as defined by Google.
