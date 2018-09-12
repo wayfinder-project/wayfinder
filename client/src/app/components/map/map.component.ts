@@ -543,7 +543,3 @@ export class MapComponent implements OnInit, AfterViewInit {
 
 
 }
-
-
-
-
