@@ -17,6 +17,8 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './utils/jwt.interceptor';
 import { ErrorInterceptor } from './utils/error.interceptor';
 import { UserRegistrationComponent } from './components/user-registration/user-registration.component';
+import { AnnotateMarkerModalComponent } from './components/annotate-marker-modal/annotate-marker-modal.component';
+import { TripListComponent } from './components/trip-list/trip-list.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,9 @@ import { UserRegistrationComponent } from './components/user-registration/user-r
     NavbarComponent,
     HomeComponent,
     UserpageComponent,
-    UserRegistrationComponent
+    UserRegistrationComponent,
+    AnnotateMarkerModalComponent,
+    TripListComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({

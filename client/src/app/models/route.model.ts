@@ -1,9 +1,11 @@
-import { Leg } from './leg.model';
+import { Waypoint } from './waypoint.model';
 
 export interface Route {
-  id: number;
+  id?: number;
+  origin: Waypoint;
+  destination: Waypoint;
   /**
    * Always ordered from start to finish.
    */
-  legs: Leg[];
+  waypoints: Waypoint[];
 }

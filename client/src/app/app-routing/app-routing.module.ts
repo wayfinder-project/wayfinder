@@ -6,6 +6,7 @@ import { HomeComponent } from '../components/home/home.component';
 import { AccessGuard } from '../guards/access.guard';
 import { UserpageComponent } from '../components/userpage/userpage.component';
 import { MapComponent } from '../components/map/map.component';
+import { TripListComponent } from '../components/trip-list/trip-list.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,7 +18,14 @@ export const routes: Routes = [
     children: [
       { path: 'account', component: UserpageComponent },
       { path: 'create-route', component: MapComponent },
-      { path: '', redirectTo: 'account', pathMatch: 'full' },
+      {
+        path: 'trips',
+        children: [
+          { path: ':id', component: MapComponent },
+          { path: '', component: TripListComponent },
+        ],
+      },
+      { path: '', redirectTo: 'trips', pathMatch: 'full' },
     ],
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' },

@@ -48,7 +48,7 @@ users alike.
 - **route**: the path that the user takes from their starting point to their
   destination
 - **waypoint**: a single stop along a route. The starting point and
-  destination are considered waypoints as well.
+  destination are not considered waypoints in a strict sense.
 - **leg**: a portion of the route between two adjacent waypoints
 
 ## Information for developers
@@ -143,7 +143,7 @@ is, properties not explicitly marked as optional may not be null.
 
 ```ts
 {
-  id: number;
+  id?: number;
   username: string;
   firstName: string;
   lastName: string;
@@ -156,7 +156,7 @@ is, properties not explicitly marked as optional may not be null.
 
 ```ts
 {
-  id: number;
+  id?: number;
   /**
    * As a UTC timestamp in the format "yyyy-MM-dd'T'HH:mm:ss'Z'"; e.g.
    * "2018-09-06T21:45:45Z".
@@ -168,6 +168,10 @@ is, properties not explicitly marked as optional may not be null.
    * particular order.
    */
   pointsOfInterest: AnnotatedWaypoint[];
+  /**
+   * The checklist associated with the trip.
+   */
+  checklist: Checklist;
 }
 ```
 
@@ -175,33 +179,13 @@ is, properties not explicitly marked as optional may not be null.
 
 ```ts
 {
-  id: number;
+  id?: number;
+  origin: Waypoint;
+  destination: Waypoint;
   /**
    * Always ordered from start to finish.
    */
-  legs: Leg[];
-}
-```
-
-##### `Leg`
-
-```ts
-{
-  id: number;
-  start: Waypoint;
-  end: Waypoint;
-  /**
-   * In seconds.
-   */
-  travelTime: number;
-  /**
-   * In meters.
-   */
-  distance: number;
-  /**
-   * The zero-based index of this leg, to order it among other legs.
-   */
-  index: number;
+  waypoints: Waypoint[];
 }
 ```
 
@@ -209,13 +193,13 @@ is, properties not explicitly marked as optional may not be null.
 
 ```ts
 {
-  id: number;
+  id?: number;
   latitude: number;
   longitude: number;
   /**
    * A user-readable address string.
    */
-  address: string;
+  address?: string;
   /**
    * The place ID, as defined by Google.
    */
@@ -230,6 +214,50 @@ is, properties not explicitly marked as optional may not be null.
 {
   name?: string;
   comments: string[];
+  /**
+   * The URL of an icon representing the type of this waypoint.
+   */
+  iconUrl: string;
+}
+```
+
+##### `Checklist`
+
+```ts
+{
+  id?: number;
+  /**
+   * The items contained in the checklist.
+   */
+  items: ChecklistItem[];
+}
+```
+
+##### `ChecklistItem`
+
+```ts
+{
+  id?: number;
+  /**
+   * The title (contents) of the item (e.g. "pack phone charger").
+   */
+  title: string;
+  status: ChecklistItemStatus;
+}
+```
+
+##### `ChecklistItemStatus` (enum)
+
+```ts
+{
+  /**
+   * The item has been created but not completed.
+   */
+  Created = 'CREATED',
+  /**
+   * The item has been completed.
+   */
+  Done = 'DONE',
 }
 ```
 
@@ -355,10 +383,13 @@ your choosing (e.g. a local Tomcat server).
 The client code is built and deployed using NPM. To insure that all
 dependencies are properly set up, navigate to the `client` directory and run
 `npm install`. To test the project locally, run `ng serve`, which will start
-a local server on port 4200 to run the app. To manually deploy the front-end
-to GitHub pages, run `npm deploy` and enter your GitHub credentials if
-prompted. Alternatively, run `ng build` or `ng build --prod` to simply build
-the project without deploying it.
+a local server on port 4200 to run the app.
+
+The client code is deployed onto the project's EC2 instance, and this
+deployment process is (unfortunately) manual, due to the instance's technical
+limitations (not enough computing power to build the project). Running
+`npm run prepare-deploy` will build the project in production mode, creating
+a distribution that is suitable for manual copying to the instance.
 
 If you run the code locally, be aware that certain environment variables may
 need to be set for the project to function properly (see the section on
