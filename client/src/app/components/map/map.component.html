@@ -23,7 +23,8 @@
               <div class="input-group-prepend">
                 <span class="input-group-text">Radius (Meters):</span>
               </div>
-              <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" [(ngModel)]="circleRadius">
+              <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm"
+                [(ngModel)]="circleRadius">
             </div>
             <div class="col-12 z1 bg-light" *ngIf="currentPlace != null">
               <h5>{{currentPlace.name}}</h5>
@@ -86,7 +87,8 @@
   </div>
   <div class="col-9" style="padding-right: 40px">
     <agm-map class="map" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)">
-      <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
+      <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints"
+        (onChange)="directionChanged($event)">
       </agm-direction>
       <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
         [visible]="longLeg.visible">
@@ -95,8 +97,9 @@
         [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
 
       </agm-marker>
-      <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"
-        [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
+      <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow"
+        [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon"
+        (markerClick)="getPlaceDetails(m.placeId, m)">
       </agm-marker>
 
       <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
@@ -104,13 +107,16 @@
         </agm-polyline-point>
       </agm-polyline>
 
-      <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius" [fillColor]="c.fillColor"
-        [circleDraggable]="false" [editable]="false">
+      <agm-circle *ngFor="let c of circles, let i = index" [latitude]="c.lat" [longitude]="c.lng" [(radius)]="c.radius"
+        [fillColor]="c.fillColor" [circleDraggable]="false" [editable]="false">
       </agm-circle>
     </agm-map>
   </div>
-<!--   <div class="col-1"></div> -->
+  <!--   <div class="col-1"></div> -->
+  <button *ngIf="false || directions" class="btn btn-outline-primary">save trip</button>
+
 </div>
+
 
 <footer class="page-footer font-small teal pt-4">
 
