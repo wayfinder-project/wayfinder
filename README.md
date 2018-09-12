@@ -48,7 +48,7 @@ users alike.
 - **route**: the path that the user takes from their starting point to their
   destination
 - **waypoint**: a single stop along a route. The starting point and
-  destination are considered waypoints as well.
+  destination are not considered waypoints in a strict sense.
 - **leg**: a portion of the route between two adjacent waypoints
 
 ## Information for developers
@@ -180,6 +180,8 @@ is, properties not explicitly marked as optional may not be null.
 ```ts
 {
   id?: number;
+  origin: Waypoint;
+  destination: Waypoint;
   /**
    * Always ordered from start to finish.
    */
