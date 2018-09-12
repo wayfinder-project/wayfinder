@@ -70,8 +70,7 @@
                 <div>
                   Directions:
                   <div *ngFor="let s of legInfo.steps, let i = index">
-                    <hr>
-                    Step {{i}} :
+                    <hr> Step {{i}} :
                     <span [innerHtml]="legInfo.steps[i].instructions"></span>
                   </div>
                 </div>
@@ -87,19 +86,19 @@
   </div>
   <div class="col-9" style="padding-right: 40px">
     <agm-map class="map" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)" (zoomChange)="updateZoomLevel()">
-      <agm-direction [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
+      <agm-direction *ngIf="origin != null && destination != null" [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
       </agm-direction>
-      <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
+      <!-- <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
         [visible]="longLeg.visible">
-      </agm-direction>
-      <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable"
+      </agm-direction> -->
+      <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.location.lat" [longitude]="m.location.lng" [markerDraggable]="m.draggable"
         [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
       </agm-marker>
-      <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"
-        [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
+      <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.location.lat"
+        [longitude]="m.location.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
       </agm-marker>
-      <agm-marker *ngFor="let m of savedMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.lat"
-        [longitude]="m.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
+      <agm-marker *ngFor="let m of savedMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.location.lat"
+        [longitude]="m.location.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
       </agm-marker>
 
       <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
@@ -112,7 +111,7 @@
       </agm-circle>
     </agm-map>
   </div>
-<!--   <div class="col-1"></div> -->
+  <!--   <div class="col-1"></div> -->
 </div>
 
 <footer class="page-footer font-small teal pt-4">

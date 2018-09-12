@@ -1,7 +1,6 @@
 import { Component, Input, ViewChild, NgZone, OnInit } from '@angular/core';
 import { MapsAPILoader, AgmMap, LatLngBounds, LatLngBoundsLiteral } from '@agm/core';
 import { GoogleMapsAPIWrapper } from '@agm/core/services';
-import { WaypointModel, LocationModel } from '../../models/mapwaypoint.model';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../services/user/user.service';
@@ -11,9 +10,8 @@ import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
 declare var google: any;
 
-interface Marker {
-  lat: number;
-  lng: number;
+class Marker {
+  location: google.maps.LatLngLiteral;
   label?: string;
   waypointId?: number;
   draggable?: boolean;
@@ -29,8 +27,6 @@ interface Circle {
   radius: number;
   fillColor: string;
 }
-
-// ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
 interface Place {
   marker: Marker;
   name: string;
@@ -60,8 +56,8 @@ interface Place {
 })
 export class MapComponent implements OnInit {
 
-  public origin: any;
-  public destination: any;
+  public origin: google.maps.LatLngLiteral;
+  public destination: google.maps.LatLngLiteral;
   geocoder: any;
 
   public renderOptions = {
@@ -97,15 +93,16 @@ export class MapComponent implements OnInit {
 
   ];
 
-  legs: any[] = [
-
-  ];
-
   polyPoints: any[] = [
 
   ];
 
-  waypoints: any = [
+  waypoints: Marker[] = [
+
+  ];
+
+  legs: any[] = [
+
   ];
 
   longLeg: any = undefined;
@@ -124,14 +121,14 @@ export class MapComponent implements OnInit {
   currentMarkers: Marker[] = [];
   savedMarkers: Marker[] = [];
   currentPlace: Place = null;
+  startup: boolean = false;
 
   constructor(private http: HttpClient, private userService: UserService) {
 
   }
 
   circleRadius: number; // Radius of the place radius
-  public location: LocationModel;
-  public waypoint: WaypointModel;
+  // public location: LocationModel;
   public directions: any;
   public directionInfo: any;
 
@@ -140,68 +137,106 @@ export class MapComponent implements OnInit {
 
   ngOnInit() {
     this.circleRadius = 500;
-    this.origin = { lat: 38.9586, lng: -77.3570 };
-    this.destination = { lat: 38.9072, lng: -77.0369 };
-    this.getLocation();
+    this.origin = null;
+    this.destination = null;
+    //this.getLocation();
     this.getDirection();
   }
+  ngAfterViewInit() {
+    this.map.mapReady.subscribe(map => {
+      this.controlmap = map;
+      this.setStartingPoint();
+    });
+  }
 
+  setStartingPoint() {
+    console.log("here");
+    let bounds = new google.maps.LatLngBounds();
+    let point1: google.maps.LatLngLiteral = {lat: 39.01331613984985, lng: -77.50444177391341};
+    let point2: google.maps.LatLngLiteral = {lat: 39.02291890790844, lng:-77.05537561180404};
+    let point3: google.maps.LatLngLiteral = {lat: 38.71992170806351, lng:-77.07146618896485};
+    let point4: google.maps.LatLngLiteral = {lat: 38.718844051434246, lng: -77.5030315209961};
+    // bounds.extend({lat: 39.01331613984985, lng: -77.50444177391341});
+    // bounds.extend({lat: 39.02291890790844, lng:-77.05537561180404});
+    // bounds.extend({lat: 38.71992170806351, lng:-77.07146618896485});
+    // bounds.extend({lat: 38.718844051434246, lng: -77.5030315209961});
+    bounds.extend(point1);
+    bounds.extend(point2);
+    bounds.extend(point3);
+    bounds.extend(point4);
+    this.controlmap.fitBounds(bounds);
+  }
 
 
   // Adds a waypoint to the map
   public addWaypoint(event: any) {
-    const loc: LocationModel = {
-      lat: event.coords.lat,
-      lng: event.coords.lng
-    };
-    const way: WaypointModel = {
-      location: loc,
-    };
-    this.waypoints.push(way);
-    this.markers.push(
-      {
-        lat: loc.lat,
-        lng: loc.lng,
-        waypointId: this.waypoints.length - 1,
-        draggable: true
+    console.log(event.coords.lat + " " + event.coords.lng);
+    if (this.origin != null && this.destination != null) {
+      const way: Marker = {
+        location: {
+          lat: event.coords.lat,
+          lng: event.coords.lng
+        },
+      };
+      this.waypoints.push(way);
+      this.markers.push(
+        {
+          location: way.location,
+          waypointId: this.waypoints.length - 1,
+          draggable: true
+        }
+      );
+    }
+    else {
+      if (this.origin == null) {
+        this.origin = {
+          lat: event.coords.lat,
+          lng: event.coords.lng
+        }
       }
-    );
+      else if (this.destination == null) {
+        this.destination = {
+          lat: event.coords.lat,
+          lng: event.coords.lng
+        }
+      }
+    }
     this.getDirection();
   }
 
   // Creates a direction based on origin and destination. based on AGM Direction api
   getDirection() {
-    this.origin = { lat: this.origin.lat, lng: this.origin.lng };
-    this.destination = { lat: this.destination.lat, lng: this.destination.lng };
-    if (this.markers.length === 0) {
+    this.origin = this.origin && { lat: this.origin.lat, lng: this.origin.lng };
+    this.destination = this.destination && { lat: this.destination.lat, lng: this.destination.lng };
+    if (this.markers[0] == null && this.origin != null) {
       this.markers.push({
-        lat: this.origin.lat,
-        lng: this.origin.lng,
+        location: {
+          lat: this.origin.lat,
+          lng: this.origin.lng
+        },
         draggable: true,
         label: 'START'
       });
+    }
+    else if (this.markers[1] == null && this.destination != null) {
       this.markers.push({
-        lat: this.destination.lat,
-        lng: this.destination.lng,
+        location: {
+          lat: this.destination.lat,
+          lng: this.destination.lng
+        },
         draggable: true,
         label: 'END'
       });
-    } else {
-      this.markers[0].lat = this.origin.lat;
-      this.markers[0].lng = this.origin.lng;
-
     }
 
   }
   // Gets called when a marker(waypoint) is dragged.
   moveWaypoint(index: number, event: any) {
     const marker = this.markers[index];
-    marker.lat = event.coords.lat;
-    marker.lng = event.coords.lng;
+    marker.location = { lat: event.coords.lat, lng: event.coords.lng };
     const way = this.waypoints[this.markers[index].waypointId];
     if (way != null) {
-      way.location.lat = marker.lat;
-      way.location.lng = marker.lng;
+      way.location = marker.location;
     } else {
       this.markerDragEnd(this.markers[index], index);
     }
@@ -212,14 +247,12 @@ export class MapComponent implements OnInit {
   }
 
   // If a marker(origin/destination) is dragged.
-  markerDragEnd(m: any, index: number) {
+  markerDragEnd(m: Marker, index: number) {
     console.log(m);
     if (index === 0) { // Origin
-      this.origin.lat = m.lat;
-      this.origin.lng = m.lng;
+      this.origin = m.location;
     } else { // Destination
-      this.destination.lat = m.lat;
-      this.destination.lng = m.lng;
+      this.destination = m.location;
     }
     this.getDirection();
   }
@@ -234,8 +267,7 @@ export class MapComponent implements OnInit {
     }
   }
   showPosition(position) {
-    this.origin.lat = position.coords.latitude;
-    this.origin.lng = position.coords.longitude;
+    this.origin = { lat: position.coords.latitude, lng: position.coords.longitude };
   }
 
   // Updates the direction info and updates the legs.
@@ -302,7 +334,7 @@ export class MapComponent implements OnInit {
     const start = this.origin;
     // this.zoomFinder();
     this.controlmap.fitBounds({
-      east: Math.max(start.lng, end.lng),
+      east: Math.max(start.lat, end.lng),
       north: Math.max(start.lat, end.lat),
       west: Math.min(start.lng, end.lng),
       south: Math.min(start.lat, end.lat)
@@ -437,8 +469,10 @@ export class MapComponent implements OnInit {
       };
 
       this.currentMarkers.push({
-        lat: inputPlace.geometry.location.lat(),
-        lng: inputPlace.geometry.location.lng(),
+        location: {
+          lat: inputPlace.geometry.location.lat(),
+          lng: inputPlace.geometry.location.lng()
+        },
         label: inputPlace.name,
         draggable: false,
         placeId: inputPlace.place_id,
@@ -510,8 +544,8 @@ export class MapComponent implements OnInit {
   saveMarker() {
     // this.currentPlace;
     const annotatedWayPoint: AnnotatedWaypoint = {
-      latitude: this.currentPlace.marker.lat,
-      longitude: this.currentPlace.marker.lng,
+      latitude: this.currentPlace.marker.location.lat,
+      longitude: this.currentPlace.marker.location.lng,
       address: this.currentPlace.address,
       placeId: this.currentPlace.marker.placeId,
       name: this.currentPlace.marker.label,
@@ -532,18 +566,14 @@ export class MapComponent implements OnInit {
     });
   }
   mapReady($event: any) {
-    // here $event will be of type google.maps.Map
-    // and you can put your logic here to get lat lng for marker. I have just put a sample code. You can refactor it the way you want.
-    // this.getLatLong('ChIJN1t_tDeuEmsRUsoyG83frY4', $event, null);
     this.controlmap = $event;
-    console.log(this.controlmap);
   }
 
   showMarkerPlaces(index: number) {
     console.log(this.directions);
     console.log(index);
     console.log(this.legs);
-    this.getPlaces.bind(this)({ lat: this.markers[index].lat, lng: this.markers[index].lng });
+    this.getPlaces.bind(this)({ lat: this.markers[index].location.lat, lng: this.markers[index].location.lng });
     if (this.markers[index].waypointId != null) {
       console.log(this.waypoints);
       const waypointOrder = this.directions.routes[0].waypoint_order.indexOf(this.markers[index].waypointId) + 1;
@@ -568,8 +598,8 @@ export class MapComponent implements OnInit {
     if (this.controlmap.zoom <= 12) {
       this.currentMarkers = [];
       this.currentPlace = null;
-      this.circles=[];
-    } 
+      this.circles = [];
+    }
   }
 
 
