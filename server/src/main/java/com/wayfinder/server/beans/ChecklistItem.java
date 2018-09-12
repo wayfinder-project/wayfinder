@@ -1,5 +1,7 @@
 package com.wayfinder.server.beans;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -18,7 +20,9 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Ian Johnson
  */
 @Entity
-public class ChecklistItem {
+public class ChecklistItem implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@SequenceGenerator(name = "seq_checklist_item_id", sequenceName = "seq_checklist_item_id")
 	@GeneratedValue(generator = "seq_checklist_item_id", strategy = GenerationType.SEQUENCE)
@@ -75,5 +79,41 @@ public class ChecklistItem {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ChecklistItem other = (ChecklistItem) obj;
+		if (id != other.id)
+			return false;
+		if (status != other.status)
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ChecklistItem [id=" + id + ", title=" + title + ", status=" + status + "]";
 	}
 }

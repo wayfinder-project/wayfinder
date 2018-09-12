@@ -1,5 +1,7 @@
 package com.wayfinder.server.beans;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +18,9 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Ian Johnson
  */
 @Entity
-public class Waypoint {
+public class Waypoint implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The ID of the waypoint in the database.
 	 */
@@ -83,5 +87,54 @@ public class Waypoint {
 
 	public void setPlaceId(String placeId) {
 		this.placeId = placeId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((address == null) ? 0 : address.hashCode());
+		result = prime * result + id;
+		long temp;
+		temp = Double.doubleToLongBits(latitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(longitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((placeId == null) ? 0 : placeId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Waypoint other = (Waypoint) obj;
+		if (address == null) {
+			if (other.address != null)
+				return false;
+		} else if (!address.equals(other.address))
+			return false;
+		if (id != other.id)
+			return false;
+		if (Double.doubleToLongBits(latitude) != Double.doubleToLongBits(other.latitude))
+			return false;
+		if (Double.doubleToLongBits(longitude) != Double.doubleToLongBits(other.longitude))
+			return false;
+		if (placeId == null) {
+			if (other.placeId != null)
+				return false;
+		} else if (!placeId.equals(other.placeId))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Waypoint [id=" + id + ", latitude=" + latitude + ", longitude=" + longitude + ", address=" + address
+				+ ", placeId=" + placeId + "]";
 	}
 }

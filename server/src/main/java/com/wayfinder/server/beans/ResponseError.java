@@ -1,5 +1,6 @@
 package com.wayfinder.server.beans;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,9 @@ import org.springframework.http.ResponseEntity;
  * 
  * @author Ian Johnson
  */
-public class ResponseError {
+public class ResponseError implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The type of the error, if it can be associated with a specific type.
 	 */
@@ -100,5 +103,44 @@ public class ResponseError {
 	 */
 	public ResponseEntity<ResponseError> toEntity(HttpStatus status) {
 		return new ResponseEntity<>(this, status);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((details == null) ? 0 : details.hashCode());
+		result = prime * result + ((message == null) ? 0 : message.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ResponseError other = (ResponseError) obj;
+		if (details == null) {
+			if (other.details != null)
+				return false;
+		} else if (!details.equals(other.details))
+			return false;
+		if (message == null) {
+			if (other.message != null)
+				return false;
+		} else if (!message.equals(other.message))
+			return false;
+		if (type != other.type)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ResponseError [type=" + type + ", message=" + message + ", details=" + details + "]";
 	}
 }

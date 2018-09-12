@@ -1,5 +1,6 @@
 package com.wayfinder.server.beans;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -28,7 +29,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * @author Ian Johnson
  */
 @Entity
-public class Trip {
+public class Trip implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The ID of the trip in the database.
 	 */
@@ -103,5 +106,57 @@ public class Trip {
 
 	public void setChecklist(Checklist checklist) {
 		this.checklist = checklist;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((checklist == null) ? 0 : checklist.hashCode());
+		result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode());
+		result = prime * result + id;
+		result = prime * result + ((pointsOfInterest == null) ? 0 : pointsOfInterest.hashCode());
+		result = prime * result + ((route == null) ? 0 : route.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Trip other = (Trip) obj;
+		if (checklist == null) {
+			if (other.checklist != null)
+				return false;
+		} else if (!checklist.equals(other.checklist))
+			return false;
+		if (creationDate == null) {
+			if (other.creationDate != null)
+				return false;
+		} else if (!creationDate.equals(other.creationDate))
+			return false;
+		if (id != other.id)
+			return false;
+		if (pointsOfInterest == null) {
+			if (other.pointsOfInterest != null)
+				return false;
+		} else if (!pointsOfInterest.equals(other.pointsOfInterest))
+			return false;
+		if (route == null) {
+			if (other.route != null)
+				return false;
+		} else if (!route.equals(other.route))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Trip [id=" + id + ", creationDate=" + creationDate + ", route=" + route + ", pointsOfInterest="
+				+ pointsOfInterest + ", checklist=" + checklist + "]";
 	}
 }
