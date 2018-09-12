@@ -7,6 +7,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 /**
  * A waypoint is a single stop on a route. The starting and ending points of a
  * route are themselves considered waypoints.
@@ -36,6 +38,7 @@ public class Waypoint {
 	 * The address of the waypoint, as a user-readable string.
 	 */
 	@Column(nullable = false)
+	@NotEmpty
 	private String address;
 	/**
 	 * The (optional) place ID, as defined by Google.
