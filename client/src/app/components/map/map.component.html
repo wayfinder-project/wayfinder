@@ -39,8 +39,12 @@
               <br> Phone Number: {{currentPlace.phoneNumber}}
               <br>
               <a href={{currentPlace.url}}>Google Maps</a>
+              <br>
+              <button class="btn btn-primary" (click)="saveMarker()">Save Marker</button>
+              <br>
+              <a (click)="openAnnotationModal()" href="#modalAnnotate" data-toggle="modal">Add Notes</a>
+              <button class="btn btn-primary" (click)="openAnnotationModal()">Add Notes</button>
             </div>
-            <button class="btn btn-primary" (click)="saveMarker()">Save Marker</button>
           </ng-template>
         </div>
       </ngb-tab>
@@ -156,3 +160,5 @@
   <!-- Copyright -->
 
 </footer>
+
+<app-annotate-marker-modal></app-annotate-marker-modal>

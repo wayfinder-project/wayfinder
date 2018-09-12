@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../services/user/user.service';
 import { AnnotatedWaypoint } from '../../models/annotated-waypoint.model';
+import { AnnotateMarkerModalComponent } from '../annotate-marker-modal/annotate-marker-modal.component';
 import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
 
@@ -19,6 +20,7 @@ class Marker {
   icon?: string;
   updateIcon?: google.maps.Icon;
   infoWindow?: boolean;
+  notes?: string[];
 }
 
 interface Circle {
@@ -111,6 +113,9 @@ export class MapComponent implements OnInit {
   @ViewChild(AgmMap) map: AgmMap;
   @ViewChild(NgbTabset)
   private tabset: NgbTabset;
+  
+  @ViewChild(AnnotateMarkerModalComponent)
+  annotateMarker: AnnotateMarkerModalComponent;
 
   // Logan Smith's Variables (To be added to service)
   savedPlaces: Marker[];
@@ -602,6 +607,9 @@ export class MapComponent implements OnInit {
     }
   }
 
+  openAnnotationModal(): void {
+    this.annotateMarker.open();
+  }
 
 
 }
