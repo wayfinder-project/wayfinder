@@ -1,14 +1,7 @@
-<img src="assets/images/compass.png" style="position: absolute;
-right: 0%;
-top: 13%;
-width:45%;
-opacity:.3;
-height:85%;
-transform-origin: 50% 70%;
-z-index: -1;" alt="">
+<!-- <img src="assets/images/compass.png" class="bigCompass" alt=""> -->
 <div class="container">
-    <div class="ml-3 row">
-        <div class="form-group col-4">
+    <div class=" row">
+        <div class="form-group col-4 rounded-left userpageform">
             <form (submit)="update()">
                 <div class="">
                     <br>
@@ -22,11 +15,11 @@ z-index: -1;" alt="">
                     <label for="email">Email:</label>
                     <input name="email" type="text" [(ngModel)]="user.email" id="email" class="form-control">
                     <br>
-                    <input type="submit" class="btn form-control col-6" value="Update Information">
+                    <input type="submit" class="btn form-control col-6" value="Update Information" style="margin-bottom:50px">
                 </div>
             </form>
         </div>
-        <div class="form-group col-4">
+        <div class="form-group col-4 rounded-right userpageform">
             <form class="" (submit)="updatePassword()">
                 <br>
                 <h1>Set New Password</h1>
@@ -43,4 +36,4 @@ z-index: -1;" alt="">
         </div>
     </div>
 </div>
-
+<img src="assets/images/camp3.png" class="userpageBackground" alt="">

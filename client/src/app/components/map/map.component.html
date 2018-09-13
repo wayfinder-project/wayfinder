@@ -95,12 +95,12 @@
   </div>
   <div class="col-9" style="padding-right: 40px">
     <agm-map class="map" id="map" (mapReady)="mapReady($event)" (mapClick)="addWaypoint($event)" (zoomChange)="updateZoomLevel()">
-      <agm-direction *ngIf="origin != null && destination != null" [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)">
+      <agm-direction *ngIf="origin != null && destination != null" [origin]="origin" [destination]="destination " [renderOptions]="renderOptions" [waypoints]="waypoints" (onChange)="directionChanged($event)" (onResponse)="onResponse($event)">
       </agm-direction>
-      <!-- <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
+      <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
         [visible]="longLeg.visible">
-      </agm-direction> -->
-      <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.location.lat" [longitude]="m.location.lng" [markerDraggable]="m.draggable"
+      </agm-direction>
+      <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.location.lat" [longitude]="m.location.lng" [markerDraggable]="m.draggable" [iconUrl]="m.icon"
         [label]="m.label" (markerClick)="showMarkerPlaces(i)" (dragEnd)="moveWaypoint(i, $event)">
       </agm-marker>
       <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.location.lat"

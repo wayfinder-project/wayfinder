@@ -27,7 +27,6 @@ export class UserpageComponent implements OnInit {
 
   constructor(private userService: UserService, private modalService: NgbModal) {}
 
-  
   ngOnInit() {
     this.userService.getCurrentUser().subscribe(user => {
       this.user = user;

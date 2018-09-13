@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, NgZone, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, NgZone, OnInit, AfterViewInit } from '@angular/core';
 import { MapsAPILoader, AgmMap, LatLngBounds, LatLngBoundsLiteral } from '@agm/core';
 import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { Observable, of } from 'rxjs';
@@ -13,6 +13,7 @@ import { Circle } from '../../models/circle.model';
 import { Trip } from '../../models/trip.model';
 
 
+
 declare var google: any;
 
 @Component({
@@ -23,7 +24,7 @@ declare var google: any;
     NgbTabset
   ]
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, AfterViewInit {
 
   public origin: google.maps.LatLngLiteral;
   public destination: google.maps.LatLngLiteral;
@@ -94,7 +95,7 @@ export class MapComponent implements OnInit {
   currentMarkers: Marker[] = [];
   savedMarkers: Marker[] = [];
   currentPlace: Place = null;
-  startup: boolean = false;
+  startup: boolean;
 
   constructor(private http: HttpClient, private userService: UserService) {
 
@@ -130,11 +131,11 @@ export class MapComponent implements OnInit {
 
   setStartingPoint() {
     console.log('here');
-    let bounds = new google.maps.LatLngBounds();
-    let point1: google.maps.LatLngLiteral = {lat: 39.01331613984985, lng: -77.50444177391341};
-    let point2: google.maps.LatLngLiteral = {lat: 39.02291890790844, lng:-77.05537561180404};
-    let point3: google.maps.LatLngLiteral = {lat: 38.71992170806351, lng:-77.07146618896485};
-    let point4: google.maps.LatLngLiteral = {lat: 38.718844051434246, lng: -77.5030315209961};
+    const bounds = new google.maps.LatLngBounds();
+    const point1: google.maps.LatLngLiteral = {lat: 39.01331613984985, lng: -77.50444177391341};
+    const point2: google.maps.LatLngLiteral = {lat: 39.02291890790844, lng: -77.05537561180404};
+    const point3: google.maps.LatLngLiteral = {lat: 38.71992170806351, lng: -77.07146618896485};
+    const point4: google.maps.LatLngLiteral = {lat: 38.718844051434246, lng: -77.5030315209961};
     // bounds.extend({lat: 39.01331613984985, lng: -77.50444177391341});
     // bounds.extend({lat: 39.02291890790844, lng:-77.05537561180404});
     // bounds.extend({lat: 38.71992170806351, lng:-77.07146618896485});
@@ -176,15 +177,20 @@ export class MapComponent implements OnInit {
       const way: Marker = {
         location: {
           lat: event.coords.lat,
-          lng: event.coords.lng
+          lng: event.coords.lng,
         },
       };
       this.waypoints.push(way);
+      const image: any = {
+        url: 'assets/images/greenmarker.png',
+        scaledSize: new google.maps.Size(40, 40)
+      };
       this.markers.push(
         {
           location: way.location,
           waypointId: this.waypoints.length - 1,
-          draggable: true
+          draggable: true,
+          icon: image
         }
       );
     } else {
@@ -274,6 +280,15 @@ export class MapComponent implements OnInit {
     this.origin = { lat: position.coords.latitude, lng: position.coords.longitude };
   }
 
+  // Checks if valid direction.
+  onResponse(response) {
+    if (response.status === 'ZERO_RESULTS') {
+      alert('this route is IMPOSSIBLE!');
+      this.waypoints.pop();
+      this.markers.pop();
+    }
+  }
+
   // Updates the direction info and updates the legs.
   directionChanged(event: any) {
     this.directions = event;
@@ -293,6 +308,7 @@ export class MapComponent implements OnInit {
     totalDistance = this.roundTo(totalDistance, 2);
     this.bigLegInfo = totalDistance;
     this.destroyLongLeg();
+    this.setMarkerLabels(this.directions);
   }
   destroyLongLeg() {
     if (this.longLeg) {

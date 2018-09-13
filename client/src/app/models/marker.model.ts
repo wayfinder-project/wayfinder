@@ -9,3 +9,4 @@ export interface Marker {
   infoWindow?: boolean;
   notes?: string[];
 }
+
