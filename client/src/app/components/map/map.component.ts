@@ -139,8 +139,9 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.zone.run(() => {
       // this.addr = addrObj;
       // this.addrKeys = Object.keys(addrObj);
-
       console.log(place);
+      this.addOriginFromAddress(place);
+
 
     });
   }
@@ -151,7 +152,17 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       // this.addrKeys = Object.keys(addrObj);
 
       console.log(place);
+      this.addDestinationFromAddress(place);
+    });
+  }
+  setWaypoint(place) {
+    // address object contains lat/lng to use
+    this.zone.run(() => {
+      // this.addr = addrObj;
+      // this.addrKeys = Object.keys(addrObj);
 
+      console.log(place);
+      this.addWaypointFromAddress(place);
     });
   }
 
@@ -246,49 +257,74 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   public addWaypointFromAddress(addressObject: any) {
-    console.log(addressObject);
     // console.log(addressObject. + ' ' + event.coords.lng);
-    if (this.origin != null && this.destination != null) {
+      console.log("normal");
+      const image: any = {
+        url: 'assets/images/greenmarker.png',
+        scaledSize: new google.maps.Size(40, 40)
+      };
       const way: Marker = {
         location: {
           lat: addressObject.geometry.location.lat(),
           lng: addressObject.geometry.location.lng()
         },
-        address: addressObject.formatted_address
+        address: addressObject.formatted_address,
+        draggable: true,
+        icon: image,
+        waypointId: this.waypoints.length - 1
       };
       this.waypoints.push(way);
-      console.log(`waypoints array after pushing something into it ${this.waypoints}`);
-      console.log(this.waypoints);
-      const image: any = {
-        url: 'assets/images/greenmarker.png',
-        scaledSize: new google.maps.Size(40, 40)
-      };
-      this.waypoints.push(
-        {
-          location: way.location,
-          waypointId: this.waypoints.length - 1,
-          draggable: true,
-          icon: image,
-          address: addressObject.formatted_address
-        }
-      );
-    } else {
-      if (this.origin.location == null) {
-        this.origin.location = {
-          lat: addressObject.geometry.location.lat(),
-          lng: addressObject.geometry.location.lng()
-        };
-        this.origin.address = addressObject.formatted_address;
-      } else if (this.destination.location == null) {
-        this.destination.location = {
-          lat: addressObject.geometry.location.lat(),
-          lng: addressObject.geometry.location.lng()
-        };
-        // this.destination.location
-      }
+      this.getDirection();
     }
-    this.getDirection();
-  }
+    public addOriginFromAddress(addressObject: any) {
+      console.log("origin");
+        this.origin = {location: {
+          lat: addressObject.geometry.location.lat(),
+          lng: addressObject.geometry.location.lng()
+        },
+        draggable: true,
+        label: 'E',
+        address: addressObject.formatted_address
+      };
+      this.getDirection();
+    }
+    public addDestinationFromAddress(addressObject: any) {
+      console.log("destination");
+        this.destination = {location: {
+          lat: addressObject.geometry.location.lat(),
+          lng: addressObject.geometry.location.lng()
+        },
+        draggable: true,
+        label: 'E',
+        address: addressObject.formatted_address
+      };
+      this.getDirection();
+    }
+  //     else {
+  //     if (this.origin.location == null) {
+  //       console.log("origin");
+  //       this.origin = {location: {
+  //         lat: addressObject.geometry.location.lat(),
+  //         lng: addressObject.geometry.location.lng()
+  //       },
+  //       draggable: true,
+  //       label: 'E',
+  //       address: addressObject.formatted_address
+  //     };
+  //     } else if (this.destination.location == null) {
+  //       console.log("destination");
+  //       this.destination = {location: {
+  //         lat: addressObject.geometry.location.lat(),
+  //         lng: addressObject.geometry.location.lng()
+  //       },
+  //       draggable: true,
+  //       label: 'E',
+  //       address: addressObject.formatted_address
+  //     };
+  //     }
+  //   }
+  //   this.getDirection();
+  // }
 
   setMarkerLabels(direction) {
     console.log(this.mapWaypoints);

@@ -385,11 +385,8 @@ dependencies are properly set up, navigate to the `client` directory and run
 `npm install`. To test the project locally, run `ng serve`, which will start
 a local server on port 4200 to run the app.
 
-The client code is deployed onto the project's EC2 instance, and this
-deployment process is (unfortunately) manual, due to the instance's technical
-limitations (not enough computing power to build the project). Running
-`npm run prepare-deploy` will build the project in production mode, creating
-a distribution that is suitable for manual copying to the instance.
+The client code is (once again) deployed onto GitHub pages, so all that is
+needed to deploy it is to run `npm run deploy` in the client directory.
 
 If you run the code locally, be aware that certain environment variables may
 need to be set for the project to function properly (see the section on

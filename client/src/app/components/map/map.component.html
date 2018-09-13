@@ -168,7 +168,19 @@
       <div style="padding-top:20px">
       <button (click)="saveTrip()" *ngIf="false || directions" class="btn btn-outline-primary">Save Trip</button>
     </div>
-    
+    <!--   <div class="col-1"></div> -->
+    <button (click)="saveTrip()" *ngIf="false || directions" class="btn btn-outline-primary">save trip</button>
+    <div class="input-container">
+      <input type="text" appPlacesAutocomplete (addressSelect)="setOrigin($event)" placeholder="Type to search origin..">
+      <input type="text" appPlacesAutocomplete (addressSelect)="setDestination($event)" placeholder="Type to search destination..">
+      <input type="text" appPlacesAutocomplete (addressSelect)="setWaypoint($event)" placeholder="Type to search waypoint..">
+      <!-- <input type="text" appPlacesAutocomplete (select)="setWaypoint($event)" placeholder="Type to search.."> -->
+      <!-- Displaying the contents of the address object received from our event emitter -->
+      <!-- <ul style="list-style-type: none;">
+        <li *ngFor="let key of addrKeys">
+          <span style="font-weight: bold">{{key}}</span>: <span>{{addr[key]}}</span>
+        </li>
+      </ul> -->
     </div>
     <!--   <div class="col-1"></div> -->
    
