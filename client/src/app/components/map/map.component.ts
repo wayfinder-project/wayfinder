@@ -81,7 +81,7 @@ export class MapComponent implements OnInit {
   @ViewChild(AgmMap) map: AgmMap;
   @ViewChild(NgbTabset)
   private tabset: NgbTabset;
-  
+
   @ViewChild(AnnotateMarkerModalComponent)
   annotateMarker: AnnotateMarkerModalComponent;
 
@@ -131,10 +131,10 @@ export class MapComponent implements OnInit {
   setStartingPoint() {
     console.log("here");
     let bounds = new google.maps.LatLngBounds();
-    let point1: google.maps.LatLngLiteral = {lat: 39.01331613984985, lng: -77.50444177391341};
-    let point2: google.maps.LatLngLiteral = {lat: 39.02291890790844, lng:-77.05537561180404};
-    let point3: google.maps.LatLngLiteral = {lat: 38.71992170806351, lng:-77.07146618896485};
-    let point4: google.maps.LatLngLiteral = {lat: 38.718844051434246, lng: -77.5030315209961};
+    let point1: google.maps.LatLngLiteral = { lat: 39.01331613984985, lng: -77.50444177391341 };
+    let point2: google.maps.LatLngLiteral = { lat: 39.02291890790844, lng: -77.05537561180404 };
+    let point3: google.maps.LatLngLiteral = { lat: 38.71992170806351, lng: -77.07146618896485 };
+    let point4: google.maps.LatLngLiteral = { lat: 38.718844051434246, lng: -77.5030315209961 };
     // bounds.extend({lat: 39.01331613984985, lng: -77.50444177391341});
     // bounds.extend({lat: 39.02291890790844, lng:-77.05537561180404});
     // bounds.extend({lat: 38.71992170806351, lng:-77.07146618896485});
@@ -387,7 +387,44 @@ export class MapComponent implements OnInit {
     this.currentMarkers = [];
 
     const service = new google.maps.places.PlacesService(this.controlmap);
-    service.nearbySearch(request, this.callbackPlaces.bind(this));
+    service.nearbySearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        console.log(results);
+        if (results.length != 0) {
+          console.log("How");
+          const bounds: LatLngBounds = new google.maps.LatLngBounds();
+          bounds.extend(coords);
+          for (let i = 0; i < results.length; i++) {
+
+            const inputPlace = results[i];
+
+            const image: google.maps.Icon = {
+              url: inputPlace.icon,
+              scaledSize: new google.maps.Size(30, 30)
+            };
+
+            this.currentMarkers.push({
+              location: {
+                lat: inputPlace.geometry.location.lat(),
+                lng: inputPlace.geometry.location.lng()
+              },
+              label: inputPlace.name,
+              draggable: false,
+              placeId: inputPlace.place_id,
+              updateIcon: image,
+              infoWindow: true
+            }
+            );
+            bounds.extend(inputPlace.geometry.location);
+          }
+          this.controlmap.fitBounds(bounds);
+        }
+        else {
+
+        }
+      }
+    });
+
   }
 
   callbackPlaces(results, status) {
@@ -422,7 +459,7 @@ export class MapComponent implements OnInit {
       );
       bounds.extend(inputPlace.geometry.location);
     }
-    this.controlmap.fitBounds(bounds);
+    //this.controlmap.fitBounds(bounds);
   }
   getPlaceDetails(newPlaceId: string, marker: Marker) {
     const request = {
@@ -450,7 +487,7 @@ export class MapComponent implements OnInit {
           },
           url: results.url
         };
-        console.log('currentplace ' + this.currentPlace);
+        console.log(this.currentPlace);
       }
     });
   }
@@ -543,7 +580,7 @@ export class MapComponent implements OnInit {
   }
 
   openAnnotationModal(): void {
-    this.annotateMarker.open();
+    this.annotateMarker.open(this.currentPlace.marker);
   }
 
 
