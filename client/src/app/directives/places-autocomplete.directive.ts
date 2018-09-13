@@ -7,7 +7,7 @@ export class PlacesAutocompleteDirective implements OnInit {
   private element: HTMLInputElement;
 
   @Output()
-  select: EventEmitter<any> = new EventEmitter();
+  addressSelect: EventEmitter<any> = new EventEmitter();
 
 
   constructor(private elRef: ElementRef) {
@@ -40,7 +40,7 @@ export class PlacesAutocompleteDirective implements OnInit {
   ngOnInit() {
     const autocomplete = new google.maps.places.Autocomplete(this.element);
     google.maps.event.addListener(autocomplete, 'place_changed', () => {
-      this.select.emit(this.getFormattedAddress(autocomplete.getPlace()));
+      this.addressSelect.emit(this.getFormattedAddress(autocomplete.getPlace()));
     });
   }
 
