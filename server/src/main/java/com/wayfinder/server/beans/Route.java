@@ -1,7 +1,7 @@
 package com.wayfinder.server.beans;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -54,7 +54,7 @@ public class Route implements Serializable {
 	@OrderColumn
 	@NotNull
 	@Valid
-	private List<Waypoint> waypoints;
+	private Set<Waypoint> waypoints;
 
 	public int getId() {
 		return id;
@@ -80,11 +80,11 @@ public class Route implements Serializable {
 		this.destination = destination;
 	}
 
-	public List<Waypoint> getWaypoints() {
+	public Set<Waypoint> getWaypoints() {
 		return waypoints;
 	}
 
-	public void setWaypoints(List<Waypoint> waypoints) {
+	public void setWaypoints(Set<Waypoint> waypoints) {
 		this.waypoints = waypoints;
 	}
 

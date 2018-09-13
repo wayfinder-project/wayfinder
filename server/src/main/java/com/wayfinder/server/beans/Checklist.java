@@ -1,7 +1,7 @@
 package com.wayfinder.server.beans;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -34,7 +34,7 @@ public class Checklist implements Serializable {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@NotNull
 	@Valid
-	private List<ChecklistItem> items;
+	private Set<ChecklistItem> items;
 
 	public int getId() {
 		return id;
@@ -44,11 +44,11 @@ public class Checklist implements Serializable {
 		this.id = id;
 	}
 
-	public List<ChecklistItem> getItems() {
+	public Set<ChecklistItem> getItems() {
 		return items;
 	}
 
-	public void setItems(List<ChecklistItem> items) {
+	public void setItems(Set<ChecklistItem> items) {
 		this.items = items;
 	}
 
