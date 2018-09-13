@@ -22,6 +22,7 @@ import { TripListComponent } from './components/trip-list/trip-list.component';
 import { ChecklistModalComponent } from './components/checklist-modal/checklist-modal.component';
 import { EditTripComponent } from './components/edit-trip/edit-trip.component';
 import { CreateTripComponent } from './components/create-trip/create-trip.component';
+import { PlacesAutocompleteDirective } from './directives/places-autocomplete.directive';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { CreateTripComponent } from './components/create-trip/create-trip.compon
     ChecklistModalComponent,
     EditTripComponent,
     CreateTripComponent,
+    PlacesAutocompleteDirective,
   ],
   imports: [
     AgmCoreModule.forRoot({

@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, Input, Output, EventEmitter, OnChanges, NgZone } from '@angular/core';
 import { MapsAPILoader, AgmMap, LatLngBounds, AgmCircle } from '@agm/core';
 import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { Observable, of } from 'rxjs';
@@ -102,7 +102,11 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   currentPlace: Place = null;
   startup = false;
 
-  constructor(private http: HttpClient, private userService: UserService, private geocodeService: GeocodeService) {
+  // Variables for address autocomplete
+  public addrKeys: string[];
+  public addr: object;
+
+  constructor(private http: HttpClient, private userService: UserService, private geocodeService: GeocodeService, private zone: NgZone) {
 
   }
 
@@ -122,6 +126,15 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       pointsOfInterest: [], checklist: null
 
     };
+  }
+
+  // get address autocomplete result
+  setAddress(addrObj) {
+    // address object contains lat/lng to use
+    this.zone.run(() => {
+      this.addr = addrObj;
+      this.addrKeys = Object.keys(addrObj);
+    });
   }
 
   ngOnChanges() {
@@ -172,6 +185,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
   // Adds a waypoint to the map
   public addWaypoint(event: any) {
+    console.log(event);
     console.log(event.coords.lat + ' ' + event.coords.lng);
     if (this.origin != null && this.destination != null) {
       const way: Marker = {
