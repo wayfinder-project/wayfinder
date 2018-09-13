@@ -8,6 +8,7 @@ import { UserpageComponent } from '../components/userpage/userpage.component';
 import { MapComponent } from '../components/map/map.component';
 import { TripListComponent } from '../components/trip-list/trip-list.component';
 import { EditTripComponent } from '../components/edit-trip/edit-trip.component';
+import { CreateTripComponent } from '../components/create-trip/create-trip.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -18,7 +19,7 @@ export const routes: Routes = [
     canActivate: [AccessGuard],
     children: [
       { path: 'account', component: UserpageComponent },
-      { path: 'create-route', component: MapComponent },
+      { path: 'create', component: CreateTripComponent },
       {
         path: 'trips',
         children: [

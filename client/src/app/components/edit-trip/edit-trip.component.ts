@@ -54,6 +54,7 @@ export class EditTripComponent implements OnInit {
       user.trips[idx] = this.trip;
       this.userService.update(user).subscribe(_ => {
         console.log('Updated user:', user);
+        this.router.navigate(['home', 'trips']);
       });
     });
   }

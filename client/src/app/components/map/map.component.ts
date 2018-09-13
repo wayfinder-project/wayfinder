@@ -121,14 +121,18 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnChanges() {
     console.log('Changing:', this.trip);
     // Store the trip data into this component's instance variables.
-    this.origin = {
-      lat: this.trip.route.origin.latitude,
-      lng: this.trip.route.origin.longitude,
-    };
-    this.destination = {
-      lat: this.trip.route.destination.latitude,
-      lng: this.trip.route.destination.longitude,
-    };
+    if (this.trip.route.origin) {
+      this.origin = {
+        lat: this.trip.route.origin.latitude,
+        lng: this.trip.route.origin.longitude,
+      };
+    }
+    if (this.trip.route.destination) {
+      this.destination = {
+        lat: this.trip.route.destination.latitude,
+        lng: this.trip.route.destination.longitude,
+      };
+    }
     this.waypoints = this.trip.route.waypoints.map(waypoint => ({
       location: {
         lat: waypoint.latitude,
@@ -509,7 +513,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   saveTrip() {
-    this.trip.creationDate = new Date().toISOString();
     this.trip.route = {
       origin: {
         latitude: this.origin.lat,
@@ -522,7 +525,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       waypoints: this.waypoints.map(markerToWaypoint),
     };
     this.trip.pointsOfInterest = this.savedMarkers.map(markerToAnnotatedWayPoint);
-    this.trip.checklist = this.trip.checklist || { items: [] };
     this.save.emit(this.trip);
   }
 
