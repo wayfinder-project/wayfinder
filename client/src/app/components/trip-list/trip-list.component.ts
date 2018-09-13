@@ -47,11 +47,14 @@ export class TripListComponent implements OnInit {
    * @param coordinate the coordinate (latitude or longitude) to format
    */
   private formatCoordinate(coordinate: number): string {
+    if (coordinate < 0) {
+      return `-${this.formatCoordinate(-coordinate)}`;
+    }
     const degrees = Math.floor(coordinate);
-    coordinate = (coordinate - degrees) / 60;
+    coordinate = (coordinate - degrees) * 60;
     const minutes = Math.floor(coordinate);
-    coordinate = (coordinate - minutes) / 60;
+    coordinate = (coordinate - minutes) * 60;
     const seconds = Math.floor(coordinate);
-    return `${degrees}° ${minutes}′ ${seconds}″`;
+    return `${degrees}°${minutes}′${seconds}″`;
   }
 }
