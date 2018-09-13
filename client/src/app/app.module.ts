@@ -18,6 +18,8 @@ import { JwtInterceptor } from './utils/jwt.interceptor';
 import { ErrorInterceptor } from './utils/error.interceptor';
 import { UserRegistrationComponent } from './components/user-registration/user-registration.component';
 import { AnnotateMarkerModalComponent } from './components/annotate-marker-modal/annotate-marker-modal.component';
+import { TripListComponent } from './components/trip-list/trip-list.component';
+import { ChecklistModalComponent } from './components/checklist-modal/checklist-modal.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,9 @@ import { AnnotateMarkerModalComponent } from './components/annotate-marker-modal
     HomeComponent,
     UserpageComponent,
     UserRegistrationComponent,
-    AnnotateMarkerModalComponent
+    AnnotateMarkerModalComponent,
+    TripListComponent,
+    ChecklistModalComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({

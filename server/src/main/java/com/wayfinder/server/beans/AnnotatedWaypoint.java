@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -25,7 +26,7 @@ public class AnnotatedWaypoint extends Waypoint {
 	/**
 	 * Any comments that the user may have added to the waypoint.
 	 */
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@NotNull
 	private List<String> comments;
 	/**
