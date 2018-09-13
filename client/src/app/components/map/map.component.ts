@@ -1,5 +1,5 @@
 import { Component, ViewChild, OnInit, AfterViewInit, Input, Output, EventEmitter, OnChanges, NgZone } from '@angular/core';
-import { MapsAPILoader, AgmMap, LatLngBounds } from '@agm/core';
+import { MapsAPILoader, AgmMap, LatLngBounds, AgmCircle } from '@agm/core';
 import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -12,6 +12,7 @@ import { Place } from '../../models/place.model';
 import { Circle } from '../../models/circle.model';
 import { Trip } from '../../models/trip.model';
 import { GeocodeService } from '../../services/geocode/geocode.service';
+
 
 declare var google: any;
 
@@ -64,9 +65,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
   ];
 
-  circles: Circle[] = [
-
-  ];
+  circle: Circle;
 
   polyPoints: any[] = [
 
@@ -84,6 +83,8 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
 
   @ViewChild(AgmMap) map: AgmMap;
+  @ViewChild(AgmCircle)
+  mapCircle: AgmCircle;
   @ViewChild(NgbTabset)
   private tabset: NgbTabset;
 
@@ -120,6 +121,11 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnInit() {
     // this.getLocation();
     this.getDirection();
+    this.trip = {id: 1, creationDate: 'now',
+      route: { origin: {latitude: 33, longitude: -77}, destination: {latitude: 34, longitude: -77}, waypoints: [] },
+      pointsOfInterest: [], checklist: null
+
+    };
   }
 
   // get address autocomplete result
@@ -185,15 +191,20 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       const way: Marker = {
         location: {
           lat: event.coords.lat,
-          lng: event.coords.lng
+          lng: event.coords.lng,
         },
       };
       this.waypoints.push(way);
+      const image: any = {
+        url: 'assets/images/greenmarker.png',
+        scaledSize: new google.maps.Size(40, 40)
+      };
       this.markers.push(
         {
           location: way.location,
           waypointId: this.waypoints.length - 1,
-          draggable: true
+          draggable: true,
+          icon: image
         }
       );
     } else {
@@ -212,6 +223,13 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.getDirection();
   }
 
+  setMarkerLabels(direction) {
+    console.log('a');
+    for (let i = 2; i < this.markers.length ; i++) {
+      this.markers[i].label = '' +  (direction.routes[0].waypoint_order.indexOf(this.markers[i].waypointId) + 1);
+    }
+  }
+
   // Creates a direction based on origin and destination. based on AGM Direction api
   getDirection() {
     this.origin = this.origin && { lat: this.origin.lat, lng: this.origin.lng };
@@ -223,7 +241,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
           lng: this.origin.lng
         },
         draggable: true,
-        label: 'START'
+        label: 'S'
       });
     } else if (this.markers[1] == null && this.destination != null) {
       this.markers.push({
@@ -232,7 +250,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
           lng: this.destination.lng
         },
         draggable: true,
-        label: 'END'
+        label: 'E'
       });
     }
 
@@ -249,7 +267,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     }
     this.currentMarkers = [];
     this.currentPlace = null;
-    this.circles = null;
+    this.circle = null;
     this.getDirection();
   }
 
@@ -277,10 +295,19 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.origin = { lat: position.coords.latitude, lng: position.coords.longitude };
   }
 
+  // Checks if valid direction.
+  onResponse(response) {
+    if (response.status === 'ZERO_RESULTS') {
+      alert('this route is IMPOSSIBLE!');
+      this.waypoints.pop();
+      this.markers.pop();
+    }
+  }
+
   // Updates the direction info and updates the legs.
   directionChanged(event: any) {
     this.directions = event;
-
+    console.log(this.trip);
     this.trip.route = this.directions.routes[0]; // cache the directions on the map screen every time it's updated
     console.log(this.directions);
     console.log(this.trip);
@@ -297,6 +324,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     totalDistance = this.roundTo(totalDistance, 2);
     this.bigLegInfo = totalDistance;
     this.destroyLongLeg();
+    this.setMarkerLabels(this.directions);
   }
   destroyLongLeg() {
     if (this.longLeg) {
@@ -382,14 +410,12 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       types: [this.currentLocationSearchType]
     };
 
-    const circle = {
+    this.circle = {
       lat: coords.lat,
       lng: coords.lng,
       radius: this.circleRadius,
       fillColor: 'blue'
     };
-    this.circles = [];
-    this.circles.push(circle);
 
     this.currentMarkers = [];
 
@@ -397,10 +423,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     service.nearbySearch(request, (results, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
         console.log(results);
-        if (results.length != 0) {
-          console.log("How");
-          const bounds: LatLngBounds = new google.maps.LatLngBounds();
-          bounds.extend(coords);
+        if (results.length !== 0) {
           for (let i = 0; i < results.length; i++) {
 
             const inputPlace = results[i];
@@ -422,12 +445,9 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
               infoWindow: true
             }
             );
-            bounds.extend(inputPlace.geometry.location);
-          }
-          this.controlmap.fitBounds(bounds);
-        }
-        else {
 
+            this.zoomToCircle(this.mapCircle);
+          }
         }
       }
     });
@@ -467,7 +487,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       );
       bounds.extend(inputPlace.geometry.location);
     }
-    //this.controlmap.fitBounds(bounds);
+    // this.controlmap.fitBounds(bounds);
   }
   getPlaceDetails(newPlaceId: string, marker: Marker) {
     const request = {
@@ -575,7 +595,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     }
   }
 
-  delete(index: number) {
+  rightTest(index: number) {
     console.log('a');
   }
 
@@ -589,7 +609,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     if (this.controlmap.zoom <= 12) {
       this.currentMarkers = [];
       this.currentPlace = null;
-      this.circles = [];
+      this.circle = null;
     }
   }
 
@@ -597,5 +617,10 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.annotateMarker.open(this.currentPlace.marker);
   }
 
-
+  /**
+   * Zooms the map in on the given circle.
+   */
+  zoomToCircle(circle: AgmCircle): void {
+    circle.getBounds().then(bounds => this.controlmap.fitBounds(bounds));
+  }
 }

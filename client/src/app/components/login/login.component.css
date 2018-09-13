@@ -17,18 +17,7 @@
     text-align:center;
 }
 
-@font-face {
-    font-family: 'Futura';
-    src: url("/assets/fonts/futura/FuturaStd-Medium.otf");
-}
 
-.font-mont{
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 400;
-}
-.font-futura{
-    font-family: 'Futura';
-}
 
 a, p {
    color:black;
