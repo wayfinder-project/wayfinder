@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { MapsAPILoader, AgmMap, LatLngBounds } from '@agm/core';
 import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { Observable, of } from 'rxjs';
@@ -23,14 +23,14 @@ declare var google: any;
     NgbTabset
   ]
 })
-export class MapComponent implements OnInit, AfterViewInit {
+export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
   public origin: google.maps.LatLngLiteral;
   public destination: google.maps.LatLngLiteral;
   geocoder: any;
 
   @Input()
-  currentTrip: Trip;
+  trip: Trip;
 
   @Output()
   save = new EventEmitter<Trip>();
@@ -105,7 +105,7 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   }
 
-  circleRadius: number; // Radius of the place radius
+  circleRadius = 500; // Radius of the place radius
   // public location: LocationModel;
   public directions: any;
   public directionInfo: any;
@@ -114,17 +114,32 @@ export class MapComponent implements OnInit, AfterViewInit {
   public legInfo: any; // single leg info
 
   ngOnInit() {
-    this.circleRadius = 500;
-    this.origin = null;
-    this.destination = null;
     // this.getLocation();
     this.getDirection();
-    this.currentTrip = {
-      creationDate: null,
-      route: null,
-      pointsOfInterest: [],
-      checklist: null
-    };
+  }
+
+  ngOnChanges() {
+    console.log('Changing:', this.trip);
+    // Store the trip data into this component's instance variables.
+    if (this.trip.route.origin) {
+      this.origin = {
+        lat: this.trip.route.origin.latitude,
+        lng: this.trip.route.origin.longitude,
+      };
+    }
+    if (this.trip.route.destination) {
+      this.destination = {
+        lat: this.trip.route.destination.latitude,
+        lng: this.trip.route.destination.longitude,
+      };
+    }
+    this.waypoints = this.trip.route.waypoints.map(waypoint => ({
+      location: {
+        lat: waypoint.latitude,
+        lng: waypoint.longitude,
+      }
+    }));
+    this.getDirection();
   }
 
   ngAfterViewInit() {
@@ -252,9 +267,9 @@ export class MapComponent implements OnInit, AfterViewInit {
   directionChanged(event: any) {
     this.directions = event;
 
-    this.currentTrip.route = this.directions.routes[0]; // cache the directions on the map screen every time it's updated
+    this.trip.route = this.directions.routes[0]; // cache the directions on the map screen every time it's updated
     console.log(this.directions);
-    console.log(this.currentTrip);
+    console.log(this.trip);
     this.directionInfo = this.directions.routes[0].legs[0].distance.text;
     const routeLegs = this.directions.routes[0].legs;
     this.legs = [];
@@ -498,9 +513,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   saveTrip() {
-    this.currentTrip.creationDate = new Date().toISOString();
-
-    this.currentTrip.route = {
+    this.trip.route = {
       origin: {
         latitude: this.origin.lat,
         longitude: this.origin.lng
@@ -511,17 +524,8 @@ export class MapComponent implements OnInit, AfterViewInit {
       },
       waypoints: this.waypoints.map(markerToWaypoint),
     };
-    this.currentTrip.pointsOfInterest = this.savedMarkers.map(markerToAnnotatedWayPoint);
-    this.currentTrip.checklist = { items: [] };
-    console.log(this.currentTrip);
-    this.userService.getCurrentUser().subscribe(user => {
-      user.trips.push(this.currentTrip);
-      console.log(user);
-      this.userService.update(user).subscribe(u => {
-        console.log(u);
-      });
-    });
-    this.save.emit(this.currentTrip);
+    this.trip.pointsOfInterest = this.savedMarkers.map(markerToAnnotatedWayPoint);
+    this.save.emit(this.trip);
   }
 
   saveMarker() {

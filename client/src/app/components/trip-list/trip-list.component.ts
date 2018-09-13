@@ -15,6 +15,7 @@ export class TripListComponent implements OnInit {
 
   ngOnInit() {
     this.userService.getCurrentUser().subscribe(user => {
+      console.log('User trips:', user.trips);
       this.trips = user.trips;
     });
   }

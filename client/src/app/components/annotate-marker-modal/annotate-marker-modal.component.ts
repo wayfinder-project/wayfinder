@@ -11,7 +11,7 @@ export class AnnotateMarkerModalComponent implements OnInit {
 
   editMarker: Marker;
   comment: string;
-  notes: string[]=[];
+  comments: string[]=[];
 
   @ViewChild('content')
   content: NgbActiveModal;
@@ -30,21 +30,21 @@ export class AnnotateMarkerModalComponent implements OnInit {
   // }
 
   addNote() {
-     this.notes.push(this.comment);
+     this.comments.push(this.comment);
   }
   deleteNote(index: number) {
-    this.notes.splice(index, 1);
+    this.comments.splice(index, 1);
   }
 
   open(editMarker: Marker): void {
     this.modal = this.modalService.open(this.content, { centered: true });
     this.editMarker = editMarker;
-    this.notes = editMarker.notes || [];
+    this.comments = editMarker.comments || [];
   }
 
   closeModal(): void {
-    this.editMarker.notes = this.notes;
-    this.notes = [];
+    this.editMarker.comments = this.comments;
+    this.comments = [];
     this.modal.close();
     // this.close.emit({ noteH);
   }
