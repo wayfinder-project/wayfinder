@@ -40,6 +40,8 @@ export class EditTripComponent implements OnInit {
   updateTrip(trip: Trip): void {
     // This line is probably not strictly necessary, but is good in case future
     // changes affect the handling of the trip variable in the map component.
+    console.log(trip.id);
+    console.log(this.trip.id);
     this.trip = trip;
     // We need to ensure that we overwrite the trip object already in the user
     // object.

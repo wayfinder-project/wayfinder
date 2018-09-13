@@ -23,6 +23,7 @@ export class AnnotateMarkerModalComponent implements OnInit {
   constructor(private modalService: NgbModal) { }
 
   ngOnInit() {
+    // this.comments = this.editMarker.comments;
   }
 
   // addNote() {
@@ -30,7 +31,8 @@ export class AnnotateMarkerModalComponent implements OnInit {
   // }
 
   addNote() {
-     this.comments.push(this.comment);
+     this.comments.push("");
+     console.log("Actually help");
   }
   deleteNote(index: number) {
     this.comments.splice(index, 1);

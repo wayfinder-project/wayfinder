@@ -112,7 +112,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   public addrKeys: string[];
   public addr: object;
 
-  constructor(private http: HttpClient, private userService: UserService, private geocodeService: GeocodeService, private zone: NgZone) {
+  constructor(private http: HttpClient, private geocodeService: GeocodeService, private zone: NgZone) {
 
   }
 
@@ -168,20 +168,53 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
         lat: this.trip.route.origin.latitude,
         lng: this.trip.route.origin.longitude,
       };
+      this.origin.label = 'S';
+      this.origin.draggable = true;
+      this.origin.address = this.trip.route.origin.address;
     }
     if (this.trip.route.destination) {
       this.destination.location = {
         lat: this.trip.route.destination.latitude,
         lng: this.trip.route.destination.longitude,
       };
+      this.destination.label = 'E';
+      this.destination.draggable = true;
+      this.destination.address = this.trip.route.destination.address;
     }
-    this.waypoints = this.trip.route.waypoints.map(waypoint => ({
+    const waypointImage: any = {
+      url: 'assets/images/greenmarker.png',
+      scaledSize: new google.maps.Size(40, 40)
+    };
+    console.log(this.trip.route.waypoints);
+    this.waypoints = this.trip.route.waypoints.map(waypoint => (
+      {
       location: {
         lat: waypoint.latitude,
         lng: waypoint.longitude,
-      }
+      },
+      icon: waypointImage,
+      draggable: true,
+      address: waypoint.address,
+      placeId: waypoint.placeId
+    }));
+    console.log(this.waypoints);
+    this.savedMarkers = this.trip.pointsOfInterest.map(marker => (
+      {
+      location: {
+        lat: marker.latitude,
+        lng: marker.longitude,
+      },
+      updateIcon: {
+        url: marker.iconUrl,
+        scaledSize: new google.maps.Size(30, 30)
+      },
+      draggable: true,
+      placeId: marker.placeId,
+      comments: marker.comments,
+      address: marker.address
     }));
     this.getDirection();
+    // this.setMarkerLabels(this.directions);
   }
 
   ngAfterViewInit() {
@@ -482,6 +515,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   getPlaces(coords: any) {
+    console.log(this.savedMarkers);
     const request = {
       location: coords,
       radius: this.circleRadius,

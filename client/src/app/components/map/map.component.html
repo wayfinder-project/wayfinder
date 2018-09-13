@@ -129,8 +129,8 @@
         </agm-polyline>
 
         <agm-circle *ngIf="circle" [latitude]="circle.lat" [longitude]="circle.lng" [(radius)]="circle.radius"
-          [fillColor]="circle.fillColor" [circleDraggable]="false" [editable]="false" (centerChange)="zoomToCircle(circle)"
-          (radiusChange)="zoomToCircle(circle)">
+          [fillColor]="circle.fillColor" [circleDraggable]="false" [editable]="false" (centerChange)="zoomToCircle(mapCircle)"
+          (radiusChange)="zoomToCircle(mapCircle)">
         </agm-circle>
       </agm-map>
     </div>
