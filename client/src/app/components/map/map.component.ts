@@ -117,6 +117,11 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnInit() {
     // this.getLocation();
     this.getDirection();
+    this.trip = {id: 1, creationDate: 'now',
+      route: { origin: {latitude: 33, longitude: -77}, destination: {latitude: 34, longitude: -77}, waypoints: [] },
+      pointsOfInterest: [], checklist: null
+
+    };
   }
 
   ngOnChanges() {
@@ -205,6 +210,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   setMarkerLabels(direction) {
+    console.log('a');
     for (let i = 2; i < this.markers.length ; i++) {
       this.markers[i].label = '' +  (direction.routes[0].waypoint_order.indexOf(this.markers[i].waypointId) + 1);
     }
@@ -287,7 +293,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   // Updates the direction info and updates the legs.
   directionChanged(event: any) {
     this.directions = event;
-
+    console.log(this.trip);
     this.trip.route = this.directions.routes[0]; // cache the directions on the map screen every time it's updated
     console.log(this.directions);
     console.log(this.trip);
