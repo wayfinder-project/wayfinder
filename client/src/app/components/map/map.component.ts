@@ -376,7 +376,44 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.currentMarkers = [];
 
     const service = new google.maps.places.PlacesService(this.controlmap);
-    service.nearbySearch(request, this.callbackPlaces.bind(this));
+    service.nearbySearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        console.log(results);
+        if (results.length != 0) {
+          console.log("How");
+          const bounds: LatLngBounds = new google.maps.LatLngBounds();
+          bounds.extend(coords);
+          for (let i = 0; i < results.length; i++) {
+
+            const inputPlace = results[i];
+
+            const image: google.maps.Icon = {
+              url: inputPlace.icon,
+              scaledSize: new google.maps.Size(30, 30)
+            };
+
+            this.currentMarkers.push({
+              location: {
+                lat: inputPlace.geometry.location.lat(),
+                lng: inputPlace.geometry.location.lng()
+              },
+              label: inputPlace.name,
+              draggable: false,
+              placeId: inputPlace.place_id,
+              updateIcon: image,
+              infoWindow: true
+            }
+            );
+            bounds.extend(inputPlace.geometry.location);
+          }
+          this.controlmap.fitBounds(bounds);
+        }
+        else {
+
+        }
+      }
+    });
+
   }
 
   callbackPlaces(results, status) {
@@ -412,7 +449,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       );
       bounds.extend(inputPlace.geometry.location);
     }
-    this.controlmap.fitBounds(bounds);
+    //this.controlmap.fitBounds(bounds);
   }
   getPlaceDetails(newPlaceId: string, marker: Marker) {
     const request = {
@@ -541,7 +578,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   openAnnotationModal(): void {
-    this.annotateMarker.open();
+    this.annotateMarker.open(this.currentPlace.marker);
   }
 
 
