@@ -7,6 +7,7 @@ import { AccessGuard } from '../guards/access.guard';
 import { UserpageComponent } from '../components/userpage/userpage.component';
 import { MapComponent } from '../components/map/map.component';
 import { TripListComponent } from '../components/trip-list/trip-list.component';
+import { EditTripComponent } from '../components/edit-trip/edit-trip.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -21,7 +22,7 @@ export const routes: Routes = [
       {
         path: 'trips',
         children: [
-          { path: ':id', component: MapComponent },
+          { path: ':id', component: EditTripComponent },
           { path: '', component: TripListComponent },
         ],
       },

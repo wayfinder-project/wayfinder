@@ -20,6 +20,7 @@ import { UserRegistrationComponent } from './components/user-registration/user-r
 import { AnnotateMarkerModalComponent } from './components/annotate-marker-modal/annotate-marker-modal.component';
 import { TripListComponent } from './components/trip-list/trip-list.component';
 import { ChecklistModalComponent } from './components/checklist-modal/checklist-modal.component';
+import { EditTripComponent } from './components/edit-trip/edit-trip.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { ChecklistModalComponent } from './components/checklist-modal/checklist-
     AnnotateMarkerModalComponent,
     TripListComponent,
     ChecklistModalComponent,
+    EditTripComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({
