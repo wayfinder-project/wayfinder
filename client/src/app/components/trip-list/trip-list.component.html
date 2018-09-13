@@ -6,8 +6,8 @@
         <h4 class="card-title">Trip title</h4>
         <h6 class="card-subtitle mb-2 text-muted">Created {{trip.creationDate | date : medium}}</h6>
         <p class="card-text">
-          From {{trip.route.origin.address}} <br>
-          To {{trip.route.destination.address}}
+          From {{formatAddress(trip.route.origin)}} <br>
+          To {{formatAddress(trip.route.destination)}}
         </p>
         <button class="btn btn-primary" (click)="handleClick(trip)">View/edit</button>
       </div>

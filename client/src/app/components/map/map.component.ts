@@ -118,15 +118,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   public bigLegInfo: any;
   public legInfo: any; // single leg info
 
-  ngOnInit() {
-    // this.getLocation();
-    this.getDirection();
-    this.trip = {id: 1, creationDate: 'now',
-      route: { origin: {latitude: 33, longitude: -77}, destination: {latitude: 34, longitude: -77}, waypoints: [] },
-      pointsOfInterest: [], checklist: null
-
-    };
-  }
+  ngOnInit() {}
 
   // get address autocomplete result
   setAddress(addrObj) {
