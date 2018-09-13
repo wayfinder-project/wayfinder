@@ -12,6 +12,8 @@ import { Place } from '../../models/place.model';
 import { Circle } from '../../models/circle.model';
 import { Trip } from '../../models/trip.model';
 import { GeocodeService } from '../../services/geocode/geocode.service';
+import { MarkeroptionsModalComponent } from '../markeroptions-modal/markeroptions-modal.component';
+import { WaypointModel } from '../../models/mapwaypoint.model';
 
 
 declare var google: any;
@@ -87,6 +89,8 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   @ViewChild(AgmMap) map: AgmMap;
   @ViewChild(NgbTabset)
   private tabset: NgbTabset;
+  @ViewChild(MarkeroptionsModalComponent)
+  private markerModal: MarkeroptionsModalComponent;
 
   @ViewChild(AnnotateMarkerModalComponent)
   annotateMarker: AnnotateMarkerModalComponent;
@@ -181,6 +185,8 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
         },
       };
       this.waypoints.push(way);
+      console.log(`waypoints array after pushing something into it ${this.waypoints}`);
+      console.log(this.waypoints);
       const image: any = {
         url: 'assets/images/greenmarker.png',
         scaledSize: new google.maps.Size(40, 40)
@@ -574,6 +580,9 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   showMarkerPlaces(index: number) {
+    console.log('waypoints from which one is to be passed to the delete functioN: ');
+    console.log(this.waypoints);
+    this.markerModal.open(this.markers[index]);
     console.log(this.directions);
     console.log(index);
     console.log(this.legs);
@@ -589,7 +598,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   rightTest(index: number) {
-    console.log('a');
   }
 
 
@@ -609,6 +617,20 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   openAnnotationModal(): void {
     this.annotateMarker.open(this.currentPlace.marker);
   }
+
+  deleteMarker(marker: Marker, waypoint: Marker) {
+    const markerIndex = this.markers.indexOf(marker);
+    this.markers.splice(markerIndex, 1);
+    console.log('waypoint to be deleted: ' + waypoint);
+    console.log('waypts array to delete from:' );
+    console.log(this.waypoints);
+    const waypointIndex = this.waypoints.indexOf(waypoint);
+    this.waypoints.splice(waypointIndex, 1);
+    this.getDirection();
+  }
+
+
+
 
 
 }

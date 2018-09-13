@@ -7,6 +7,7 @@ import { ApiError } from '../../models/api-error.model';
 import { UserRegistrationComponent } from '../user-registration/user-registration.component';
 import { User } from '../../models/user.model';
 
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -33,7 +34,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
   ) { }
 
   ngOnInit() { }
