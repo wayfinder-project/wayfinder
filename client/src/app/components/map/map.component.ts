@@ -385,7 +385,15 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
         console.log(results);
         if (results.length != 0) {
           console.log("How");
-          const bounds: LatLngBounds = new google.maps.LatLngBounds();
+          const bounds = new google.maps.LatLngBounds();
+          const point1: google.maps.LatLngLiteral = {lat: coords.lat+(this.circleRadius/111111), lng: coords.lng+(Math.cos(this.circleRadius)/111111)};
+          const point2: google.maps.LatLngLiteral = {lat: coords.lat-(this.circleRadius/111111), lng: coords.lng+(Math.cos(this.circleRadius)/111111)};
+          const point3: google.maps.LatLngLiteral = {lat: coords.lat+(this.circleRadius/111111), lng: coords.lng-(Math.cos(this.circleRadius)/111111)};
+          const point4: google.maps.LatLngLiteral = {lat: coords.lat-(this.circleRadius/111111), lng: coords.lng-(Math.cos(this.circleRadius)/111111)};
+          bounds.extend(point1);
+          bounds.extend(point2);
+          bounds.extend(point3);
+          bounds.extend(point4);
           bounds.extend(coords);
           for (let i = 0; i < results.length; i++) {
 
