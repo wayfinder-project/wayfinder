@@ -1,5 +1,5 @@
 import { Component, ViewChild, OnInit, AfterViewInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
-import { MapsAPILoader, AgmMap, LatLngBounds } from '@agm/core';
+import { MapsAPILoader, AgmMap, LatLngBounds, AgmCircle } from '@agm/core';
 import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -65,9 +65,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
   ];
 
-  circles: Circle[] = [
-
-  ];
+  circle: Circle;
 
   polyPoints: any[] = [
 
@@ -85,6 +83,8 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
 
   @ViewChild(AgmMap) map: AgmMap;
+  @ViewChild(AgmCircle)
+  mapCircle: AgmCircle;
   @ViewChild(NgbTabset)
   private tabset: NgbTabset;
 
@@ -253,7 +253,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     }
     this.currentMarkers = [];
     this.currentPlace = null;
-    this.circles = null;
+    this.circle = null;
     this.getDirection();
   }
 
@@ -396,14 +396,12 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       types: [this.currentLocationSearchType]
     };
 
-    const circle = {
+    this.circle = {
       lat: coords.lat,
       lng: coords.lng,
       radius: this.circleRadius,
       fillColor: 'blue'
     };
-    this.circles = [];
-    this.circles.push(circle);
 
     this.currentMarkers = [];
 
@@ -412,9 +410,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
         console.log(results);
         if (results.length !== 0) {
-          console.log('How');
-          const bounds: LatLngBounds = new google.maps.LatLngBounds();
-          bounds.extend(coords);
           for (let i = 0; i < results.length; i++) {
 
             const inputPlace = results[i];
@@ -436,11 +431,9 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
               infoWindow: true
             }
             );
-            bounds.extend(inputPlace.geometry.location);
-          }
-          this.controlmap.fitBounds(bounds);
-        } else {
 
+            this.zoomToCircle(this.mapCircle);
+          }
         }
       }
     });
@@ -602,7 +595,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     if (this.controlmap.zoom <= 12) {
       this.currentMarkers = [];
       this.currentPlace = null;
-      this.circles = [];
+      this.circle = null;
     }
   }
 
@@ -610,5 +603,10 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.annotateMarker.open(this.currentPlace.marker);
   }
 
-
+  /**
+   * Zooms the map in on the given circle.
+   */
+  zoomToCircle(circle: AgmCircle): void {
+    circle.getBounds().then(bounds => this.controlmap.fitBounds(bounds));
+  }
 }
