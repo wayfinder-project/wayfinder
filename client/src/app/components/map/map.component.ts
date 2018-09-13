@@ -26,8 +26,11 @@ declare var google: any;
 })
 export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
-  public origin: google.maps.LatLngLiteral;
-  public destination: google.maps.LatLngLiteral;
+  // public origin: google.maps.LatLngLiteral;
+  // public destination: google.maps.LatLngLiteral;
+  public origin: Marker = { location: null };
+  public destination: Marker = { location: null };
+
   geocoder: any;
 
   @Input()
@@ -72,6 +75,9 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   ];
 
   waypoints: Marker[] = [
+
+  ];
+  mapWaypoints: Marker[] = [
 
   ];
 
@@ -121,19 +127,32 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnInit() {
     // this.getLocation();
     this.getDirection();
-    this.trip = {id: 1, creationDate: 'now',
-      route: { origin: {latitude: 33, longitude: -77}, destination: {latitude: 34, longitude: -77}, waypoints: [] },
+    this.trip = {
+      id: 1, creationDate: 'now',
+      route: { origin: { latitude: 33, longitude: -77 }, destination: { latitude: 34, longitude: -77 }, waypoints: [] },
       pointsOfInterest: [], checklist: null
-
     };
   }
 
   // get address autocomplete result
-  setAddress(addrObj) {
+  setOrigin(place) {
     // address object contains lat/lng to use
     this.zone.run(() => {
-      this.addr = addrObj;
-      this.addrKeys = Object.keys(addrObj);
+      // this.addr = addrObj;
+      // this.addrKeys = Object.keys(addrObj);
+
+      console.log(place);
+
+    });
+  }
+  setDestination(place) {
+    // address object contains lat/lng to use
+    this.zone.run(() => {
+      // this.addr = addrObj;
+      // this.addrKeys = Object.keys(addrObj);
+
+      console.log(place);
+
     });
   }
 
@@ -141,13 +160,13 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     console.log('Changing:', this.trip);
     // Store the trip data into this component's instance variables.
     if (this.trip.route.origin) {
-      this.origin = {
+      this.origin.location = {
         lat: this.trip.route.origin.latitude,
         lng: this.trip.route.origin.longitude,
       };
     }
     if (this.trip.route.destination) {
-      this.destination = {
+      this.destination.location = {
         lat: this.trip.route.destination.latitude,
         lng: this.trip.route.destination.longitude,
       };
@@ -183,105 +202,133 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.controlmap.fitBounds(bounds);
   }
 
+  convertWaypoints() {
+    this.mapWaypoints = this.waypoints.map(waypoint => ({location: waypoint.location}));
+  }
+
   // Adds a waypoint to the map
   public addWaypoint(event: any) {
-    console.log(event);
-    console.log(event.coords.lat + ' ' + event.coords.lng);
-    if (this.origin != null && this.destination != null) {
+    console.log("wat");
+    if (this.origin.location != null && this.destination.location != null) {
+      const image: any = {
+        url: 'assets/images/greenmarker.png',
+        scaledSize: new google.maps.Size(40, 40)
+      };
       const way: Marker = {
         location: {
           lat: event.coords.lat,
           lng: event.coords.lng,
         },
+        waypointId: this.waypoints.length - 1,
+        draggable: true,
+        icon: image
+      };
+      this.waypoints.push(way);
+    } else {
+      if (this.origin.location == null) {
+        this.origin = {location: {
+          lat: event.coords.lat,
+          lng: event.coords.lng
+        },
+        draggable: true,
+        label: 'S'
+      };
+      } else if (this.destination.location == null) {
+        this.destination = {location: {
+          lat: event.coords.lat,
+          lng: event.coords.lng
+        },
+        draggable: true,
+        label: 'E'
+      };
+      }
+    }
+    this.getDirection();
+  }
+
+  public addWaypointFromAddress(addressObject: any) {
+    console.log(addressObject);
+    // console.log(addressObject. + ' ' + event.coords.lng);
+    if (this.origin != null && this.destination != null) {
+      const way: Marker = {
+        location: {
+          lat: addressObject.geometry.location.lat(),
+          lng: addressObject.geometry.location.lng()
+        },
+        address: addressObject.formatted_address
       };
       this.waypoints.push(way);
       const image: any = {
         url: 'assets/images/greenmarker.png',
         scaledSize: new google.maps.Size(40, 40)
       };
-      this.markers.push(
+      this.waypoints.push(
         {
           location: way.location,
           waypointId: this.waypoints.length - 1,
           draggable: true,
-          icon: image
+          icon: image,
+          address: addressObject.formatted_address
         }
       );
     } else {
-      if (this.origin == null) {
-        this.origin = {
-          lat: event.coords.lat,
-          lng: event.coords.lng
+      if (this.origin.location == null) {
+        this.origin.location = {
+          lat: addressObject.geometry.location.lat(),
+          lng: addressObject.geometry.location.lng()
         };
-      } else if (this.destination == null) {
-        this.destination = {
-          lat: event.coords.lat,
-          lng: event.coords.lng
+        this.origin.address = addressObject.formatted_address;
+      } else if (this.destination.location == null) {
+        this.destination.location = {
+          lat: addressObject.geometry.location.lat(),
+          lng: addressObject.geometry.location.lng()
         };
+        this.destination.location
       }
     }
     this.getDirection();
   }
 
   setMarkerLabels(direction) {
-    console.log('a');
-    for (let i = 2; i < this.markers.length ; i++) {
-      this.markers[i].label = '' +  (direction.routes[0].waypoint_order.indexOf(this.markers[i].waypointId) + 1);
+    console.log(this.waypoints.length);
+    for (let i = 0; i < this.waypoints.length; i++) {
+      this.waypoints[i].label = '' + (direction.routes[0].waypoint_order.indexOf(this.waypoints[i].waypointId) + 1);
     }
   }
 
   // Creates a direction based on origin and destination. based on AGM Direction api
   getDirection() {
-    this.origin = this.origin && { lat: this.origin.lat, lng: this.origin.lng };
-    this.destination = this.destination && { lat: this.destination.lat, lng: this.destination.lng };
-    if (this.markers[0] == null && this.origin != null) {
+    this.origin.location = this.origin.location && { lat: this.origin.location.lat, lng: this.origin.location.lng };
+    this.destination.location = this.destination.location && { lat: this.destination.location.lat, lng: this.destination.location.lng };
+    if (this.markers[0] == null && this.origin.location != null) {
       this.markers.push({
         location: {
-          lat: this.origin.lat,
-          lng: this.origin.lng
+          lat: this.origin.location.lat,
+          lng: this.origin.location.lng
         },
         draggable: true,
         label: 'S'
       });
-    } else if (this.markers[1] == null && this.destination != null) {
+    } else if (this.markers[1] == null && this.destination.location != null) {
       this.markers.push({
         location: {
-          lat: this.destination.lat,
-          lng: this.destination.lng
+          lat: this.destination.location.lat,
+          lng: this.destination.location.lng
         },
         draggable: true,
         label: 'E'
       });
     }
-
+    this.convertWaypoints();
   }
   // Gets called when a marker(waypoint) is dragged.
-  moveWaypoint(index: number, event: any) {
-    const marker = this.markers[index];
+  moveWaypoint(marker: Marker, event: any) {
     marker.location = { lat: event.coords.lat, lng: event.coords.lng };
-    const way = this.waypoints[this.markers[index].waypointId];
-    if (way != null) {
-      way.location = marker.location;
-    } else {
-      this.markerDragEnd(this.markers[index], index);
-    }
     this.currentMarkers = [];
     this.currentPlace = null;
     this.circle = null;
     this.getDirection();
   }
-
-  // If a marker(origin/destination) is dragged.
-  markerDragEnd(m: Marker, index: number) {
-    console.log(m);
-    if (index === 0) { // Origin
-      this.origin = m.location;
-    } else { // Destination
-      this.destination = m.location;
-    }
-    this.getDirection();
-  }
-
 
   // Gets the current location of the user.
   getLocation() {
@@ -292,7 +339,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     }
   }
   showPosition(position) {
-    this.origin = { lat: position.coords.latitude, lng: position.coords.longitude };
+    this.origin.location = { lat: position.coords.latitude, lng: position.coords.longitude };
   }
 
   // Checks if valid direction.
@@ -371,10 +418,10 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     const end = this.destination;
     const start = this.origin;
     this.controlmap.fitBounds({
-      east: Math.max(start.lat, end.lng),
-      north: Math.max(start.lat, end.lat),
-      west: Math.min(start.lng, end.lng),
-      south: Math.min(start.lat, end.lat)
+      east: Math.max(start.location.lat, end.location.lng),
+      north: Math.max(start.location.lat, end.location.lat),
+      west: Math.min(start.location.lng, end.location.lng),
+      south: Math.min(start.location.lat, end.location.lat)
     });
     this.polyPoints = [];
     this.destroyLongLeg();
@@ -549,12 +596,12 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   saveTrip() {
     this.trip.route = {
       origin: {
-        latitude: this.origin.lat,
-        longitude: this.origin.lng
+        latitude: this.origin.location.lat,
+        longitude: this.origin.location.lng
       },
       destination: {
-        latitude: this.destination.lat,
-        longitude: this.destination.lng
+        latitude: this.destination.location.lat,
+        longitude: this.destination.location.lng
       },
       waypoints: this.waypoints.map(markerToWaypoint),
     };
@@ -580,18 +627,18 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.controlmap = $event;
   }
 
-  showMarkerPlaces(index: number) {
+  showMarkerPlaces(marker: Marker) {
     console.log(this.directions);
-    console.log(index);
+    // console.log(index);
     console.log(this.legs);
-    this.getPlaces.bind(this)({ lat: this.markers[index].location.lat, lng: this.markers[index].location.lng });
-    if (this.markers[index].waypointId != null) {
+    this.getPlaces.bind(this)({ lat: marker.location.lat, lng: marker.location.lng });
+    if (marker.waypointId != null) {
       console.log(this.waypoints);
-      const waypointOrder = this.directions.routes[0].waypoint_order.indexOf(this.markers[index].waypointId) + 1;
+      const waypointOrder = this.directions.routes[0].waypoint_order.indexOf(marker.waypointId) + 1;
       console.log(waypointOrder);
       console.log(this.legs[waypointOrder]);
     } else {
-      console.log(this.legs[index]);
+      // console.log(this.legs[index]);
     }
   }
 
