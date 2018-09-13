@@ -1,6 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { UserService } from '../../services/user/user.service';
 import { UserWithId } from '../../models/user.model';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+
+
+
+
 
 @Component({
   selector: 'app-userpage',
@@ -16,13 +22,17 @@ export class UserpageComponent implements OnInit {
   inputPassword1: string;
   inputPassword2: string;
 
-  constructor(private userService: UserService) {}
+
+
+
+  constructor(private userService: UserService, private modalService: NgbModal) {}
 
   ngOnInit() {
     this.userService.getCurrentUser().subscribe(user => {
       this.user = user;
     });
   }
+
 
   update() {
     this.userService.update(this.user).subscribe(_ => {

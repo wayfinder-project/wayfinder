@@ -19,8 +19,7 @@ import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./checklist-modal.component.css'],
 })
 export class ChecklistModalComponent implements OnInit {
-  @Input()
-  checklist: Checklist = { items: [] };
+  checklist: Checklist;
   completedItems: ChecklistItem[] = [];
   uncompletedItems: ChecklistItem[] = [];
   @Output()
@@ -59,7 +58,8 @@ export class ChecklistModalComponent implements OnInit {
     this.modal.close();
   }
 
-  open(): void {
+  open(checklist: Checklist): void {
+    this.checklist = checklist;
     this.modalService.open(this.content, { ariaLabelledBy: 'modal-title' });
   }
 
