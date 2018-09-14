@@ -43,6 +43,14 @@ export class ChecklistModalComponent implements OnInit {
     this.refreshItems();
   }
 
+  removeItem(item: ChecklistItem) {
+    console.log('a');
+    console.log(this.checklist.items.indexOf(item));
+    this.checklist.items.splice(this.checklist.items.indexOf(item), 1);
+    console.log(this.checklist.items);
+    this.refreshItems();
+  }
+
   check(item: ChecklistItem): void {
     item.status = ChecklistItemStatus.Done;
     this.refreshItems();
@@ -61,6 +69,11 @@ export class ChecklistModalComponent implements OnInit {
   open(checklist: Checklist): void {
     this.checklist = checklist;
     this.modalService.open(this.content, { ariaLabelledBy: 'modal-title' });
+    this.refreshItems();
+  }
+
+  save() {
+    this.close.emit(this.checklist);
   }
 
   private getCompleted(): ChecklistItem[] {

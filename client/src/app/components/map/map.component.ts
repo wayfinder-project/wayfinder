@@ -14,6 +14,8 @@ import { Trip } from '../../models/trip.model';
 import { GeocodeService } from '../../services/geocode/geocode.service';
 import { MarkeroptionsModalComponent } from '../markeroptions-modal/markeroptions-modal.component';
 import { WaypointModel } from '../../models/mapwaypoint.model';
+import { ChecklistModalComponent } from '../checklist-modal/checklist-modal.component';
+import { Checklist, ChecklistItemStatus } from '../../models/checklist.model';
 
 
 declare var google: any;
@@ -97,7 +99,8 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   private tabset: NgbTabset;
   @ViewChild(MarkeroptionsModalComponent)
   private markerModal: MarkeroptionsModalComponent;
-
+  @ViewChild(ChecklistModalComponent)
+  private checklistmodal: ChecklistModalComponent;
   @ViewChild(AnnotateMarkerModalComponent)
   annotateMarker: AnnotateMarkerModalComponent;
 
@@ -127,9 +130,11 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
   public bigLegInfo: any;
   public legInfo: any; // single leg info
+  public selectedWaypoint: any;
 
   ngOnInit() {
-
+    /* this.trip = {creationDate: '', route: { origin: null ,
+    destination: null, waypoints: []}, pointsOfInterest: [], checklist: {items: []}}; */
   }
 
   // get address autocomplete result
@@ -434,7 +439,9 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   // Checks if valid direction.
   onResponse(response) {
     if (response.status === 'ZERO_RESULTS') {
-      alert('this route is IMPOSSIBLE!');
+      alert('Destination not available');
+      this.waypoints.pop();
+      this.markers.pop();
     }
   }
 
@@ -461,6 +468,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.destroyLongLeg();
     this.setMarkerLabels(this.directions);
     this.legInfo = null;
+    this.selectedWaypoint = null;
     if (this.tabset.activeId === 'directions') {
       this.tabset.select('routes');
     }
@@ -642,6 +650,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     // this.controlmap.fitBounds(bounds);
   }
   getPlaceDetails(newPlaceId: string, marker: Marker) {
+    this.tabset.select('place');
     const request = {
       placeId: newPlaceId,
       fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
@@ -736,9 +745,16 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
   mapReady($event: any) {
     this.controlmap = $event;
+    this.controlmap.fitBounds({
+      east: -66.94,
+      north: 49.38,
+      west: -124.39,
+      south: 25.82
+    });
   }
 
   showMarkerPlaces(marker: Marker) {
+    this.selectedWaypoint = marker;
     this.getPlaces({ lat: marker.location.lat, lng: marker.location.lng });
   }
 
@@ -763,10 +779,21 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.markerModal.open(this.waypoints[index]);
   }
 
-  deleteMarker(marker: Marker) {
+  openChecklistModal(): void {
+    console.log(this.trip);
+    this.checklistmodal.open(this.trip.checklist);
+  }
+
+  deleteMarker() {
+    const marker = this.selectedWaypoint;
     const waypointIndex = this.waypoints.indexOf(marker);
     this.waypoints.splice(waypointIndex, 1);
     this.getDirection();
+  }
+
+  saveChecklist(checklist) {
+    console.log(checklist);
+    this.trip.checklist = checklist;
   }
 
   /**
@@ -777,18 +804,18 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ConvertSectoDay(seconds: number) {
-    const day = Math.round(seconds / (24 * 3600));
-    seconds = seconds % (24 * 3600);
-    const hour = Math.round(seconds / 3600);
-    seconds %= 3600;
-    const minutes = Math.round(seconds / 60);
-    seconds %= 60;
-    if (day > 0) {
-      return day + ' day(s) ' + hour + ' hour(s)';
-    } else if (hour > 0) {
-      return hour + ' hours(s) ' + minutes + ' minutes(s)';
-    } else {
-      return minutes + ' min(s)';
+        const day = Math.round(seconds / (24 * 3600));
+        seconds = seconds % (24 * 3600);
+        const hour = Math.round(seconds / 3600);
+        seconds %= 3600;
+        const minutes = Math.round(seconds / 60);
+        seconds %= 60;
+        if (day > 0) {
+          return day + ' day(s) ' + hour + ' hour(s)';
+        } else if (hour > 0) {
+          return hour + ' hour(s) ' + minutes + ' minute(s)';
+        } else {
+          return minutes + ' min(s)';
+        }
     }
-  }
 }
