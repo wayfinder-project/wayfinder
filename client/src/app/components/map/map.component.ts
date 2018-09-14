@@ -128,8 +128,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   public bigLegInfo: any;
   public legInfo: any; // single leg info
 
-  public deletedWayPointIndex = -1; // Index of recently deleted waypoint
-
   ngOnInit() {
 
   }
@@ -264,7 +262,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
           lat: event.coords.lat,
           lng: event.coords.lng,
         },
-        waypointId: this.directions.routes[0].waypoint_order.length,
         draggable: true,
         icon: image
       };
@@ -322,7 +319,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       address: addressObject.formatted_address,
       draggable: true,
       icon: image,
-      waypointId: this.waypoints.length - 1
     };
     this.waypoints.push(way);
     this.getDirection();
@@ -380,27 +376,11 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   // }
 
   setMarkerLabels(direction: any) {
-    if (this.deletedWayPointIndex > -1) {
-      this.normalizeMarkerId();
-    }
     for (let i = 0; i < this.waypoints.length; i++) {
-      if (i > 0 && this.waypoints[i].waypointId === this.waypoints[i - 1].waypointId) {
-        this.waypoints[i].waypointId++; // ..Checks for duplicate waypointId. Duplicates happen if user clicks too fast.
-      }
-      // Sets the label to the index of the waypoint in the waypoint_order array in the direction object.
-      this.waypoints[i].label = '' + (direction.routes[0].waypoint_order.indexOf(this.waypoints[i].waypointId) + 1);
+      // Sets the label to the index of the waypoint in the waypoint_order array
+      // in the direction object.
+      this.waypoints[i].label = '' + (direction.routes[0].waypoint_order.indexOf(i) + 1);
     }
-  }
-
-  // When waypoint id is deleted, makes sure waypointId's can still be found in waypoint_order array
-  // By making sure waypointId's are less than waypoint_order.lenght.
-  normalizeMarkerId() {
-    for (let i = 0; i < this.waypoints.length; i++) {
-      if (this.waypoints[i].waypointId >= this.deletedWayPointIndex) {
-        this.waypoints[i].waypointId -= 1;
-      }
-    }
-    this.deletedWayPointIndex = -1;
   }
 
   // Creates a direction based on origin and destination. based on AGM Direction api
@@ -446,6 +426,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       console.log('error');
     }
   }
+
   showPosition(position) {
     this.origin.location = { lat: position.coords.latitude, lng: position.coords.longitude };
   }
@@ -484,12 +465,12 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       this.tabset.select('routes');
     }
   }
+
   destroyLongLeg() {
     if (this.longLeg) {
       this.longLeg.visible = false;
     }
   }
-
 
   // Creates buttons for each leg. Highlights and centers on the leg when pressed.
   legButton(i: number) {
@@ -630,6 +611,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       console.log(results);
     }
   }
+
   createMarkers(places) {
     const bounds: LatLngBounds = new google.maps.LatLngBounds();
 
@@ -757,23 +739,8 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   showMarkerPlaces(marker: Marker) {
-    console.log(this.directions);
-    // console.log(index);
-    console.log(this.legs);
-    this.getPlaces.bind(this)({ lat: marker.location.lat, lng: marker.location.lng });
-    if (marker.waypointId != null) {
-      console.log(this.waypoints);
-      const waypointOrder = this.directions.routes[0].waypoint_order.indexOf(marker.waypointId) + 1;
-      console.log(waypointOrder);
-      console.log(this.legs[waypointOrder]);
-    } else {
-      // console.log(this.legs[index]);
-    }
+    this.getPlaces({ lat: marker.location.lat, lng: marker.location.lng });
   }
-
-  rightTest(index: number) {
-  }
-
 
   collapseButton() {
     const myGroup = ('#myGroup');
@@ -798,14 +765,9 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
   deleteMarker(marker: Marker) {
     const waypointIndex = this.waypoints.indexOf(marker);
-    this.deletedWayPointIndex = waypointIndex;
     this.waypoints.splice(waypointIndex, 1);
     this.getDirection();
   }
-
-
-
-
 
   /**
    * Zooms the map in on the given circle.
