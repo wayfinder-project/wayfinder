@@ -17,4 +17,5 @@ export interface Place {
     sunday: string;
   };
   url: string;
+  website?: string;
 }

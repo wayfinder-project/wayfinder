@@ -256,7 +256,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
   // Adds a waypoint to the map
   public addWaypoint(event: any) {
-    console.log("wat");
     if (this.origin.location != null && this.destination.location != null) {
       const image: any = {
         url: 'assets/images/greenmarker.png',
@@ -298,20 +297,18 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     }
     this.getDirection();
   }
-  getReverseGeocode(coords:google.maps.LatLng, marker: Marker): string {
+  getReverseGeocode(coords: google.maps.LatLng, marker: Marker): string {
     let newAddress: string;
     this.geocodeService.reverseGeocode(coords).subscribe(
       T => {
         newAddress = T[0].formatted_address;
         marker.address = newAddress;
       }
-    )
-    return newAddress
+    );
+    return newAddress;
   }
 
   public addWaypointFromAddress(addressObject: any) {
-    // console.log(addressObject. + ' ' + event.coords.lng);
-    console.log("normal");
     const image: any = {
       url: 'assets/images/greenmarker.png',
       scaledSize: new google.maps.Size(40, 40)
@@ -329,7 +326,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.getDirection();
   }
   public addOriginFromAddress(addressObject: any) {
-    console.log("origin");
     this.origin = {
       location: {
         lat: addressObject.geometry.location.lat(),
@@ -342,7 +338,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.getDirection();
   }
   public addDestinationFromAddress(addressObject: any) {
-    console.log("destination");
     this.destination = {
       location: {
         lat: addressObject.geometry.location.lat(),
@@ -653,7 +648,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.tabset.select('place');
     const request = {
       placeId: newPlaceId,
-      fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo']
+      fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo', 'website']
     };
     const service = new google.maps.places.PlacesService(this.controlmap);
     service.getDetails(request, (results, status) => {
@@ -674,9 +669,10 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
             saturday: results.opening_hours && results.opening_hours.weekday_text[5],
             sunday: results.opening_hours && results.opening_hours.weekday_text[6]
           },
-          url: results.url
+          url: results.url,
+          website: results.website
         };
-        console.log('currentplace ' + this.currentPlace);
+        console.log(results);
         this.currentPlace.marker.address = this.currentPlace.address;
       }
     });
