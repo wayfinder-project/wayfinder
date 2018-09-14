@@ -22,6 +22,7 @@ import { TripListComponent } from './components/trip-list/trip-list.component';
 import { ChecklistModalComponent } from './components/checklist-modal/checklist-modal.component';
 import { EditTripComponent } from './components/edit-trip/edit-trip.component';
 import { CreateTripComponent } from './components/create-trip/create-trip.component';
+import { MarkeroptionsModalComponent } from './components/markeroptions-modal/markeroptions-modal.component';
 import { PlacesAutocompleteDirective } from './directives/places-autocomplete.directive';
 
 @NgModule({
@@ -38,6 +39,7 @@ import { PlacesAutocompleteDirective } from './directives/places-autocomplete.di
     ChecklistModalComponent,
     EditTripComponent,
     CreateTripComponent,
+    MarkeroptionsModalComponent,
     PlacesAutocompleteDirective,
   ],
   imports: [

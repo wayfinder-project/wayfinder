@@ -10,7 +10,7 @@ a {
     top: -40px; /*Offsets the top navbar 40px from the top of the viewport*/
 }
 .navbar-container-color {
-    background-color: rgba(125, 170, 146, 0.466);
+    background-color: rgba(125, 170, 146, 0.301);
 }
 .logo-config {
     height: 35px;

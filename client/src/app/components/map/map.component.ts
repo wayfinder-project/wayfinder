@@ -12,6 +12,8 @@ import { Place } from '../../models/place.model';
 import { Circle } from '../../models/circle.model';
 import { Trip } from '../../models/trip.model';
 import { GeocodeService } from '../../services/geocode/geocode.service';
+import { MarkeroptionsModalComponent } from '../markeroptions-modal/markeroptions-modal.component';
+import { WaypointModel } from '../../models/mapwaypoint.model';
 
 
 declare var google: any;
@@ -93,6 +95,8 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   mapCircle: AgmCircle;
   @ViewChild(NgbTabset)
   private tabset: NgbTabset;
+  @ViewChild(MarkeroptionsModalComponent)
+  private markerModal: MarkeroptionsModalComponent;
 
   @ViewChild(AnnotateMarkerModalComponent)
   annotateMarker: AnnotateMarkerModalComponent;
@@ -124,7 +128,10 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   public bigLegInfo: any;
   public legInfo: any; // single leg info
 
+  public deletedWayPointIndex = -1; // Index of recently deleted waypoint
+
   ngOnInit() {
+
   }
 
   // get address autocomplete result
@@ -135,7 +142,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
       // this.addrKeys = Object.keys(addrObj);
       console.log(place);
       this.addOriginFromAddress(place);
-     
+
 
     });
   }
@@ -256,7 +263,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
           lat: event.coords.lat,
           lng: event.coords.lng,
         },
-        waypointId: this.waypoints.length - 1,
+        waypointId: this.directions.routes[0].waypoint_order.length,
         draggable: true,
         icon: image
       };
@@ -353,11 +360,28 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   //   this.getDirection();
   // }
 
-  setMarkerLabels(direction) {
-    console.log(this.waypoints.length);
+  setMarkerLabels(direction: any) {
+    if (this.deletedWayPointIndex > -1) {
+      this.normalizeMarkerId();
+    }
     for (let i = 0; i < this.waypoints.length; i++) {
+      if (i > 0 && this.waypoints[i].waypointId === this.waypoints[i - 1].waypointId) {
+        this.waypoints[i].waypointId++; // ..Checks for duplicate waypointId. Duplicates happen if user clicks too fast.
+      }
+      // Sets the label to the index of the waypoint in the waypoint_order array in the direction object.
       this.waypoints[i].label = '' + (direction.routes[0].waypoint_order.indexOf(this.waypoints[i].waypointId) + 1);
     }
+  }
+
+  // When waypoint id is deleted, makes sure waypointId's can still be found in waypoint_order array
+  // By making sure waypointId's are less than waypoint_order.lenght.
+  normalizeMarkerId() {
+    for (let i = 0; i < this.waypoints.length; i++) {
+      if (this.waypoints[i].waypointId >= this.deletedWayPointIndex) {
+        this.waypoints[i].waypointId -= 1;
+      }
+    }
+    this.deletedWayPointIndex = -1;
   }
 
   // Creates a direction based on origin and destination. based on AGM Direction api
@@ -410,8 +434,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   onResponse(response) {
     if (response.status === 'ZERO_RESULTS') {
       alert('this route is IMPOSSIBLE!');
-      this.waypoints.pop();
-      this.markers.pop();
     }
   }
 
@@ -426,16 +448,22 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     const routeLegs = this.directions.routes[0].legs;
     this.legs = [];
     let totalDistance = 0;
+    let totalDuration = 0;
     for (let i = 0; i < routeLegs.length; i++) {
       this.legs.push(routeLegs[i]);
       totalDistance += routeLegs[i].distance.value;
+      totalDuration += routeLegs[i].duration.value;
     }
     this.polyPoints = [];
     totalDistance *= 0.000621371192;
     totalDistance = this.roundTo(totalDistance, 2);
-    this.bigLegInfo = totalDistance;
+    this.bigLegInfo = {distance: {text: totalDistance}, duration: {text: this.ConvertSectoDay(totalDuration)}, steps: [] };
     this.destroyLongLeg();
     this.setMarkerLabels(this.directions);
+    this.legInfo = null;
+    if (this.tabset.activeId === 'directions') {
+      this.tabset.select('routes');
+    }
   }
   destroyLongLeg() {
     if (this.longLeg) {
@@ -478,23 +506,34 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.tabset.select('directions');
   }
 
+  clearLegs() {
+    this.destroyLongLeg();
+    this.polyPoints = [];
+    this.renderOptions.polylineOptions.strokeColor = '#6fa5fcD3';
+    this.legInfo = null;
+    this.tabset.select('routes');
+  }
+
   totalLegsButton() {
     const end = this.destination;
     const start = this.origin;
     this.controlmap.fitBounds({
-      east: Math.max(start.location.lat, end.location.lng),
-      north: Math.max(start.location.lat, end.location.lat),
-      west: Math.min(start.location.lng, end.location.lng),
-      south: Math.min(start.location.lat, end.location.lat)
+      east: this.directions.routes[0].bounds.b.f,
+      north: this.directions.routes[0].bounds.f.f,
+      west: this.directions.routes[0].bounds.b.b,
+      south: this.directions.routes[0].bounds.f.b
     });
     this.polyPoints = [];
     this.destroyLongLeg();
     const pathLength = this.directions.routes[0].overview_path.length;
-
-    for (let q = 0; q < pathLength; q++) {
-      const pathPoint = this.directions.routes[0].overview_path[q];
-      this.polyPoints.push({ lat: pathPoint.lat(), lng: pathPoint.lng() });
+    this.legInfo = {distance: this.bigLegInfo.distance, duration: this.bigLegInfo.duration, steps: []};
+    for (let i = 0; i < this.directions.routes[0].legs.length; i++) {
+      for (let q = 0; q < this.directions.routes[0].legs[i].steps.length; q++) {
+        this.legInfo.steps.push({instructions: this.directions.routes[0].legs[i].steps[q].instructions});
+      }
     }
+    // this.legInfo = this.bigLegInfo;
+    this.tabset.select('directions');
 
   }
 
@@ -708,7 +747,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   rightTest(index: number) {
-    console.log('a');
   }
 
 
@@ -729,10 +767,41 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.annotateMarker.open(this.currentPlace.marker);
   }
 
+  openOptionsModal(index: number): void {
+    this.markerModal.open(this.waypoints[index]);
+  }
+
+  deleteMarker(marker: Marker) {
+    const waypointIndex = this.waypoints.indexOf(marker);
+    this.deletedWayPointIndex = waypointIndex;
+    this.waypoints.splice(waypointIndex, 1);
+    this.getDirection();
+  }
+
+
+
+
+
   /**
    * Zooms the map in on the given circle.
    */
   zoomToCircle(circle: AgmCircle): void {
     circle.getBounds().then(bounds => this.controlmap.fitBounds(bounds));
   }
+
+  ConvertSectoDay(seconds: number) {
+        const day = Math.round(seconds / (24 * 3600));
+        seconds = seconds % (24 * 3600);
+        const hour = Math.round(seconds / 3600);
+        seconds %= 3600;
+        const minutes = Math.round(seconds / 60);
+        seconds %= 60;
+        if (day > 0) {
+          return day + ' day(s) ' + hour + ' hour(s)';
+        } else if (hour > 0) {
+          return hour + ' hours(s) ' + minutes + ' minutes(s)';
+        } else {
+          return minutes + ' min(s)';
+        }
+    }
 }
