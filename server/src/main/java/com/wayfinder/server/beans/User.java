@@ -1,8 +1,11 @@
 package com.wayfinder.server.beans;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -130,7 +133,8 @@ public class User implements UserDetails {
 	}
 
 	public List<Trip> getTrips() {
-		return trips;
+		Set<Trip> tripSet = new LinkedHashSet<>(trips);
+		return new ArrayList<>(tripSet);
 	}
 
 	public void setTrips(List<Trip> trips) {
