@@ -254,13 +254,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   // Adds a waypoint to the map
   public addWaypoint(event: any) {
     console.log("wat");
-    let newAddress: string;
-    this.geocodeService.reverseGeocode(event.coords).subscribe(
-      T => {
-        newAddress = T[0].formatted_address;
-        //console.log(T);
-      }
-    )
     if (this.origin.location != null && this.destination.location != null) {
       const image: any = {
         url: 'assets/images/greenmarker.png',
@@ -273,10 +266,11 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
         },
         waypointId: this.directions.routes[0].waypoint_order.length,
         draggable: true,
-        icon: image,
-        address: newAddress
+        icon: image
       };
       this.waypoints.push(way);
+      this.getReverseGeocode(event.coords, way);
+      console.log(this.waypoints);
     } else {
       if (this.origin.location == null) {
         this.origin = {
@@ -285,9 +279,9 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
             lng: event.coords.lng
           },
           draggable: true,
-          label: 'S',
-          address: newAddress
+          label: 'S'
         };
+        this.getReverseGeocode(event.coords, this.origin);
       } else if (this.destination.location == null) {
         this.destination = {
           location: {
@@ -295,12 +289,22 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
             lng: event.coords.lng
           },
           draggable: true,
-          label: 'E',
-          address: newAddress
+          label: 'E'
         };
+        this.getReverseGeocode(event.coords, this.destination);
       }
     }
     this.getDirection();
+  }
+  getReverseGeocode(coords:google.maps.LatLng, marker: Marker): string {
+    let newAddress: string;
+    this.geocodeService.reverseGeocode(coords).subscribe(
+      T => {
+        newAddress = T[0].formatted_address;
+        marker.address = newAddress;
+      }
+    )
+    return newAddress
   }
 
   public addWaypointFromAddress(addressObject: any) {
