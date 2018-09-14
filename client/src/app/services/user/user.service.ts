@@ -41,7 +41,6 @@ export class UserService {
       ? of(this.currentUser)
       : this.http
           .get<UserWithId>(environment.apiUrl + '/login')
-          .pipe(tap(console.log))
           .pipe(tap(user => (this.currentUser = user)));
   }
 
