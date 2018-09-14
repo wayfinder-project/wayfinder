@@ -431,6 +431,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   // Gets called when a marker(waypoint) is dragged.
   moveWaypoint(marker: Marker, event: any) {
     marker.location = { lat: event.coords.lat, lng: event.coords.lng };
+    this.getReverseGeocode(event.coords, marker);
     this.currentMarkers = [];
     this.currentPlace = null;
     this.circle = null;
