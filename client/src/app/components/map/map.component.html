@@ -2,6 +2,7 @@
   <div class="form-group row ">
     <!-- <div class="col-1"></div> -->
     <div class="col-3 " style="padding-left: 30px">
+      <input type="text" class="form-control form-control-lg" [(ngModel)]="trip.title" placeholder="Trip title" aria-label="Trip title" required>
       <ngb-tabset>
         <br>
         <ngb-tab>
@@ -96,7 +97,7 @@
           <ng-template ngbTabTitle> <span class="tab">Route</span></ng-template>
           <ng-template ngbTabContent>
             <br>
-            <h3>Routes</h3> 
+            <h3>Routes</h3>
             <br>
             <br>
             <button class="btn" *ngIf="legs.length > 1" (click)="totalLegsButton()">{{bigLegInfo.distance.text}} mi</button>

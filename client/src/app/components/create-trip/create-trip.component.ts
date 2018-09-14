@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 })
 export class CreateTripComponent implements OnInit {
   trip: Trip = {
+    title: 'Untitled trip',
     creationDate: new Date().toISOString(),
     route: {
       origin: null,
