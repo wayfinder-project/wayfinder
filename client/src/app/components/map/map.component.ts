@@ -131,7 +131,8 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   public deletedWayPointIndex = -1; // Index of recently deleted waypoint
 
   ngOnInit() {
-
+    /* this.trip = {creationDate: '', route: { origin: null ,
+    destination: null, waypoints: []}, pointsOfInterest: [], checklist: {items: []}}; */
   }
 
   // get address autocomplete result
@@ -799,7 +800,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
         if (day > 0) {
           return day + ' day(s) ' + hour + ' hour(s)';
         } else if (hour > 0) {
-          return hour + ' hours(s) ' + minutes + ' minutes(s)';
+          return hour + ' hour(s) ' + minutes + ' minute(s)';
         } else {
           return minutes + ' min(s)';
         }
