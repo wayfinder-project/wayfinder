@@ -15,10 +15,12 @@ export interface Marker {
 }
 
 export function markerToWaypoint(marker: Marker): Waypoint {
+  console.log(parseInt(marker.label));
   return {
     latitude: marker.location.lat,
     longitude: marker.location.lng,
-    placeId: marker.placeId
+    placeId: marker.placeId,
+    id: parseInt(marker.label)
   };
 }
 

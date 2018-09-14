@@ -8,10 +8,10 @@
   <div class="modal-body col-12">
     <div class="container-fluid">
       <div class="form-group">
-        <ng-container *ngFor="let a of notes; let i = index; trackBy:trackBy">
+        <ng-container *ngFor="let a of comments; let i = index; trackBy:trackBy">
           <div class="row">
             <div class="col-9">
-          <textarea class="form-control" id="exampleFormControlTextarea1" rows="2" [(ngModel)]="notes[i]"></textarea>
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="2" [(ngModel)]="comments[i]"></textarea>
           </div>
           <button class="btn btn-primary col-2" (click)="deleteNote(i)">Remove</button>
           </div>
