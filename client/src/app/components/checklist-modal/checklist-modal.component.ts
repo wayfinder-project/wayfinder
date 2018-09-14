@@ -32,7 +32,9 @@ export class ChecklistModalComponent implements OnInit {
   constructor(private modalService: NgbModal) {}
 
   ngOnInit() {
-    this.refreshItems();
+    if (this.checklist) {
+      this.refreshItems();
+    }
   }
 
   addItem(): void {
