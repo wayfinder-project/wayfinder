@@ -17,6 +17,13 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './utils/jwt.interceptor';
 import { ErrorInterceptor } from './utils/error.interceptor';
 import { UserRegistrationComponent } from './components/user-registration/user-registration.component';
+import { AnnotateMarkerModalComponent } from './components/annotate-marker-modal/annotate-marker-modal.component';
+import { TripListComponent } from './components/trip-list/trip-list.component';
+import { ChecklistModalComponent } from './components/checklist-modal/checklist-modal.component';
+import { EditTripComponent } from './components/edit-trip/edit-trip.component';
+import { CreateTripComponent } from './components/create-trip/create-trip.component';
+import { MarkeroptionsModalComponent } from './components/markeroptions-modal/markeroptions-modal.component';
+import { PlacesAutocompleteDirective } from './directives/places-autocomplete.directive';
 
 @NgModule({
   declarations: [
@@ -26,7 +33,14 @@ import { UserRegistrationComponent } from './components/user-registration/user-r
     NavbarComponent,
     HomeComponent,
     UserpageComponent,
-    UserRegistrationComponent
+    UserRegistrationComponent,
+    AnnotateMarkerModalComponent,
+    TripListComponent,
+    ChecklistModalComponent,
+    EditTripComponent,
+    CreateTripComponent,
+    MarkeroptionsModalComponent,
+    PlacesAutocompleteDirective,
   ],
   imports: [
     AgmCoreModule.forRoot({

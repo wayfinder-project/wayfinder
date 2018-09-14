@@ -1,0 +1,28 @@
+<ng-template #content let-dismiss="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Add Notes</h4>
+    <button type="button" class="close" aria-label="Close" (click)="dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body col-12">
+    <div class="container-fluid">
+      <div class="form-group">
+        <ng-container *ngFor="let a of comments; let i = index; trackBy:trackBy">
+          <div class="row">
+            <div class="col-9">
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="2" [(ngModel)]="comments[i]"></textarea>
+          </div>
+          <button class="btn btn-primary col-2" (click)="deleteNote(i)">Remove</button>
+          </div>
+          <br>
+        </ng-container>
+        <button class="btn btn-primary" (click)="addNote()">Add Notes</button>
+      </div>
+
+    </div>
+  </div>
+  <div class=" modal-footer ">
+    <button type="button " class="btn btn-outline" (click)="closeModal() ">Submit</button>
+  </div>
+</ng-template>

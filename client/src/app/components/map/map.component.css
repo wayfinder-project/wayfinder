@@ -12,3 +12,12 @@
   width: 100%;;
   overflow-y:auto;
 }
+.input-group-text, .btn{
+  background-color:#5F464B;
+  color:white
+}
+
+
+.tab{
+  color:#5F464B
+}

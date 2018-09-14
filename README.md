@@ -48,7 +48,7 @@ users alike.
 - **route**: the path that the user takes from their starting point to their
   destination
 - **waypoint**: a single stop along a route. The starting point and
-  destination are considered waypoints as well.
+  destination are not considered waypoints in a strict sense.
 - **leg**: a portion of the route between two adjacent waypoints
 
 ## Information for developers
@@ -157,6 +157,7 @@ is, properties not explicitly marked as optional may not be null.
 ```ts
 {
   id?: number;
+  title: string;
   /**
    * As a UTC timestamp in the format "yyyy-MM-dd'T'HH:mm:ss'Z'"; e.g.
    * "2018-09-06T21:45:45Z".
@@ -168,6 +169,10 @@ is, properties not explicitly marked as optional may not be null.
    * particular order.
    */
   pointsOfInterest: AnnotatedWaypoint[];
+  /**
+   * The checklist associated with the trip.
+   */
+  checklist: Checklist;
 }
 ```
 
@@ -176,28 +181,12 @@ is, properties not explicitly marked as optional may not be null.
 ```ts
 {
   id?: number;
+  origin: Waypoint;
+  destination: Waypoint;
   /**
    * Always ordered from start to finish.
    */
-  legs: Leg[];
-}
-```
-
-##### `Leg`
-
-```ts
-{
-  id?: number;
-  start: Waypoint;
-  end: Waypoint;
-  /**
-   * In seconds.
-   */
-  travelTime: number;
-  /**
-   * In meters.
-   */
-  distance: number;
+  waypoints: Waypoint[];
 }
 ```
 
@@ -230,6 +219,46 @@ is, properties not explicitly marked as optional may not be null.
    * The URL of an icon representing the type of this waypoint.
    */
   iconUrl: string;
+}
+```
+
+##### `Checklist`
+
+```ts
+{
+  id?: number;
+  /**
+   * The items contained in the checklist.
+   */
+  items: ChecklistItem[];
+}
+```
+
+##### `ChecklistItem`
+
+```ts
+{
+  id?: number;
+  /**
+   * The title (contents) of the item (e.g. "pack phone charger").
+   */
+  title: string;
+  status: ChecklistItemStatus;
+}
+```
+
+##### `ChecklistItemStatus` (enum)
+
+```ts
+{
+  /**
+   * The item has been created but not completed.
+   */
+  Created = 'CREATED',
+  /**
+   * The item has been completed.
+   */
+  Done = 'DONE',
 }
 ```
 
@@ -355,10 +384,10 @@ your choosing (e.g. a local Tomcat server).
 The client code is built and deployed using NPM. To insure that all
 dependencies are properly set up, navigate to the `client` directory and run
 `npm install`. To test the project locally, run `ng serve`, which will start
-a local server on port 4200 to run the app. To manually deploy the front-end
-to GitHub pages, run `npm deploy` and enter your GitHub credentials if
-prompted. Alternatively, run `ng build` or `ng build --prod` to simply build
-the project without deploying it.
+a local server on port 4200 to run the app.
+
+The client code is (once again) deployed onto GitHub pages, so all that is
+needed to deploy it is to run `npm run deploy` in the client directory.
 
 If you run the code locally, be aware that certain environment variables may
 need to be set for the project to function properly (see the section on

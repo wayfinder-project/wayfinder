@@ -74,7 +74,7 @@ public class ErrorController implements AccessDeniedHandler, AuthenticationEntry
 	 */
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ResponseError> handleException(HttpMessageNotReadableException e) {
-		return new ResponseError("Invalid request body format.").toEntity(HttpStatus.BAD_REQUEST);
+		return new ResponseError("Invalid request body format.", e.getMessage()).toEntity(HttpStatus.BAD_REQUEST);
 	}
 
 	/**

@@ -40,6 +40,12 @@ export class UserRegistrationComponent implements OnInit {
     };
     const password = this.password;
 
+    this.username = "";
+    this.firstName = "";
+    this.lastName = "";
+    this.email = "";
+    this.password = "";
+
     this.modal.close();
     this.close.emit({ user, password });
   }

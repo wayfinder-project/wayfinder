@@ -78,19 +78,10 @@ public class UserService {
 		if (byUsername != null && byUsername.getId() != existing.getId()) {
 			throw new UserAlreadyExistsException(user.getUsername());
 		}
-		// Just make sure we save the given user object's password data to avoid
-		// leaking it to the client (we'll replace it once we're done updating).
-		byte[] salt = user.getPasswordSalt();
-		byte[] hash = user.getPasswordHash();
 		user.setPasswordSalt(existing.getPasswordSalt());
 		user.setPasswordHash(existing.getPasswordHash());
 
-		userRepo.save(user);
-		// Replace the original password data.
-		user.setPasswordSalt(salt);
-		user.setPasswordHash(hash);
-
-		return user;
+		return userRepo.save(user);
 	}
 
 	/**

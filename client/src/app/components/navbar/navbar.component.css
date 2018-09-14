@@ -10,11 +10,21 @@ a {
     top: -40px; /*Offsets the top navbar 40px from the top of the viewport*/
 }
 .navbar-container-color {
-    background-color: #7DAA92;
+    background-color: rgba(125, 170, 146, 0.301);
 }
 .logo-config {
-    height: 65px;
-    width: 65px;
+    height: 35px;
+    width: 35px;
+}
+.logo-config2 {
+    position: absolute;
+    top: -3.4%;
+    left: -.7%;
+    height:10%;
+    width:8%;
+    display:block;
+    z-index:0;
+
 }
 .font-mont{
     font-family: 'Montserrat', sans-serif;
@@ -25,6 +35,7 @@ a {
 }
 .web-title {
     font-size:30px;
+    z-index:1
     }
 .web-item {
     font-size:20px;
