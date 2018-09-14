@@ -442,7 +442,6 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   directionChanged(event: any) {
     this.directions = event;
     console.log(this.trip);
-    this.trip.route = this.directions.routes[0]; // cache the directions on the map screen every time it's updated
     console.log(this.directions);
     console.log(this.trip);
     this.directionInfo = this.directions.routes[0].legs[0].distance.text;
