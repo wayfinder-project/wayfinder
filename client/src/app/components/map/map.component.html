@@ -5,35 +5,41 @@
       <ngb-tabset>
         <br>
         <ngb-tab>
-            <ng-template ngbTabTitle> <span class="tab">Search</span></ng-template>
-            <ng-template ngbTabContent>
-                <div class="input-container">
-                  <br>
-                  <div class="input-group input-group-md mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">Origin: </span>
-                    </div>
-                    <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm"
-                    name="origin" appPlacesAutocomplete (select)="setOrigin($event)" placeholder="Type to search..">
-                  </div>
-                  <div class="input-group input-group-md mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">Destination: </span>
-                    </div>
-                    <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm"
-                    name="destination" appPlacesAutocomplete (select)="setDestination($event)" placeholder="Type to search..">
-                  </div>
-                   
-                    <!-- <input type="text" appPlacesAutocomplete (select)="setWaypoint($event)" placeholder="Type to search.."> -->
-                    <!-- Displaying the contents of the address object received from our event emitter -->
-                    <!-- <ul style="list-style-type: none;">
+          <ng-template ngbTabTitle> <span class="tab">Search</span></ng-template>
+          <ng-template ngbTabContent>
+            <div class="input-container">
+              <br>
+              <div class="input-group input-group-md mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Origin: </span>
+                </div>
+                <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="origin" appPlacesAutocomplete
+                  (select)="setOrigin($event)" placeholder="Type to search..">
+              </div>
+              <div class="input-group input-group-md mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Destination: </span>
+                </div>
+                <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="destination" appPlacesAutocomplete
+                  (select)="setDestination($event)" placeholder="Type to search..">
+              </div>
+
+              <div class="input-group input-group-md mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Waypoints: </span>
+                </div>
+                <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm"  appPlacesAutocomplete name="waypoint" (addressSelect)="setWaypoint($event)" placeholder="Type to search waypoint..">
+              </div>
+              <!-- <input type="text" appPlacesAutocomplete (select)="setWaypoint($event)" placeholder="Type to search.."> -->
+              <!-- Displaying the contents of the address object received from our event emitter -->
+              <!-- <ul style="list-style-type: none;">
                       <li *ngFor="let key of addrKeys">
                         <span style="font-weight: bold">{{key}}</span>: <span>{{addr[key]}}</span>
                       </li>
                     </ul> -->
-                  </div>
+            </div>
 
-            </ng-template>
+          </ng-template>
 
         </ngb-tab>
         <ngb-tab>
@@ -58,12 +64,11 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text">Radius (Meters):</span>
                 </div>
-                <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm"
-                  [(ngModel)]="circleRadius">
+                <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" [(ngModel)]="circleRadius">
               </div>
               <div class="col-12 z1 bg-light" *ngIf="currentPlace != null">
                 <h5>{{currentPlace.name}}</h5>
-                <br> Rating: {{currentPlace.rating}}
+                Rating: {{currentPlace.rating}}
                 <br>
                 <ng-container *ngIf="currentPlace.address">
                   Open Now
@@ -76,19 +81,24 @@
                 <br>
                 <a href={{currentPlace.url}}>Google Maps</a>
                 <br>
+                <br>
                 <button class="btn btn-primary" (click)="saveMarker()">Save Marker</button>
                 <br>
-                <a (click)="openAnnotationModal()" href="#modalAnnotate" data-toggle="modal">Add Notes</a>
+                <br>
+      <!--           <a (click)="openAnnotationModal()" href="#modalAnnotate" data-toggle="modal">Add Notes</a> -->
                 <button class="btn btn-primary" (click)="openAnnotationModal()">Add Notes</button>
               </div>
             </ng-template>
           </div>
         </ngb-tab>
-        <ngb-tab>
+        <ngb-tab id="routes">
           <ng-template ngbTabTitle> <span class="tab">Route</span></ng-template>
           <ng-template ngbTabContent>
             <br>
-            <h3>Routes</h3>
+            <h3>Routes</h3> 
+            <br>
+            <br>
+            <button class="btn" *ngIf="legs.length > 1" (click)="totalLegsButton()">{{bigLegInfo.distance.text}} mi</button>
             <button class="btn" *ngFor="let l of legs, let i = index" (click)="legButton(i)">
               {{legs[i].distance.text}}
             </button>
@@ -112,10 +122,13 @@
                   <div>
                     Directions:
                     <div *ngFor="let s of legInfo.steps, let i = index">
-                      <hr> Step {{i}} :
+                      <hr> Step {{i+1}} :
                       <span [innerHtml]="legInfo.steps[i].instructions"></span>
                     </div>
                   </div>
+                </div>
+                <div style="padding-top:22px">
+                  <button *ngIf="legInfo" class="btn" (click)="clearLegs()">Unselect</button>
                 </div>
                 <div *ngIf="!legInfo">
                   <h3>Nothing Selected</h3>
@@ -134,25 +147,21 @@
         <agm-direction *ngIf="longLeg" [origin]="longLeg.origin" [destination]="longLeg.destination " [renderOptions]="renderOptionsForLongLeg"
           [visible]="longLeg.visible">
         </agm-direction>
-        <agm-marker *ngIf="origin.location != null" [latitude]="origin.location.lat" [longitude]="origin.location.lng"
-          [markerDraggable]="origin.draggable" [iconUrl]="origin.icon" [label]="origin.label" (markerClick)="showMarkerPlaces(origin)"
-          (dragEnd)="moveWaypoint(origin, $event)">
+        <agm-marker *ngIf="origin.location != null" [latitude]="origin.location.lat" [longitude]="origin.location.lng" [markerDraggable]="origin.draggable"
+          [iconUrl]="origin.icon" [label]="origin.label" (markerClick)="showMarkerPlaces(origin)" (dragEnd)="moveWaypoint(origin, $event)">
         </agm-marker>
         <agm-marker *ngIf="destination.location != null" [latitude]="destination.location.lat" [longitude]="destination.location.lng"
           [markerDraggable]="destination.draggable" [iconUrl]="destination.icon" [label]="destination.label" (markerClick)="showMarkerPlaces(destination)"
           (dragEnd)="moveWaypoint(destination, $event)">
         </agm-marker>
-        <agm-marker *ngFor="let m of waypoints; let i = index" [latitude]="m.location.lat" [longitude]="m.location.lng"
-          [markerDraggable]="m.draggable" [iconUrl]="m.icon" [label]="m.label" (markerClick)="showMarkerPlaces(m)"
-          (dragEnd)="moveWaypoint(m, $event)">
+        <agm-marker *ngFor="let m of waypoints; let i = index" [latitude]="m.location.lat" [longitude]="m.location.lng" [markerDraggable]="m.draggable" (markerClick)="openOptionsModal(i)"
+          [iconUrl]="m.icon" [label]="m.label" (markerClick)="showMarkerPlaces(m)" (dragEnd)="moveWaypoint(m, $event)">
         </agm-marker>
-        <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow"
-          [latitude]="m.location.lat" [longitude]="m.location.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon"
-          (markerClick)="getPlaceDetails(m.placeId, m)">
+        <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.location.lat"
+          [longitude]="m.location.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
         </agm-marker>
-        <agm-marker *ngFor="let m of savedMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow"
-          [latitude]="m.location.lat" [longitude]="m.location.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon"
-          (markerClick)="getPlaceDetails(m.placeId, m)">
+        <agm-marker *ngFor="let m of savedMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.location.lat"
+          [longitude]="m.location.lng" [markerDraggable]="m.markerDraggable" [iconUrl]="m.updateIcon" (markerClick)="getPlaceDetails(m.placeId, m)">
         </agm-marker>
 
         <agm-polyline [strokeColor]="'green'" [strokeWeight]="10">
@@ -160,75 +169,71 @@
           </agm-polyline-point>
         </agm-polyline>
 
-        <agm-circle *ngIf="circle" [latitude]="circle.lat" [longitude]="circle.lng" [(radius)]="circle.radius"
-          [fillColor]="circle.fillColor" [circleDraggable]="false" [editable]="false" (centerChange)="zoomToCircle(circle)"
-          (radiusChange)="zoomToCircle(circle)">
+        <agm-circle *ngIf="circle" [latitude]="circle.lat" [longitude]="circle.lng" [(radius)]="circle.radius" [fillColor]="circle.fillColor"
+          [circleDraggable]="false" [editable]="false" (centerChange)="zoomToCircle(circle)" (radiusChange)="zoomToCircle(circle)">
         </agm-circle>
       </agm-map>
       <div style="padding-top:20px">
-      <button (click)="saveTrip()" *ngIf="false || directions" class="btn btn-outline-primary">Save Trip</button>
-    </div>
-    <!--   <div class="col-1"></div> -->
-    <button (click)="saveTrip()" *ngIf="false || directions" class="btn btn-outline-primary">save trip</button>
-    <div class="input-container">
-      <input type="text" appPlacesAutocomplete (addressSelect)="setOrigin($event)" placeholder="Type to search origin..">
-      <input type="text" appPlacesAutocomplete (addressSelect)="setDestination($event)" placeholder="Type to search destination..">
-      <input type="text" appPlacesAutocomplete (addressSelect)="setWaypoint($event)" placeholder="Type to search waypoint..">
-      <!-- <input type="text" appPlacesAutocomplete (select)="setWaypoint($event)" placeholder="Type to search.."> -->
-      <!-- Displaying the contents of the address object received from our event emitter -->
-      <!-- <ul style="list-style-type: none;">
+        <button (click)="saveTrip()" *ngIf="false || directions" class="btn btn-outline-primary">Save Trip</button>
+      </div>
+      <!--   <div class="col-1"></div> -->
+      <!-- <div class="input-container">
+ -->
+        <!-- <input type="text" appPlacesAutocomplete (select)="setWaypoint($event)" placeholder="Type to search.."> -->
+        <!-- Displaying the contents of the address object received from our event emitter -->
+        <!-- <ul style="list-style-type: none;">
         <li *ngFor="let key of addrKeys">
           <span style="font-weight: bold">{{key}}</span>: <span>{{addr[key]}}</span>
         </li>
       </ul> -->
-    </div>
-    <!--   <div class="col-1"></div> -->
-   
-  </div>
-</div>
-
-<footer class="page-footer font-small teal pt-4">
-
-  <!-- Footer Text -->
-  <div class="container-fluid text-center text-md-left">
-
-    <!-- Grid row -->
-    <div class="row">
-
-      <!-- Grid column -->
-      <div class="col-md-6 mt-md-0 mt-3">
-
-        <!-- Content -->
-        <h5 class="text-uppercase font-weight-bold"></h5>
-
       </div>
-      <!-- Grid column -->
-
-      <hr class="clearfix w-100 d-md-none pb-3">
-
-      <!-- Grid column -->
-      <div class="col-md-6 mb-md-0 mb-3">
-
-        <!-- Content -->
-        <h5 class="text-uppercase font-weight-bold"></h5>
-
-
-      </div>
-      <!-- Grid column -->
+      <!--   <div class="col-1"></div> -->
 
     </div>
-    <!-- Grid row -->
-
   </div>
-  <!-- Footer Text -->
 
-  <!-- Copyright -->
-  <div class="footer-copyright text-center py-3">© 2018 Copyright:
-    <a href="https://github.com/wayfinder-project/wayfinder/blob/dev/README.md"> WayfindersUnited</a>
-  </div>
-  <!-- Copyright -->
+  <footer class="page-footer font-small teal pt-4">
 
-</footer>
+    <!-- Footer Text -->
+    <div class="container-fluid text-center text-md-left">
 
-<app-annotate-marker-modal></app-annotate-marker-modal>
-<app-markeroptions-modal (deleteMarker)='deleteMarker($event)'></app-markeroptions-modal>
+      <!-- Grid row -->
+      <div class="row">
+
+        <!-- Grid column -->
+        <div class="col-md-6 mt-md-0 mt-3">
+
+          <!-- Content -->
+          <h5 class="text-uppercase font-weight-bold"></h5>
+
+        </div>
+        <!-- Grid column -->
+
+        <hr class="clearfix w-100 d-md-none pb-3">
+
+        <!-- Grid column -->
+        <div class="col-md-6 mb-md-0 mb-3">
+
+          <!-- Content -->
+          <h5 class="text-uppercase font-weight-bold"></h5>
+
+
+        </div>
+        <!-- Grid column -->
+
+      </div>
+      <!-- Grid row -->
+
+    </div>
+    <!-- Footer Text -->
+
+    <!-- Copyright -->
+    <div class="footer-copyright text-center py-3">© 2018 Copyright:
+      <a href="https://github.com/wayfinder-project/wayfinder/blob/dev/README.md"> WayfindersUnited</a>
+    </div>
+    <!-- Copyright -->
+
+  </footer>
+
+  <app-annotate-marker-modal></app-annotate-marker-modal>
+  <app-markeroptions-modal (deleteMarker)='deleteMarker($event)'></app-markeroptions-modal>
