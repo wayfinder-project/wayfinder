@@ -1,11 +1,8 @@
 package com.wayfinder.server.beans;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,6 +18,8 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -68,6 +67,7 @@ public class User implements UserDetails {
 	 * date/time.
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@Fetch(FetchMode.SELECT)
 	@OrderBy("creationDate")
 	@NotNull
 	@Valid
@@ -133,8 +133,7 @@ public class User implements UserDetails {
 	}
 
 	public List<Trip> getTrips() {
-		Set<Trip> tripSet = new LinkedHashSet<>(trips);
-		return new ArrayList<>(tripSet);
+		return trips;
 	}
 
 	public void setTrips(List<Trip> trips) {
