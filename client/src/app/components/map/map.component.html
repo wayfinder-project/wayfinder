@@ -154,7 +154,7 @@
           [markerDraggable]="destination.draggable" [iconUrl]="destination.icon" [label]="destination.label" (markerClick)="showMarkerPlaces(destination)"
           (dragEnd)="moveWaypoint(destination, $event)">
         </agm-marker>
-        <agm-marker *ngFor="let m of waypoints; let i = index" [latitude]="m.location.lat" [longitude]="m.location.lng" [markerDraggable]="m.draggable" (markerClick)="openOptionsModal(i)"
+        <agm-marker *ngFor="let m of waypoints; let i = index" [latitude]="m.location.lat" [longitude]="m.location.lng" [markerDraggable]="m.draggable" 
           [iconUrl]="m.icon" [label]="m.label" (markerClick)="showMarkerPlaces(m)" (dragEnd)="moveWaypoint(m, $event)">
         </agm-marker>
         <agm-marker *ngFor="let m of currentMarkers; let i = index" [title]="m.label" [openInfoWindow]="m.infoWindow" [latitude]="m.location.lat"
@@ -175,7 +175,13 @@
         </agm-circle>
       </agm-map>
       <div style="padding-top:20px">
-        <button (click)="saveTrip()" *ngIf="false || directions" class="btn btn-outline-primary">Save Trip</button>
+        <button (click)="openChecklistModal()" class="btn btn-outline">Open Checklist</button>
+        <span style="padding-left:20px">
+          <button (click)="saveTrip()" *ngIf="false || directions" class="btn btn-outline">Save Trip</button>
+          <span style="padding-left:20px">
+            <button  *ngIf="selectedWaypoint" (click)="deleteMarker()"  class="btn btn-outline">Delete Marker</button>
+          </span>
+        </span>
       </div>
       <!--   <div class="col-1"></div> -->
       <!-- <div class="input-container">
@@ -238,3 +244,4 @@
 
   <app-annotate-marker-modal></app-annotate-marker-modal>
   <app-markeroptions-modal (deleteMarker)='deleteMarker($event)'></app-markeroptions-modal>
+  <app-checklist-modal></app-checklist-modal>

@@ -14,6 +14,8 @@ import { Trip } from '../../models/trip.model';
 import { GeocodeService } from '../../services/geocode/geocode.service';
 import { MarkeroptionsModalComponent } from '../markeroptions-modal/markeroptions-modal.component';
 import { WaypointModel } from '../../models/mapwaypoint.model';
+import { ChecklistModalComponent } from '../checklist-modal/checklist-modal.component';
+import { Checklist, ChecklistItemStatus } from '../../models/checklist.model';
 
 
 declare var google: any;
@@ -97,7 +99,8 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   private tabset: NgbTabset;
   @ViewChild(MarkeroptionsModalComponent)
   private markerModal: MarkeroptionsModalComponent;
-
+  @ViewChild(ChecklistModalComponent)
+  private checklistmodal: ChecklistModalComponent;
   @ViewChild(AnnotateMarkerModalComponent)
   annotateMarker: AnnotateMarkerModalComponent;
 
@@ -127,7 +130,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
   public bigLegInfo: any;
   public legInfo: any; // single leg info
-
+  public selectedWaypoint = null;
   public deletedWayPointIndex = -1; // Index of recently deleted waypoint
 
   ngOnInit() {
@@ -461,6 +464,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.destroyLongLeg();
     this.setMarkerLabels(this.directions);
     this.legInfo = null;
+    this.selectedWaypoint = null;
     if (this.tabset.activeId === 'directions') {
       this.tabset.select('routes');
     }
@@ -732,6 +736,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   showMarkerPlaces(marker: Marker) {
+    this.selectedWaypoint = marker;
     console.log(this.directions);
     // console.log(index);
     console.log(this.legs);
@@ -771,7 +776,14 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.markerModal.open(this.waypoints[index]);
   }
 
-  deleteMarker(marker: Marker) {
+  openChecklistModal(): void {
+    console.log('a');
+    console.log(this.trip);
+    this.checklistmodal.open(this.trip.checklist);
+  }
+
+  deleteMarker() {
+    const marker = this.selectedWaypoint;
     const waypointIndex = this.waypoints.indexOf(marker);
     this.deletedWayPointIndex = waypointIndex;
     this.waypoints.splice(waypointIndex, 1);
