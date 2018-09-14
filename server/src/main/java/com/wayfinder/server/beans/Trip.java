@@ -19,6 +19,8 @@ import javax.persistence.TemporalType;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
@@ -39,6 +41,12 @@ public class Trip implements Serializable {
 	@SequenceGenerator(name = "seq_trip_id", sequenceName = "seq_trip_id")
 	@GeneratedValue(generator = "seq_trip_id", strategy = GenerationType.SEQUENCE)
 	private int id;
+	/**
+	 * The title of the trip, as defined by the user.
+	 */
+	@Column(nullable = false)
+	@NotEmpty
+	private String title;
 	/**
 	 * The date/time on which the trip was created.
 	 */
@@ -74,6 +82,14 @@ public class Trip implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public Date getCreationDate() {
@@ -117,6 +133,7 @@ public class Trip implements Serializable {
 		result = prime * result + id;
 		result = prime * result + ((pointsOfInterest == null) ? 0 : pointsOfInterest.hashCode());
 		result = prime * result + ((route == null) ? 0 : route.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
 
@@ -151,12 +168,17 @@ public class Trip implements Serializable {
 				return false;
 		} else if (!route.equals(other.route))
 			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Trip [id=" + id + ", creationDate=" + creationDate + ", route=" + route + ", pointsOfInterest="
-				+ pointsOfInterest + ", checklist=" + checklist + "]";
+		return "Trip [id=" + id + ", title=" + title + ", creationDate=" + creationDate + ", route=" + route
+				+ ", pointsOfInterest=" + pointsOfInterest + ", checklist=" + checklist + "]";
 	}
 }
