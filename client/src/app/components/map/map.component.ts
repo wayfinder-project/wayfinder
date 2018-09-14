@@ -195,31 +195,32 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     console.log(this.trip.route.waypoints);
     this.waypoints = this.trip.route.waypoints.map(waypoint => (
       {
-      location: {
-        lat: waypoint.latitude,
-        lng: waypoint.longitude,
-      },
-      icon: waypointImage,
-      draggable: true,
-      address: waypoint.address,
-      placeId: waypoint.placeId
-    }));
+        location: {
+          lat: waypoint.latitude,
+          lng: waypoint.longitude,
+        },
+        icon: waypointImage,
+        draggable: true,
+        address: waypoint.address,
+        placeId: waypoint.placeId
+      }));
     console.log(this.waypoints);
     this.savedMarkers = this.trip.pointsOfInterest.map(marker => (
       {
-      location: {
-        lat: marker.latitude,
-        lng: marker.longitude,
-      },
-      updateIcon: {
-        url: marker.iconUrl,
-        scaledSize: new google.maps.Size(30, 30)
-      },
-      draggable: true,
-      placeId: marker.placeId,
-      comments: marker.comments,
-      address: marker.address
-    }));
+        location: {
+          lat: marker.latitude,
+          lng: marker.longitude,
+        },
+        updateIcon: {
+          url: marker.iconUrl,
+          scaledSize: new google.maps.Size(30, 30)
+        },
+        draggable: true,
+        placeId: marker.placeId,
+        comments: marker.comments,
+        address: marker.address,
+        saved: true
+      }));
     this.getDirection();
     // this.setMarkerLabels(this.directions);
   }
@@ -247,7 +248,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   convertWaypoints() {
-    this.mapWaypoints = this.waypoints.map(waypoint => ({location: waypoint.location}));
+    this.mapWaypoints = this.waypoints.map(waypoint => ({ location: waypoint.location }));
   }
 
   // Adds a waypoint to the map
@@ -268,72 +269,90 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
         icon: image
       };
       this.waypoints.push(way);
+      this.getReverseGeocode(event.coords, way);
+      console.log(this.waypoints);
     } else {
       if (this.origin.location == null) {
-        this.origin = {location: {
-          lat: event.coords.lat,
-          lng: event.coords.lng
-        },
-        draggable: true,
-        label: 'S'
-      };
+        this.origin = {
+          location: {
+            lat: event.coords.lat,
+            lng: event.coords.lng
+          },
+          draggable: true,
+          label: 'S'
+        };
+        this.getReverseGeocode(event.coords, this.origin);
       } else if (this.destination.location == null) {
-        this.destination = {location: {
-          lat: event.coords.lat,
-          lng: event.coords.lng
-        },
-        draggable: true,
-        label: 'E'
-      };
+        this.destination = {
+          location: {
+            lat: event.coords.lat,
+            lng: event.coords.lng
+          },
+          draggable: true,
+          label: 'E'
+        };
+        this.getReverseGeocode(event.coords, this.destination);
       }
     }
     this.getDirection();
   }
+  getReverseGeocode(coords:google.maps.LatLng, marker: Marker): string {
+    let newAddress: string;
+    this.geocodeService.reverseGeocode(coords).subscribe(
+      T => {
+        newAddress = T[0].formatted_address;
+        marker.address = newAddress;
+      }
+    )
+    return newAddress
+  }
 
   public addWaypointFromAddress(addressObject: any) {
     // console.log(addressObject. + ' ' + event.coords.lng);
-      console.log("normal");
-      const image: any = {
-        url: 'assets/images/greenmarker.png',
-        scaledSize: new google.maps.Size(40, 40)
-      };
-      const way: Marker = {
-        location: {
-          lat: addressObject.geometry.location.lat(),
-          lng: addressObject.geometry.location.lng()
-        },
-        address: addressObject.formatted_address,
-        draggable: true,
-        icon: image,
-        waypointId: this.waypoints.length - 1
-      };
-      this.waypoints.push(way);
-      this.getDirection();
-    }
-    public addOriginFromAddress(addressObject: any) {
-      console.log("origin");
-        this.origin = {location: {
-          lat: addressObject.geometry.location.lat(),
-          lng: addressObject.geometry.location.lng()
-        },
-        draggable: true,
-        label: 'E',
-        address: addressObject.formatted_address
-      };
-      this.getDirection();
-    }
-    public addDestinationFromAddress(addressObject: any) {
-      console.log("destination");
-        this.destination = {location: {
-          lat: addressObject.geometry.location.lat(),
-          lng: addressObject.geometry.location.lng()
-        },
-        draggable: true,
-        label: 'E',
-        address: addressObject.formatted_address
-      };
-      this.getDirection();
-    }
+    console.log("normal");
+    const image: any = {
+      url: 'assets/images/greenmarker.png',
+      scaledSize: new google.maps.Size(40, 40)
+    };
+    const way: Marker = {
+      location: {
+        lat: addressObject.geometry.location.lat(),
+        lng: addressObject.geometry.location.lng()
+      },
+      address: addressObject.formatted_address,
+      draggable: true,
+      icon: image,
+      waypointId: this.waypoints.length - 1
+    };
+    this.waypoints.push(way);
+    this.getDirection();
+  }
+  public addOriginFromAddress(addressObject: any) {
+    console.log("origin");
+    this.origin = {
+      location: {
+        lat: addressObject.geometry.location.lat(),
+        lng: addressObject.geometry.location.lng()
+      },
+      draggable: true,
+      label: 'E',
+      address: addressObject.formatted_address
+    };
+    this.getDirection();
+  }
+  public addDestinationFromAddress(addressObject: any) {
+    console.log("destination");
+    this.destination = {
+      location: {
+        lat: addressObject.geometry.location.lat(),
+        lng: addressObject.geometry.location.lng()
+      },
+      draggable: true,
+      label: 'E',
+      address: addressObject.formatted_address
+    };
+    this.getDirection();
+  }
   //     else {
   //     if (this.origin.location == null) {
   //       console.log("origin");
@@ -412,6 +431,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   // Gets called when a marker(waypoint) is dragged.
   moveWaypoint(marker: Marker, event: any) {
     marker.location = { lat: event.coords.lat, lng: event.coords.lng };
+    this.getReverseGeocode(event.coords, marker);
     this.currentMarkers = [];
     this.currentPlace = null;
     this.circle = null;
@@ -456,7 +476,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.polyPoints = [];
     totalDistance *= 0.000621371192;
     totalDistance = this.roundTo(totalDistance, 2);
-    this.bigLegInfo = {distance: {text: totalDistance}, duration: {text: this.ConvertSectoDay(totalDuration)}, steps: [] };
+    this.bigLegInfo = { distance: { text: totalDistance }, duration: { text: this.ConvertSectoDay(totalDuration) }, steps: [] };
     this.destroyLongLeg();
     this.setMarkerLabels(this.directions);
     this.legInfo = null;
@@ -525,10 +545,10 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.polyPoints = [];
     this.destroyLongLeg();
     const pathLength = this.directions.routes[0].overview_path.length;
-    this.legInfo = {distance: this.bigLegInfo.distance, duration: this.bigLegInfo.duration, steps: []};
+    this.legInfo = { distance: this.bigLegInfo.distance, duration: this.bigLegInfo.duration, steps: [] };
     for (let i = 0; i < this.directions.routes[0].legs.length; i++) {
       for (let q = 0; q < this.directions.routes[0].legs[i].steps.length; q++) {
-        this.legInfo.steps.push({instructions: this.directions.routes[0].legs[i].steps[q].instructions});
+        this.legInfo.steps.push({ instructions: this.directions.routes[0].legs[i].steps[q].instructions });
       }
     }
     // this.legInfo = this.bigLegInfo;
@@ -714,7 +734,13 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
 
   saveMarker() {
     this.savedMarkers.push(this.currentPlace.marker);
+    this.currentPlace.marker.saved = true;
     console.log(this.savedMarkers);
+  }
+  deletePOIMarker() {
+    const POIIndex = this.savedMarkers.indexOf(this.currentPlace.marker);
+    this.savedMarkers.splice(POIIndex, 1);
+    this.currentPlace.marker.saved = false;
   }
 
   getLatLong(placeid: string, map: any, fn) {
@@ -789,18 +815,18 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ConvertSectoDay(seconds: number) {
-        const day = Math.round(seconds / (24 * 3600));
-        seconds = seconds % (24 * 3600);
-        const hour = Math.round(seconds / 3600);
-        seconds %= 3600;
-        const minutes = Math.round(seconds / 60);
-        seconds %= 60;
-        if (day > 0) {
-          return day + ' day(s) ' + hour + ' hour(s)';
-        } else if (hour > 0) {
-          return hour + ' hours(s) ' + minutes + ' minutes(s)';
-        } else {
-          return minutes + ' min(s)';
-        }
+    const day = Math.round(seconds / (24 * 3600));
+    seconds = seconds % (24 * 3600);
+    const hour = Math.round(seconds / 3600);
+    seconds %= 3600;
+    const minutes = Math.round(seconds / 60);
+    seconds %= 60;
+    if (day > 0) {
+      return day + ' day(s) ' + hour + ' hour(s)';
+    } else if (hour > 0) {
+      return hour + ' hours(s) ' + minutes + ' minutes(s)';
+    } else {
+      return minutes + ' min(s)';
     }
+  }
 }
