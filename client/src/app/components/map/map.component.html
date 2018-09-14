@@ -14,14 +14,14 @@
                   <span class="input-group-text">Origin: </span>
                 </div>
                 <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="origin" appPlacesAutocomplete
-                  (select)="setOrigin($event)" placeholder="Type to search..">
+                  (addressSelect)="setOrigin($event)" placeholder="Type to search..">
               </div>
               <div class="input-group input-group-md mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text">Destination: </span>
                 </div>
                 <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="destination" appPlacesAutocomplete
-                  (select)="setDestination($event)" placeholder="Type to search..">
+                  (addressSelect)="setDestination($event)" placeholder="Type to search..">
               </div>
 
               <div class="input-group input-group-md mb-3">
