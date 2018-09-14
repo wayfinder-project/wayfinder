@@ -335,7 +335,7 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
         lng: addressObject.geometry.location.lng()
       },
       draggable: true,
-      label: 'E',
+      label: 'S',
       address: addressObject.formatted_address
     };
     this.getDirection();
