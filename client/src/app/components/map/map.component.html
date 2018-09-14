@@ -82,11 +82,12 @@
                 <a href={{currentPlace.url}}>Google Maps</a>
                 <br>
                 <br>
-                <button class="btn btn-primary" (click)="saveMarker()">Save Marker</button>
+                <button *ngIf="currentPlace.marker.saved == false || currentPlace.marker.saved == undefined" class="btn btn-primary" (click)="saveMarker()">Save Marker</button>
+                <button *ngIf="currentPlace.marker.saved == true" class="btn btn-primary" (click)="deletePOIMarker()">Delete Marker</button>
                 <br>
                 <br>
       <!--           <a (click)="openAnnotationModal()" href="#modalAnnotate" data-toggle="modal">Add Notes</a> -->
-                <button class="btn btn-primary" (click)="openAnnotationModal()">Add Notes</button>
+                <button *ngIf="currentPlace.marker.saved == true" class="btn btn-primary" (click)="openAnnotationModal()">Add Notes</button>
               </div>
             </ng-template>
           </div>

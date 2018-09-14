@@ -12,6 +12,7 @@ export interface Marker {
   updateIcon?: google.maps.Icon;
   infoWindow?: boolean;
   comments?: string[];
+  saved?: boolean;
 }
 
 export function markerToWaypoint(marker: Marker): Waypoint {
