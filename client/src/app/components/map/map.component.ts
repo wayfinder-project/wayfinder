@@ -648,11 +648,12 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
     this.tabset.select('place');
     const request = {
       placeId: newPlaceId,
-      fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photo', 'website']
+      fields: ['name', 'rating', 'formatted_phone_number', 'formatted_address', 'opening_hours', 'url', 'photos', 'website']
     };
     const service = new google.maps.places.PlacesService(this.controlmap);
     service.getDetails(request, (results, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
+        console.log(results.photos);
         this.currentPlace = {
           marker: marker,
           name: results.name,
@@ -670,8 +671,11 @@ export class MapComponent implements OnInit, OnChanges, AfterViewInit {
             sunday: results.opening_hours && results.opening_hours.weekday_text[6]
           },
           url: results.url,
-          website: results.website
+          website: results.website,
         };
+        if (results.photos !== undefined) {
+          this.currentPlace.photo = results.photos[0].getUrl({'maxWidth': 500, 'maxHeight': 500});
+        }
         console.log(results);
         this.currentPlace.marker.address = this.currentPlace.address;
       }
