@@ -49,7 +49,6 @@
           <div id="placeFilter">
             <ng-template ngbTabTitle> <span class="tab">Places</span></ng-template>
             <ng-template ngbTabContent>
-
               <br>
               <h3>Place Filter</h3>
               <div class="input-group mb-3">
@@ -69,35 +68,41 @@
                 </div>
                 <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" [(ngModel)]="circleRadius">
               </div>
-              <div class="col-12 z1 bg-light" *ngIf="currentPlace != null" style="padding-bottom:20px">
-                <h5>{{currentPlace.name}}</h5>
-                Rating: {{currentPlace.rating}}
-                <br>
-                <ng-container *ngIf="currentPlace.address">
-                  Open Now
-                </ng-container>
-                <ng-container *ngIf="!currentPlace.address">
-                  Closed Now
-                </ng-container>
-                <br> Address: {{currentPlace.address}}
-                <br> Phone Number: {{currentPlace.phoneNumber}}
-                <br>
-                <a href={{currentPlace.url}} target="_blank">Google Maps</a>
-                <br>
-                <ng-container *ngIf="currentPlace.website != undefined">
-                  <a href={{currentPlace.website}} target="_blank">Website</a>
+              <div class="col-12"  [ngStyle]="{ 'background-image': currentPlace != undefined ?
+              'url(' + currentPlace.photo + ')' : 'none'}">
+                <div class="col-12 z1" *ngIf="currentPlace != null" style="opacity: 1; padding-bottom:20px; background-color:rgba(255, 255, 255, 0.849)">
+                  <h5>{{currentPlace.name}}</h5>
+                  Rating: {{currentPlace.rating}}
                   <br>
-                </ng-container>
-                <br>
-                <div>
-                  <button *ngIf="!currentPlace.marker.saved" class="btn btn-primary" (click)="saveMarker()">Save Marker</button>
-                  <button *ngIf="currentPlace.marker.saved" class="btn btn-primary" (click)="deletePOIMarker()">Delete Place</button>
+                  <ng-container *ngIf="currentPlace.address">
+                    Open Now
+                  </ng-container>
+                  <ng-container *ngIf="!currentPlace.address">
+                    Closed Now
+                  </ng-container>
+                  <br> Address: {{currentPlace.address}}
+                  <br> Phone Number: {{currentPlace.phoneNumber}}
+                  <br>
+                  <a href={{currentPlace.url}} target="_blank">Google Maps</a>
+                  <br>
+                  <ng-container *ngIf="currentPlace.website != undefined">
+                    <a href={{currentPlace.website}} target="_blank">Website</a>
+                    <br>
+                  </ng-container>
+
+                    <br>
+                  <br>
+                  <div>
+                    <button *ngIf="!currentPlace.marker.saved" class="btn btn-primary" (click)="saveMarker()">Save Marker</button>
+                    <button *ngIf="currentPlace.marker.saved" class="btn btn-primary" (click)="deletePOIMarker()">Delete
+                      Place</button>
 
 
-                  <!--           <a (click)="openAnnotationModal()" href="#modalAnnotate" data-toggle="modal">Add Notes</a> -->
-                  <span style="padding-left:20px">
-                    <button *ngIf="currentPlace.marker.saved" class="btn btn-primary" (click)="openAnnotationModal()">Notes</button>
-                  </span>
+                    <!--           <a (click)="openAnnotationModal()" href="#modalAnnotate" data-toggle="modal">Add Notes</a> -->
+                    <span style="padding-left:20px">
+                      <button *ngIf="currentPlace.marker.saved" class="btn btn-primary" (click)="openAnnotationModal()">Notes</button>
+                    </span>
+                  </div>
                 </div>
               </div>
             </ng-template>
@@ -254,5 +259,5 @@
 </footer>
 
 <app-annotate-marker-modal></app-annotate-marker-modal>
-<app-markeroptions-modal (deleteMarker)='deleteMarker($event)'></app-markeroptions-modal>
+<app-markeroptions-modal (deleteMarker)='deleteMarker()'></app-markeroptions-modal>
 <app-checklist-modal (close)='saveChecklist($event)'></app-checklist-modal>

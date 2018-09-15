@@ -18,4 +18,5 @@ export interface Place {
   };
   url: string;
   website?: string;
+  photo?: any;
 }

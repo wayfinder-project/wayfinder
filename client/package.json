@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "deploy": "ng build --prod && cp CNAME dist/client/ && gh-pages -d dist/client"
+    "deploy": "ng build --prod && cp CNAME dist/client/ && cp dist/client/index.html dist/client/404.html && gh-pages -d dist/client"
   },
   "private": true,
   "dependencies": {
