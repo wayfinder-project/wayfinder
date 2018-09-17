@@ -1,11 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
+import { TokenStorage } from '../../utils/token.storage';
+import { Router } from '@angular/router';
 import { UserService } from '../../services/user/user.service';
-import { ApiError } from '../../models/api-error.model';
-import { UserRegistrationComponent } from '../user-registration/user-registration.component';
-import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -13,83 +10,35 @@ import { User } from '../../models/user.model';
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
-
-  @ViewChild(UserRegistrationComponent)
-  registrationModal: UserRegistrationComponent;
-
-  username = '';
-  password = '';
-  loginError?: string;
-
-  // Registration form
-  regUsername = '';
-  regFirstName = '';
-  regLastName = '';
-  regEmail = '';
-  regPassword = '';
-  regPasswordConfirm = '';
-  registrationError?: string;
+  private username: string;
+  private password: string;
 
   constructor(
     private authService: AuthService,
-    private router: Router,
-    private userService: UserService
-  ) { }
+    private userService: UserService,
+    private tokenStorage: TokenStorage,
+    private router: Router
+  ) {}
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.userService.create(
+      {
+        username: 'ianprime0509',
+        firstName: 'Ian',
+        lastName: 'Ian',
+        email: 'ianprime0509@gmail.com',
+      },
+      'password'
+    ).subscribe(user => console.log('Created user!', user));
+  }
 
   login() {
     this.authService
       .authenticate(this.username, this.password)
-      .subscribe(() => {
+      .subscribe(data => {
+        this.tokenStorage.saveToken(data.token);
+        // data package can have user object, we can save user object in localStorage also, if we need to see its details
         this.router.navigate(['home']);
-      }, (err: ApiError) => {
-        this.loginError = err.message;
       });
-  }
-
-  openRegistrationModal(): void {
-    this.registrationModal.open();
-  }
-
-  registerNewUser(registrationData: { user: User, password: string }) {
-    console.log(registrationData);
-    this.userService.create(registrationData.user, registrationData.password).subscribe(user => {
-      // User created successfully.
-      this.authService
-        .authenticate(user.username, registrationData.password)
-        .subscribe(() => {
-          this.router.navigate(['home']);
-        });
-    }, (err: ApiError) => {
-      // Error in creating user.
-      this.registrationError = err.message;
-    });
-  }
-
-  register(): void {
-    // Make sure passwords match (TODO: do more validation later).
-    if (this.regPassword !== this.regPasswordConfirm) {
-      this.registrationError = 'Passwords do not match.';
-      return;
-    }
-    this.registrationError = '';
-    const newUser = {
-      username: this.regUsername,
-      firstName: this.regFirstName,
-      lastName: this.regLastName,
-      email: this.regEmail,
-    };
-    this.userService.create(newUser, this.regPassword).subscribe(user => {
-      // User created successfully.
-      this.authService
-        .authenticate(user.username, this.regPassword)
-        .subscribe(() => {
-          this.router.navigate(['home']);
-        });
-    }, (err: ApiError) => {
-      // Error in creating user.
-      this.registrationError = err.message;
-    });
   }
 }

@@ -2,13 +2,10 @@
     height:550px;
   }
 
-
-.z1{
-  z-index: 1;
-}
-
-.dyn-height {
-  max-height:486px;
-  width: 100%;;
-  overflow-y:auto;
+.map{
+  position:absolute;
+  bottom:0%;
+  left:50%;
+  height:50%;
+  width:50%;
 }
